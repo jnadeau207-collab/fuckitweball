@@ -1,0 +1,3 @@
+{
+  "/api/admin/batches/[id]": "pages/api/admin/batches/[id].js"
+}

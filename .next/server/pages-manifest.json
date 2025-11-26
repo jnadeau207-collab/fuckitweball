@@ -1,0 +1,9 @@
+{
+  "/_app": "pages/_app.js",
+  "/_error": "pages/_error.js",
+  "/_document": "pages/_document.js",
+  "/api/admin/uploads": "pages/api/admin/uploads.js",
+  "/admin/uploads": "pages/admin/uploads.js",
+  "/api/auth/[...nextauth]": "pages/api/auth/[...nextauth].js",
+  "/api/admin/uploads/[id]": "pages/api/admin/uploads/[id].js"
+}

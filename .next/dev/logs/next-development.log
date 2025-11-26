@@ -1,0 +1,6 @@
+[00:00:00.735] Server  LOG      ✓ Ready in 469ms
+[00:00:05.991] Server  WARN    API handler should not return a value, received object.
+[00:53:45.374] Server  WARN     ⚠ Fast Refresh had to perform a full reload when ./pages/admin/uploads/[id].tsx changed. Read more: https://nextjs.org/docs/messages/fast-refresh-reload
+[00:53:45.374] Browser LOG     Refreshing page data due to server-side change
+[00:53:45.375] Server  WARN     ⚠ Fast Refresh had to perform a full reload when ./pages/admin/uploads/[id].tsx changed. Read more: https://nextjs.org/docs/messages/fast-refresh-reload
+[00:56:25.215] Server  WARN    API handler should not return a value, received object.
