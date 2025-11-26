@@ -1,127 +1,89 @@
 // lib/coaParsers/registry.ts
-import { LabParser, ParsedCoa } from './types';
-import { parseNovaAnalytic } from './novaAnalytic';
 
-type LabRegistryEntry = {
-  slug: string;
-  displayName: string;
-  states: string[];  // where they mainly operate
-  patterns: RegExp[]; // name/branding text in COA
-  parser: LabParser;
-  website?: string;
+import { parseNovaAnalyticLabs, NovaParseResult } from "./novaAnalyticLabs";
+
+export type CoaParseInput = {
+  fileName?: string;
+  extractedText: string;
+  labNameCandidate?: string | null;
 };
 
-const noopParser: LabParser = (text) => ({
-  contaminants: [],
-});
+export type CoaParseResult = {
+  labName?: string | null;
 
-export const LAB_REGISTRY: LabRegistryEntry[] = [
-  {
-    slug: 'nova-analytic-labs',
-    displayName: 'Nova Analytic Labs',
-    states: ['ME'],
-    patterns: [/NOVA ANALYTIC LABS?/i],
-    parser: parseNovaAnalytic,
-    website: 'https://www.nova-analyticlabs.com/',
-  },
-  {
-    slug: 'mcr-labs',
-    displayName: 'MCR Labs',
-    states: ['MA', 'CT', 'PA'],
-    patterns: [/MCR LABS?/i],
-    parser: noopParser,
-    website: 'https://mcrlabs.com/',
-  },
-  {
-    slug: 'proverde-labs',
-    displayName: 'ProVerde Laboratories',
-    states: ['MA', 'ME'],
-    patterns: [/PROVERDE LAB/i],
-    parser: noopParser,
-    website: 'https://www.proverdelabs.com/',
-  },
-  {
-    slug: 'sc-labs',
-    displayName: 'SC Labs',
-    states: ['CA', 'CO', 'MI', 'OR', 'TX'],
-    patterns: [/SC LABS?/i],
-    parser: noopParser,
-    website: 'https://www.sclabs.com/',
-  },
-  {
-    slug: 'kaycha-labs',
-    displayName: 'Kaycha Labs',
-    states: ['FL', 'CA', 'MA', 'NY', 'CO', 'TN'],
-    patterns: [/KAYCHA LABS?/i],
-    parser: noopParser,
-    website: 'https://kaychalabs.com/',
-  },
-  {
-    slug: 'green-leaf-lab',
-    displayName: 'Green Leaf Lab',
-    states: ['OR', 'CA'],
-    patterns: [/GREEN LEAF LAB/i],
-    parser: noopParser,
-    website: 'https://www.greenleaflab.org/',
-  },
-  {
-    slug: 'confidence-analytics',
-    displayName: 'Confidence Analytics',
-    states: ['WA'],
-    patterns: [/CONFIDENCE ANALYTICS/i],
-    parser: noopParser,
-    website: 'https://www.confidenceanalytics.com/',
-  },
-  // Add new labs here as you get COA examples.
-];
+  productName?: string | null;
+  batchCode?: string | null;
+  sampleId?: string | null;
 
-export function findLabEntry(text: string): LabRegistryEntry | null {
-  for (const entry of LAB_REGISTRY) {
-    if (entry.patterns.some((re) => re.test(text))) {
-      return entry;
-    }
+  jurisdiction?: string | null;
+  stateCode?: string | null;
+
+  thcPercent?: number | null;
+  cbdPercent?: number | null;
+  totalCannabinoidsPercent?: number | null;
+
+  passed?: boolean | null;
+  pesticidesPass?: boolean | null;
+};
+
+/**
+ * Central COA parsing entrypoint used by /api/admin/uploads.
+ *
+ * You can extend this later with additional lab-specific parsers
+ * and state-specific templates.
+ */
+export function parseCoa(input: CoaParseInput): CoaParseResult {
+  const text = (input.extractedText || "").replace(/\r/g, "");
+  const lower = text.toLowerCase();
+
+  let result: CoaParseResult = {};
+
+  // --- Lab-specific detection ---
+
+  const isNova = lower.includes("nova analytic labs");
+  if (isNova) {
+    const nova: NovaParseResult = parseNovaAnalyticLabs(text);
+
+    result = {
+      ...result,
+      ...nova,
+      // Ensure lab name & jurisdiction always set
+      labName: nova.labName ?? "Nova Analytic Labs",
+      jurisdiction: nova.jurisdiction ?? "ME",
+      stateCode: nova.stateCode ?? "ME",
+    };
   }
-  return null;
-}
 
-export function parseCoa(text: string): ParsedCoa {
-  const entry = findLabEntry(text);
+  // --- Generic lab name fallback ---
+  if (!result.labName && input.labNameCandidate) {
+    result.labName = input.labNameCandidate;
+  }
 
-  if (entry) {
-    const parsed = entry.parser(text);
-    if (parsed) {
-      return {
-        ...parsed,
-        labName: parsed.labName ?? entry.displayName,
-        labStateCode: parsed.labStateCode ?? entry.states[0],
-        contaminants: parsed.contaminants ?? [],
-      };
+  // --- Generic pass/fail fallback (in case a lab parser didn’t set it) ---
+  if (result.passed == null) {
+    const m = text.match(/BATCH\s+RESULT\s*[:\-]\s*(PASS(?:ED)?|FAIL(?:ED)?)/i);
+    if (m) {
+      const v = m[1].toLowerCase();
+      result.passed = v.startsWith("pass");
     }
   }
 
-  // Generic fallback parser (THC/CBD/Total Cannabinoids only)
-  const generic: ParsedCoa = {
-    contaminants: [],
-  };
-
-  const canonical = text.replace(/\r\n/g, '\n');
-
-  const thcMatch =
-    canonical.match(/TOTAL\s+THC[:\s]+(\d+(\.\d+)?)\s*%/i) ||
-    canonical.match(/Δ-?9?[-\s]*THC[:\s]+(\d+(\.\d+)?)\s*%/i);
-  if (thcMatch) generic.thcPercent = parseFloat(thcMatch[1]);
-
-  const cbdMatch =
-    canonical.match(/TOTAL\s+CBD[:\s]+(\d+(\.\d+)?)\s*%/i) ||
-    canonical.match(/\bCBD[:\s]+(\d+(\.\d+)?)\s*%/i);
-  if (cbdMatch) generic.cbdPercent = parseFloat(cbdMatch[1]);
-
-  const totalCannMatch = canonical.match(
-    /TOTAL\s+CANNABINOIDS?[:\s]+(\d+(\.\d+)?)\s*%/i
-  );
-  if (totalCannMatch) {
-    generic.totalCannabinoidsPercent = parseFloat(totalCannMatch[1]);
+  // --- Generic batch code fallback ---
+  if (!result.batchCode) {
+    // 1) BATCH NO.: ABC123-XYZ
+    const m1 = text.match(/BATCH\s+NO\.?\s*[:\-]\s*([A-Z0-9\-]+)/i);
+    if (m1) {
+      result.batchCode = m1[1].trim();
+    } else {
+      // 2) BATCH: ..., but explicitly ignore "Batch Result" and "Batch Size"
+      const m2 = text.match(
+        /BATCH(?!\s+(RESULT|SIZE))\s*[:\-]\s*([A-Z0-9\-]+)/i
+      );
+      if (m2) {
+        result.batchCode = m2[2].trim();
+      }
+    }
   }
 
-  return generic;
+  return result;
 }

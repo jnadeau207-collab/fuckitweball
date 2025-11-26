@@ -3,16 +3,5 @@
   "/_app": "pages/_app.js",
   "/_document": "pages/_document.js",
   "/admin": "pages/admin.js",
-  "/admin/batches": "pages/admin/batches.js",
-  "/admin/lab-results": "pages/admin/lab-results.js",
-  "/admin/labs": "pages/admin/labs.js",
-  "/admin/locations": "pages/admin/locations.js",
-  "/admin/states": "pages/admin/states.js",
-  "/admin/states/[stateCode]": "pages/admin/states/[stateCode].js",
-  "/admin/uploads": "pages/admin/uploads.js",
-  "/api/admin/batches": "pages/api/admin/batches.js",
-  "/api/admin/brands": "pages/api/admin/brands.js",
-  "/api/admin/uploads": "pages/api/admin/uploads.js",
-  "/api/admin/uploads/[id]": "pages/api/admin/uploads/[id].js",
   "/api/auth/[...nextauth]": "pages/api/auth/[...nextauth].js"
 }

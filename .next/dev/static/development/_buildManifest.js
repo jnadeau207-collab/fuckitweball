@@ -5,27 +5,6 @@ self.__BUILD_MANIFEST = {
   "/admin": [
     "static/chunks/pages/admin.js"
   ],
-  "/admin/batches": [
-    "static/chunks/pages/admin/batches.js"
-  ],
-  "/admin/lab-results": [
-    "static/chunks/pages/admin/lab-results.js"
-  ],
-  "/admin/labs": [
-    "static/chunks/pages/admin/labs.js"
-  ],
-  "/admin/locations": [
-    "static/chunks/pages/admin/locations.js"
-  ],
-  "/admin/states": [
-    "static/chunks/pages/admin/states.js"
-  ],
-  "/admin/states/[stateCode]": [
-    "static/chunks/pages/admin/states/[stateCode].js"
-  ],
-  "/admin/uploads": [
-    "static/chunks/pages/admin/uploads.js"
-  ],
   "__rewrites": {
     "afterFiles": [],
     "beforeFiles": [],
