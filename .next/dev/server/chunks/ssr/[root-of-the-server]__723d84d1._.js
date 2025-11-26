@@ -285,8 +285,8 @@ function AdminUploadFullDebug() {
                                                             children: "Not detected"
                                                         }, void 0, false, {
                                                             fileName: "[project]/pages/admin/uploads/[id].tsx",
-                                                            lineNumber: 156,
-                                                            columnNumber: 37
+                                                            lineNumber: 157,
+                                                            columnNumber: 21
                                                         }, this)
                                                     }, void 0, false, {
                                                         fileName: "[project]/pages/admin/uploads/[id].tsx",
@@ -306,7 +306,7 @@ function AdminUploadFullDebug() {
                                                         children: "Lab name"
                                                     }, void 0, false, {
                                                         fileName: "[project]/pages/admin/uploads/[id].tsx",
-                                                        lineNumber: 160,
+                                                        lineNumber: 162,
                                                         columnNumber: 17
                                                     }, this),
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$externals$5d2f$react$2f$jsx$2d$dev$2d$runtime__$5b$external$5d$__$28$react$2f$jsx$2d$dev$2d$runtime$2c$__cjs$29$__["jsxDEV"])("div", {
@@ -316,18 +316,18 @@ function AdminUploadFullDebug() {
                                                             children: "Not detected"
                                                         }, void 0, false, {
                                                             fileName: "[project]/pages/admin/uploads/[id].tsx",
-                                                            lineNumber: 162,
-                                                            columnNumber: 35
+                                                            lineNumber: 165,
+                                                            columnNumber: 21
                                                         }, this)
                                                     }, void 0, false, {
                                                         fileName: "[project]/pages/admin/uploads/[id].tsx",
-                                                        lineNumber: 161,
+                                                        lineNumber: 163,
                                                         columnNumber: 17
                                                     }, this)
                                                 ]
                                             }, void 0, true, {
                                                 fileName: "[project]/pages/admin/uploads/[id].tsx",
-                                                lineNumber: 159,
+                                                lineNumber: 161,
                                                 columnNumber: 15
                                             }, this),
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$externals$5d2f$react$2f$jsx$2d$dev$2d$runtime__$5b$external$5d$__$28$react$2f$jsx$2d$dev$2d$runtime$2c$__cjs$29$__["jsxDEV"])("div", {
@@ -337,7 +337,7 @@ function AdminUploadFullDebug() {
                                                         children: "Uploaded"
                                                     }, void 0, false, {
                                                         fileName: "[project]/pages/admin/uploads/[id].tsx",
-                                                        lineNumber: 166,
+                                                        lineNumber: 170,
                                                         columnNumber: 17
                                                     }, this),
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$externals$5d2f$react$2f$jsx$2d$dev$2d$runtime__$5b$external$5d$__$28$react$2f$jsx$2d$dev$2d$runtime$2c$__cjs$29$__["jsxDEV"])("div", {
@@ -345,13 +345,13 @@ function AdminUploadFullDebug() {
                                                         children: new Date(doc.createdAt).toLocaleString()
                                                     }, void 0, false, {
                                                         fileName: "[project]/pages/admin/uploads/[id].tsx",
-                                                        lineNumber: 167,
+                                                        lineNumber: 171,
                                                         columnNumber: 17
                                                     }, this)
                                                 ]
                                             }, void 0, true, {
                                                 fileName: "[project]/pages/admin/uploads/[id].tsx",
-                                                lineNumber: 165,
+                                                lineNumber: 169,
                                                 columnNumber: 15
                                             }, this),
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$externals$5d2f$react$2f$jsx$2d$dev$2d$runtime__$5b$external$5d$__$28$react$2f$jsx$2d$dev$2d$runtime$2c$__cjs$29$__["jsxDEV"])("div", {
@@ -361,7 +361,7 @@ function AdminUploadFullDebug() {
                                                         children: "File path (backend)"
                                                     }, void 0, false, {
                                                         fileName: "[project]/pages/admin/uploads/[id].tsx",
-                                                        lineNumber: 172,
+                                                        lineNumber: 176,
                                                         columnNumber: 17
                                                     }, this),
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$externals$5d2f$react$2f$jsx$2d$dev$2d$runtime__$5b$external$5d$__$28$react$2f$jsx$2d$dev$2d$runtime$2c$__cjs$29$__["jsxDEV"])("div", {
@@ -369,13 +369,13 @@ function AdminUploadFullDebug() {
                                                         children: doc.filePath || 'Not stored on disk (in-memory upload)'
                                                     }, void 0, false, {
                                                         fileName: "[project]/pages/admin/uploads/[id].tsx",
-                                                        lineNumber: 173,
+                                                        lineNumber: 177,
                                                         columnNumber: 17
                                                     }, this)
                                                 ]
                                             }, void 0, true, {
                                                 fileName: "[project]/pages/admin/uploads/[id].tsx",
-                                                lineNumber: 171,
+                                                lineNumber: 175,
                                                 columnNumber: 15
                                             }, this)
                                         ]
@@ -398,7 +398,7 @@ function AdminUploadFullDebug() {
                                         children: "Linked lab result"
                                     }, void 0, false, {
                                         fileName: "[project]/pages/admin/uploads/[id].tsx",
-                                        lineNumber: 182,
+                                        lineNumber: 186,
                                         columnNumber: 13
                                     }, this),
                                     !doc.labResult ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$externals$5d2f$react$2f$jsx$2d$dev$2d$runtime__$5b$external$5d$__$28$react$2f$jsx$2d$dev$2d$runtime$2c$__cjs$29$__["jsxDEV"])("div", {
@@ -406,7 +406,7 @@ function AdminUploadFullDebug() {
                                         children: "No LabResult record linked to this COA yet."
                                     }, void 0, false, {
                                         fileName: "[project]/pages/admin/uploads/[id].tsx",
-                                        lineNumber: 186,
+                                        lineNumber: 190,
                                         columnNumber: 15
                                     }, this) : /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$externals$5d2f$react$2f$jsx$2d$dev$2d$runtime__$5b$external$5d$__$28$react$2f$jsx$2d$dev$2d$runtime$2c$__cjs$29$__["jsxDEV"])("div", {
                                         className: "space-y-2 text-xs",
@@ -422,7 +422,7 @@ function AdminUploadFullDebug() {
                                                         ]
                                                     }, void 0, true, {
                                                         fileName: "[project]/pages/admin/uploads/[id].tsx",
-                                                        lineNumber: 192,
+                                                        lineNumber: 196,
                                                         columnNumber: 19
                                                     }, this),
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$externals$5d2f$react$2f$jsx$2d$dev$2d$runtime__$5b$external$5d$__$28$react$2f$jsx$2d$dev$2d$runtime$2c$__cjs$29$__["jsxDEV"])("div", {
@@ -430,13 +430,13 @@ function AdminUploadFullDebug() {
                                                         children: new Date(doc.labResult.createdAt).toLocaleString()
                                                     }, void 0, false, {
                                                         fileName: "[project]/pages/admin/uploads/[id].tsx",
-                                                        lineNumber: 195,
+                                                        lineNumber: 199,
                                                         columnNumber: 19
                                                     }, this)
                                                 ]
                                             }, void 0, true, {
                                                 fileName: "[project]/pages/admin/uploads/[id].tsx",
-                                                lineNumber: 191,
+                                                lineNumber: 195,
                                                 columnNumber: 17
                                             }, this),
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$externals$5d2f$react$2f$jsx$2d$dev$2d$runtime__$5b$external$5d$__$28$react$2f$jsx$2d$dev$2d$runtime$2c$__cjs$29$__["jsxDEV"])("div", {
@@ -449,7 +449,7 @@ function AdminUploadFullDebug() {
                                                                 children: "THC %"
                                                             }, void 0, false, {
                                                                 fileName: "[project]/pages/admin/uploads/[id].tsx",
-                                                                lineNumber: 201,
+                                                                lineNumber: 205,
                                                                 columnNumber: 21
                                                             }, this),
                                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$externals$5d2f$react$2f$jsx$2d$dev$2d$runtime__$5b$external$5d$__$28$react$2f$jsx$2d$dev$2d$runtime$2c$__cjs$29$__["jsxDEV"])("div", {
@@ -457,13 +457,13 @@ function AdminUploadFullDebug() {
                                                                 children: doc.labResult.thcPercent != null ? `${doc.labResult.thcPercent.toFixed(2)}%` : '—'
                                                             }, void 0, false, {
                                                                 fileName: "[project]/pages/admin/uploads/[id].tsx",
-                                                                lineNumber: 202,
+                                                                lineNumber: 206,
                                                                 columnNumber: 21
                                                             }, this)
                                                         ]
                                                     }, void 0, true, {
                                                         fileName: "[project]/pages/admin/uploads/[id].tsx",
-                                                        lineNumber: 200,
+                                                        lineNumber: 204,
                                                         columnNumber: 19
                                                     }, this),
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$externals$5d2f$react$2f$jsx$2d$dev$2d$runtime__$5b$external$5d$__$28$react$2f$jsx$2d$dev$2d$runtime$2c$__cjs$29$__["jsxDEV"])("div", {
@@ -473,7 +473,7 @@ function AdminUploadFullDebug() {
                                                                 children: "CBD %"
                                                             }, void 0, false, {
                                                                 fileName: "[project]/pages/admin/uploads/[id].tsx",
-                                                                lineNumber: 209,
+                                                                lineNumber: 213,
                                                                 columnNumber: 21
                                                             }, this),
                                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$externals$5d2f$react$2f$jsx$2d$dev$2d$runtime__$5b$external$5d$__$28$react$2f$jsx$2d$dev$2d$runtime$2c$__cjs$29$__["jsxDEV"])("div", {
@@ -481,13 +481,13 @@ function AdminUploadFullDebug() {
                                                                 children: doc.labResult.cbdPercent != null ? `${doc.labResult.cbdPercent.toFixed(2)}%` : '—'
                                                             }, void 0, false, {
                                                                 fileName: "[project]/pages/admin/uploads/[id].tsx",
-                                                                lineNumber: 210,
+                                                                lineNumber: 214,
                                                                 columnNumber: 21
                                                             }, this)
                                                         ]
                                                     }, void 0, true, {
                                                         fileName: "[project]/pages/admin/uploads/[id].tsx",
-                                                        lineNumber: 208,
+                                                        lineNumber: 212,
                                                         columnNumber: 19
                                                     }, this),
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$externals$5d2f$react$2f$jsx$2d$dev$2d$runtime__$5b$external$5d$__$28$react$2f$jsx$2d$dev$2d$runtime$2c$__cjs$29$__["jsxDEV"])("div", {
@@ -497,7 +497,7 @@ function AdminUploadFullDebug() {
                                                                 children: "Total cannabinoids %"
                                                             }, void 0, false, {
                                                                 fileName: "[project]/pages/admin/uploads/[id].tsx",
-                                                                lineNumber: 217,
+                                                                lineNumber: 221,
                                                                 columnNumber: 21
                                                             }, this),
                                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$externals$5d2f$react$2f$jsx$2d$dev$2d$runtime__$5b$external$5d$__$28$react$2f$jsx$2d$dev$2d$runtime$2c$__cjs$29$__["jsxDEV"])("div", {
@@ -505,13 +505,13 @@ function AdminUploadFullDebug() {
                                                                 children: doc.labResult.totalCannabinoidsPercent != null ? `${doc.labResult.totalCannabinoidsPercent.toFixed(2)}%` : '—'
                                                             }, void 0, false, {
                                                                 fileName: "[project]/pages/admin/uploads/[id].tsx",
-                                                                lineNumber: 218,
+                                                                lineNumber: 222,
                                                                 columnNumber: 21
                                                             }, this)
                                                         ]
                                                     }, void 0, true, {
                                                         fileName: "[project]/pages/admin/uploads/[id].tsx",
-                                                        lineNumber: 216,
+                                                        lineNumber: 220,
                                                         columnNumber: 19
                                                     }, this),
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$externals$5d2f$react$2f$jsx$2d$dev$2d$runtime__$5b$external$5d$__$28$react$2f$jsx$2d$dev$2d$runtime$2c$__cjs$29$__["jsxDEV"])("div", {
@@ -521,7 +521,7 @@ function AdminUploadFullDebug() {
                                                                 children: "Overall result"
                                                             }, void 0, false, {
                                                                 fileName: "[project]/pages/admin/uploads/[id].tsx",
-                                                                lineNumber: 225,
+                                                                lineNumber: 229,
                                                                 columnNumber: 21
                                                             }, this),
                                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$externals$5d2f$react$2f$jsx$2d$dev$2d$runtime__$5b$external$5d$__$28$react$2f$jsx$2d$dev$2d$runtime$2c$__cjs$29$__["jsxDEV"])("div", {
@@ -529,19 +529,19 @@ function AdminUploadFullDebug() {
                                                                 children: doc.labResult.passed == null ? 'Unknown' : doc.labResult.passed ? 'Pass' : 'Fail'
                                                             }, void 0, false, {
                                                                 fileName: "[project]/pages/admin/uploads/[id].tsx",
-                                                                lineNumber: 226,
+                                                                lineNumber: 230,
                                                                 columnNumber: 21
                                                             }, this)
                                                         ]
                                                     }, void 0, true, {
                                                         fileName: "[project]/pages/admin/uploads/[id].tsx",
-                                                        lineNumber: 224,
+                                                        lineNumber: 228,
                                                         columnNumber: 19
                                                     }, this)
                                                 ]
                                             }, void 0, true, {
                                                 fileName: "[project]/pages/admin/uploads/[id].tsx",
-                                                lineNumber: 199,
+                                                lineNumber: 203,
                                                 columnNumber: 17
                                             }, this),
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$externals$5d2f$react$2f$jsx$2d$dev$2d$runtime__$5b$external$5d$__$28$react$2f$jsx$2d$dev$2d$runtime$2c$__cjs$29$__["jsxDEV"])("div", {
@@ -553,19 +553,19 @@ function AdminUploadFullDebug() {
                                                 ]
                                             }, void 0, true, {
                                                 fileName: "[project]/pages/admin/uploads/[id].tsx",
-                                                lineNumber: 235,
+                                                lineNumber: 239,
                                                 columnNumber: 17
                                             }, this)
                                         ]
                                     }, void 0, true, {
                                         fileName: "[project]/pages/admin/uploads/[id].tsx",
-                                        lineNumber: 190,
+                                        lineNumber: 194,
                                         columnNumber: 15
                                     }, this)
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/pages/admin/uploads/[id].tsx",
-                                lineNumber: 181,
+                                lineNumber: 185,
                                 columnNumber: 11
                             }, this)
                         ]
@@ -585,7 +585,7 @@ function AdminUploadFullDebug() {
                                         children: "Raw extracted text"
                                     }, void 0, false, {
                                         fileName: "[project]/pages/admin/uploads/[id].tsx",
-                                        lineNumber: 249,
+                                        lineNumber: 253,
                                         columnNumber: 13
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$externals$5d2f$react$2f$jsx$2d$dev$2d$runtime__$5b$external$5d$__$28$react$2f$jsx$2d$dev$2d$runtime$2c$__cjs$29$__["jsxDEV"])("span", {
@@ -593,13 +593,13 @@ function AdminUploadFullDebug() {
                                         children: "Use this to refine per-lab parsing rules."
                                     }, void 0, false, {
                                         fileName: "[project]/pages/admin/uploads/[id].tsx",
-                                        lineNumber: 252,
+                                        lineNumber: 256,
                                         columnNumber: 13
                                     }, this)
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/pages/admin/uploads/[id].tsx",
-                                lineNumber: 248,
+                                lineNumber: 252,
                                 columnNumber: 11
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$externals$5d2f$react$2f$jsx$2d$dev$2d$runtime__$5b$external$5d$__$28$react$2f$jsx$2d$dev$2d$runtime$2c$__cjs$29$__["jsxDEV"])("div", {
@@ -607,13 +607,13 @@ function AdminUploadFullDebug() {
                                 children: doc.extractedText ? doc.extractedText : 'No extracted text stored for this COA.'
                             }, void 0, false, {
                                 fileName: "[project]/pages/admin/uploads/[id].tsx",
-                                lineNumber: 256,
+                                lineNumber: 260,
                                 columnNumber: 11
                             }, this)
                         ]
                     }, void 0, true, {
                         fileName: "[project]/pages/admin/uploads/[id].tsx",
-                        lineNumber: 247,
+                        lineNumber: 251,
                         columnNumber: 9
                     }, this)
                 ]

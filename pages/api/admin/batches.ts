@@ -1,7 +1,8 @@
+// pages/api/admin/batches.ts
 import type { NextApiRequest, NextApiResponse } from 'next';
-import { PrismaClient } from '@prisma/client';
 import { getServerSession } from 'next-auth/next';
 import { authOptions } from '../auth/[...nextauth]';
+import { PrismaClient } from '@prisma/client';
 
 const prisma = new PrismaClient();
 
@@ -9,105 +10,118 @@ export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse
 ) {
-  const session = await getServerSession(req, res, authOptions as any);
-
-  if (!session || (session.user as any).role !== 'admin') {
-    return res.status(403).json({ error: 'forbidden' });
+  // ✅ Same auth pattern as /api/admin/uploads
+  const session = await getServerSession(req, res, authOptions);
+  if (!session) {
+    return res.status(401).json({ error: 'Unauthorized' });
   }
 
-  // GET: list batches, optionally filtered by state and search query
-    if (req.method === 'GET') {
-    const { id, stateCode, q } = req.query;
+  if (req.method === 'GET') {
+    const { stateCode, q } = req.query;
 
-    // Detail view: GET /api/admin/batches?id=123
-    if (id) {
-      const batchId = Number(id);
-      if (!batchId) {
-        return res.status(400).json({ error: 'invalid id' });
-      }
-
-      const item = await prisma.batch.findUnique({
-        where: { id: batchId },
-        include: {
-          brand: true,
-          labResults: {
-            orderBy: { createdAt: 'desc' },
-            include: {
-              uploadedDocument: true, // make sure LabResult has this relation in schema
-            },
-          },
-        },
-      });
-
-      if (!item) {
-        return res.status(404).json({ error: 'not found' });
-      }
-
-      return res.json(item);
-    }
-
-    // List view (state + search)
     const where: any = {};
 
-    if (stateCode && typeof stateCode === 'string') {
+    // Optional state filter (used by /admin/states/[stateCode])
+    if (typeof stateCode === 'string' && stateCode.trim() !== '') {
       where.stateCode = stateCode.toUpperCase();
     }
 
-    if (q && typeof q === 'string' && q.trim().length > 0) {
+    // Optional text search (batch code, product name, category)
+    if (typeof q === 'string' && q.trim() !== '') {
+      const search = q.trim();
       where.OR = [
-        { batchCode: { contains: q, mode: 'insensitive' } },
-        { productName: { contains: q, mode: 'insensitive' } },
-        { productCategory: { contains: q, mode: 'insensitive' } },
-        // remove this line if you don't have brand.name:
-        { brand: { name: { contains: q, mode: 'insensitive' } } },
+        { batchCode: { contains: search, mode: 'insensitive' } },
+        { productName: { contains: search, mode: 'insensitive' } },
+        { primaryCategory: { contains: search, mode: 'insensitive' } },
+        { subCategory: { contains: search, mode: 'insensitive' } },
       ];
     }
 
-    const items = await prisma.batch.findMany({
+    const batches = await prisma.batch.findMany({
       where,
       orderBy: { createdAt: 'desc' },
       include: {
         brand: true,
-        labResults: true,
+        labResults: {
+          orderBy: { testedAt: 'desc' },
+          take: 1,
+          include: { lab: true },
+        },
       },
     });
 
-    return res.json(items);
+    const mapped = batches.map((b) => {
+      const latest = b.labResults[0];
+
+      return {
+        id: b.id,
+        batchCode: b.batchCode,
+        productName: b.productName,
+        productSku: b.productSku,
+        primaryCategory: b.primaryCategory,
+        subCategory: b.subCategory,
+        jurisdiction: b.jurisdiction,
+        stateCode: b.stateCode,
+        isActive: b.isActive,
+        createdAt: b.createdAt,
+
+        brand: b.brand
+          ? {
+              id: b.brand.id,
+              name: b.brand.name,
+            }
+          : null,
+
+        latestLab: latest
+          ? {
+              id: latest.id,
+              testedAt: latest.testedAt,
+              thcPercent: latest.thcPercent,
+              cbdPercent: latest.cbdPercent,
+              totalCannabinoidsPercent: latest.totalCannabinoidsPercent,
+              passed: latest.passed,
+              labName: latest.lab?.name ?? null,
+            }
+          : null,
+      };
+    });
+
+    return res.json(mapped);
   }
 
-
-  // POST: create batch
   if (req.method === 'POST') {
     const body = req.body || {};
 
     const created = await prisma.batch.create({
       data: {
-        batchCode: body.batchCode || '',
-        productName: body.productName || null,
-        productCategory: body.productCategory || null,
-        productSubcategory: body.productSubcategory || null,
-        brandId: body.brandId ?? null,
-        sku: body.sku || null,
+        batchCode: body.batchCode,
+        productName: body.productName ?? null,
+        productSku: body.productSku ?? null,
+        primaryCategory: body.primaryCategory ?? null,
+        subCategory: body.subCategory ?? null,
+        jurisdiction: body.jurisdiction ?? null,
         stateCode: body.stateCode ? String(body.stateCode).toUpperCase() : null,
+        brandId:
+          body.brandId === null || body.brandId === undefined
+            ? null
+            : Number(body.brandId),
         harvestDate: body.harvestDate ? new Date(body.harvestDate) : null,
         productionDate: body.productionDate
           ? new Date(body.productionDate)
           : null,
-        packageDate: body.packageDate
-          ? new Date(body.packageDate)
-          : null,
+        packageDate: body.packageDate ? new Date(body.packageDate) : null,
         expirationDate: body.expirationDate
           ? new Date(body.expirationDate)
           : null,
-        isActive: body.isActive === true,
-        notes: body.notes || null,
+        isActive:
+          typeof body.isActive === 'boolean' ? body.isActive : true,
+        notes: body.notes ?? null,
       },
     });
 
     return res.status(201).json(created);
   }
 
-  // PUT: update batch
   if (req.method === 'PUT') {
     const id = Number(req.query.id);
     if (!id) {
@@ -119,32 +133,34 @@ export default async function handler(
     const updated = await prisma.batch.update({
       where: { id },
       data: {
-        batchCode: body.batchCode || '',
-        productName: body.productName || null,
-        productCategory: body.productCategory || null,
-        productSubcategory: body.productSubcategory || null,
-        brandId: body.brandId ?? null,
-        sku: body.sku || null,
+        batchCode: body.batchCode,
+        productName: body.productName ?? null,
+        productSku: body.productSku ?? null,
+        primaryCategory: body.primaryCategory ?? null,
+        subCategory: body.subCategory ?? null,
+        jurisdiction: body.jurisdiction ?? null,
         stateCode: body.stateCode ? String(body.stateCode).toUpperCase() : null,
+        brandId:
+          body.brandId === null || body.brandId === undefined
+            ? null
+            : Number(body.brandId),
         harvestDate: body.harvestDate ? new Date(body.harvestDate) : null,
         productionDate: body.productionDate
           ? new Date(body.productionDate)
           : null,
-        packageDate: body.packageDate
-          ? new Date(body.packageDate)
-          : null,
+        packageDate: body.packageDate ? new Date(body.packageDate) : null,
         expirationDate: body.expirationDate
           ? new Date(body.expirationDate)
           : null,
-        isActive: body.isActive === true,
-        notes: body.notes || null,
+        isActive:
+          typeof body.isActive === 'boolean' ? body.isActive : true,
+        notes: body.notes ?? null,
       },
     });
 
     return res.json(updated);
   }
 
-  // DELETE: delete batch + its lab results
   if (req.method === 'DELETE') {
     const id = Number(req.query.id);
     if (!id) {
@@ -152,7 +168,7 @@ export default async function handler(
     }
 
     try {
-      // delete all lab results that reference this batch
+      // Remove child lab results first to avoid FK errors
       await prisma.labResult.deleteMany({
         where: { batchId: id },
       });
@@ -161,7 +177,8 @@ export default async function handler(
         where: { id },
       });
 
-      return res.json({ ok: true });
+      // 204 = no content (what your client already expects)
+      return res.status(204).end();
     } catch (e: any) {
       console.error('Failed to delete batch', e);
       return res

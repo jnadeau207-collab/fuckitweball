@@ -17,8 +17,8 @@ export default function AdminLabs() {
     <div className="p-6 max-w-4xl mx-auto space-y-4">
       <h1 className="text-2xl font-semibold mb-1">Labs</h1>
       <p className="text-sm text-slate-400 mb-4">
-        This section will manage testing labs, their state licenses, and
-        CartFax internal reliability scores.
+        This section will manage testing labs, their state licenses, and CartFax
+        internal reliability scores.
       </p>
 
       <div className="rounded-xl border border-slate-800 bg-slate-900/70 p-4 text-sm text-slate-300">

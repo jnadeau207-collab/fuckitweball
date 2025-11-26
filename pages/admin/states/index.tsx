@@ -2,13 +2,56 @@ import Link from 'next/link';
 import { useSession } from 'next-auth/react';
 
 const STATES = [
-  'ME', 'NH', 'VT', 'MA', 'RI', 'CT', 'NY', 'NJ', 'PA',
-  'DE', 'MD', 'VA', 'WV', 'NC', 'SC', 'GA', 'FL',
-  'OH', 'MI', 'IN', 'IL', 'WI', 'MN', 'IA', 'MO',
-  'ND', 'SD', 'NE', 'KS', 'KY', 'TN', 'AL', 'MS',
-  'AR', 'LA', 'OK', 'TX',
-  'MT', 'ID', 'WY', 'CO', 'NM', 'AZ', 'UT', 'NV',
-  'CA', 'OR', 'WA', 'AK', 'HI',
+  'ME',
+  'NH',
+  'VT',
+  'MA',
+  'RI',
+  'CT',
+  'NY',
+  'NJ',
+  'PA',
+  'DE',
+  'MD',
+  'VA',
+  'WV',
+  'NC',
+  'SC',
+  'GA',
+  'FL',
+  'OH',
+  'MI',
+  'IN',
+  'IL',
+  'WI',
+  'MN',
+  'IA',
+  'MO',
+  'ND',
+  'SD',
+  'NE',
+  'KS',
+  'KY',
+  'TN',
+  'AL',
+  'MS',
+  'AR',
+  'LA',
+  'OK',
+  'TX',
+  'MT',
+  'ID',
+  'WY',
+  'CO',
+  'NM',
+  'AZ',
+  'UT',
+  'NV',
+  'CA',
+  'OR',
+  'WA',
+  'AK',
+  'HI',
 ];
 
 export default function AdminStatesIndex() {
@@ -31,9 +74,9 @@ export default function AdminStatesIndex() {
           CartFax admin · by state
         </h1>
         <p className="text-sm text-slate-400">
-          Use this map-style view to drill into operators, labs, and batches
-          for a specific state. This keeps large national datasets manageable
-          and intuitive.
+          Use this map-style view to drill into operators, labs, and batches for
+          a specific state. This keeps large national datasets manageable and
+          intuitive.
         </p>
       </div>
 
@@ -56,8 +99,8 @@ export default function AdminStatesIndex() {
         </div>
 
         <p className="text-[11px] text-slate-500 mt-2">
-          This is an admin-only navigation shell. Later we can replace this
-          grid with a proper SVG map or a more detailed regional view.
+          This is an admin-only navigation shell. Later we can replace this grid
+          with a proper SVG map or a more detailed regional view.
         </p>
       </div>
     </div>

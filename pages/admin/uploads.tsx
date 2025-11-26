@@ -130,13 +130,13 @@ export default function AdminUploads() {
       const data = await res.json();
       if (data.reused) {
         setSuccessMessage(
-          `This COA was already uploaded (document #${data.document.id}).`
+          `This COA was already uploaded (document #${data.document.id}).`,
         );
       } else {
         setSuccessMessage(
           `Uploaded COA as document #${data.document.id}${
             data.labResult ? `; created lab result #${data.labResult.id}` : ''
-          }.`
+          }.`,
         );
       }
 
@@ -195,7 +195,7 @@ export default function AdminUploads() {
       const updated = await res.json();
       setSelectedDoc((prev) => (prev ? { ...prev, ...updated } : prev));
       setDocs((prev) =>
-        prev.map((d) => (d.id === updated.id ? { ...d, ...updated } : d))
+        prev.map((d) => (d.id === updated.id ? { ...d, ...updated } : d)),
       );
       setSuccessMessage(`Updated COA #${updated.id} (batch code & lab name).`);
     } catch (e: any) {
@@ -278,7 +278,9 @@ export default function AdminUploads() {
     if (lr.thcPercent != null) pieces.push(`THC ${lr.thcPercent.toFixed(2)}%`);
     if (lr.cbdPercent != null) pieces.push(`CBD ${lr.cbdPercent.toFixed(2)}%`);
     if (lr.totalCannabinoidsPercent != null)
-      pieces.push(`Total cannabinoids ${lr.totalCannabinoidsPercent.toFixed(2)}%`);
+      pieces.push(
+        `Total cannabinoids ${lr.totalCannabinoidsPercent.toFixed(2)}%`,
+      );
     if (pieces.length === 0) return 'No potency data linked yet.';
     return pieces.join(' · ');
   }
@@ -397,9 +399,7 @@ export default function AdminUploads() {
                       }`}
                     >
                       <td className="py-2 pr-3 text-slate-300">{d.id}</td>
-                      <td className="py-2 pr-3 text-slate-100">
-                        {d.fileName}
-                      </td>
+                      <td className="py-2 pr-3 text-slate-100">{d.fileName}</td>
                       <td className="py-2 pr-3 text-slate-200">
                         {d.batchCode || (
                           <span className="text-slate-500">Not detected</span>

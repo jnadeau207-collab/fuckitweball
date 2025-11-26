@@ -539,12 +539,12 @@ function AdminStatesIndex() {
                 children: "Sign in as an admin to view state-level navigation."
             }, void 0, false, {
                 fileName: "[project]/pages/admin/states/index.tsx",
-                lineNumber: 20,
+                lineNumber: 63,
                 columnNumber: 9
             }, this)
         }, void 0, false, {
             fileName: "[project]/pages/admin/states/index.tsx",
-            lineNumber: 19,
+            lineNumber: 62,
             columnNumber: 7
         }, this);
     }
@@ -558,7 +558,7 @@ function AdminStatesIndex() {
                         children: "CartFax admin · by state"
                     }, void 0, false, {
                         fileName: "[project]/pages/admin/states/index.tsx",
-                        lineNumber: 30,
+                        lineNumber: 73,
                         columnNumber: 9
                     }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -566,13 +566,13 @@ function AdminStatesIndex() {
                         children: "Use this map-style view to drill into operators, labs, and batches for a specific state. This keeps large national datasets manageable and intuitive."
                     }, void 0, false, {
                         fileName: "[project]/pages/admin/states/index.tsx",
-                        lineNumber: 33,
+                        lineNumber: 76,
                         columnNumber: 9
                     }, this)
                 ]
             }, void 0, true, {
                 fileName: "[project]/pages/admin/states/index.tsx",
-                lineNumber: 29,
+                lineNumber: 72,
                 columnNumber: 7
             }, this),
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -583,7 +583,7 @@ function AdminStatesIndex() {
                         children: "Select a state to view its batches and lab results"
                     }, void 0, false, {
                         fileName: "[project]/pages/admin/states/index.tsx",
-                        lineNumber: 41,
+                        lineNumber: 84,
                         columnNumber: 9
                     }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -594,12 +594,12 @@ function AdminStatesIndex() {
                                 children: code
                             }, code, false, {
                                 fileName: "[project]/pages/admin/states/index.tsx",
-                                lineNumber: 48,
+                                lineNumber: 91,
                                 columnNumber: 13
                             }, this))
                     }, void 0, false, {
                         fileName: "[project]/pages/admin/states/index.tsx",
-                        lineNumber: 46,
+                        lineNumber: 89,
                         columnNumber: 9
                     }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -607,19 +607,19 @@ function AdminStatesIndex() {
                         children: "This is an admin-only navigation shell. Later we can replace this grid with a proper SVG map or a more detailed regional view."
                     }, void 0, false, {
                         fileName: "[project]/pages/admin/states/index.tsx",
-                        lineNumber: 58,
+                        lineNumber: 101,
                         columnNumber: 9
                     }, this)
                 ]
             }, void 0, true, {
                 fileName: "[project]/pages/admin/states/index.tsx",
-                lineNumber: 40,
+                lineNumber: 83,
                 columnNumber: 7
             }, this)
         ]
     }, void 0, true, {
         fileName: "[project]/pages/admin/states/index.tsx",
-        lineNumber: 28,
+        lineNumber: 71,
         columnNumber: 5
     }, this);
 }

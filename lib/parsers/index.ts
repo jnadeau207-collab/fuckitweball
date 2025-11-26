@@ -5,7 +5,7 @@ export type LabSpecificParsed = NovaParsed & {
 };
 
 export function parseWithLabSpecificParsers(
-  text: string
+  text: string,
 ): LabSpecificParsed | null {
   // Nova Analytic Labs
   if (isNovaLabsCoa(text)) {

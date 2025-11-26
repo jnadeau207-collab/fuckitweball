@@ -40,19 +40,18 @@ export default function AdminIndex() {
         </button>
       </div>
 
-<Link
-  href="/admin/states"
-  className="block rounded-xl border border-slate-800 bg-slate-900/70 p-4 hover:border-sky-500"
->
-  <h2 className="text-sm font-semibold text-slate-100 mb-1">
-    Browse by state
-  </h2>
-  <p className="text-xs text-slate-400">
-    Explore operators, labs, and batches organized by state instead of giant
-    national lists.
-  </p>
-</Link>
-
+      <Link
+        href="/admin/states"
+        className="block rounded-xl border border-slate-800 bg-slate-900/70 p-4 hover:border-sky-500"
+      >
+        <h2 className="text-sm font-semibold text-slate-100 mb-1">
+          Browse by state
+        </h2>
+        <p className="text-xs text-slate-400">
+          Explore operators, labs, and batches organized by state instead of
+          giant national lists.
+        </p>
+      </Link>
 
       {/* Primary sections */}
       <div className="grid gap-4 md:grid-cols-3">
@@ -65,8 +64,8 @@ export default function AdminIndex() {
           </div>
           <div className="font-medium mb-1">Batches</div>
           <p className="text-xs text-slate-400">
-            Create and manage batch records, link them to brands, locations,
-            lab results, and recall data.
+            Create and manage batch records, link them to brands, locations, lab
+            results, and recall data.
           </p>
         </Link>
 

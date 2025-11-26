@@ -51,7 +51,10 @@ export default function AdminBatches() {
     try {
       setLoading(true);
       setError(null);
-      const url = q && q.trim().length > 0 ? `/api/admin/batches?q=${encodeURIComponent(q)}` : '/api/admin/batches';
+      const url =
+        q && q.trim().length > 0
+          ? `/api/admin/batches?q=${encodeURIComponent(q)}`
+          : '/api/admin/batches';
       const res = await fetch(url);
       const data = await res.json();
       if (Array.isArray(data)) {
@@ -59,9 +62,13 @@ export default function AdminBatches() {
         const normalized = data.map((b: any) => ({
           ...b,
           harvestDate: b.harvestDate ? b.harvestDate.slice(0, 10) : null,
-          productionDate: b.productionDate ? b.productionDate.slice(0, 10) : null,
+          productionDate: b.productionDate
+            ? b.productionDate.slice(0, 10)
+            : null,
           packageDate: b.packageDate ? b.packageDate.slice(0, 10) : null,
-          expirationDate: b.expirationDate ? b.expirationDate.slice(0, 10) : null,
+          expirationDate: b.expirationDate
+            ? b.expirationDate.slice(0, 10)
+            : null,
         }));
         setBatches(normalized);
       } else {
@@ -302,7 +309,10 @@ export default function AdminBatches() {
                 type="date"
                 value={editing.harvestDate || ''}
                 onChange={(e) =>
-                  setEditing({ ...editing, harvestDate: e.target.value || null })
+                  setEditing({
+                    ...editing,
+                    harvestDate: e.target.value || null,
+                  })
                 }
                 className="p-2 rounded-md bg-slate-900 border border-slate-700 text-slate-100"
               />
@@ -457,34 +467,31 @@ export default function AdminBatches() {
                   <span className="mr-2">{b.primaryCategory}</span>
                 )}
                 {b.brand && (
-                  <span className="mr-2 text-slate-300">
-                    · {b.brand.name}
-                  </span>
+                  <span className="mr-2 text-slate-300">· {b.brand.name}</span>
                 )}
               </div>
               <div>{renderRating(b)}</div>
             </div>
             <div className="flex gap-2">
-  <Link
-    href={`/admin/batches/${b.id}`}
-    className="px-2 py-1 border border-slate-700 rounded text-xs text-slate-200"
-  >
-    View
-  </Link>
-  <button
-    onClick={() => startEdit(b)}
-    className="px-2 py-1 border border-slate-700 rounded text-xs text-slate-200"
-  >
-    Edit
-  </button>
-  <button
-    onClick={() => deleteBatch(b.id)}
-    className="px-2 py-1 border border-red-500/60 text-red-400 rounded text-xs"
-  >
-    Delete
-  </button>
-</div>
-
+              <Link
+                href={`/admin/batches/${b.id}`}
+                className="px-2 py-1 border border-slate-700 rounded text-xs text-slate-200"
+              >
+                View
+              </Link>
+              <button
+                onClick={() => startEdit(b)}
+                className="px-2 py-1 border border-slate-700 rounded text-xs text-slate-200"
+              >
+                Edit
+              </button>
+              <button
+                onClick={() => deleteBatch(b.id)}
+                className="px-2 py-1 border border-red-500/60 text-red-400 rounded text-xs"
+              >
+                Delete
+              </button>
+            </div>
           </div>
         ))}
       </div>

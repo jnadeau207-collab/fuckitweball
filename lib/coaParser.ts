@@ -53,7 +53,11 @@ function normalizeText(input: string): string {
 /**
  * Utility: extract first match group as string or null
  */
-function matchGroup(text: string, regex: RegExp, groupIndex = 1): string | null {
+function matchGroup(
+  text: string,
+  regex: RegExp,
+  groupIndex = 1,
+): string | null {
   const m = text.match(regex);
   if (!m || !m[groupIndex]) return null;
   return m[groupIndex].trim();
@@ -65,7 +69,7 @@ function matchGroup(text: string, regex: RegExp, groupIndex = 1): string | null 
 function matchNumber(
   text: string,
   regex: RegExp,
-  groupIndex = 1
+  groupIndex = 1,
 ): number | null {
   const s = matchGroup(text, regex, groupIndex);
   if (!s) return null;
@@ -80,7 +84,7 @@ function matchNumber(
 function sliceBetween(
   text: string,
   startMarker: string,
-  endMarkers: string[]
+  endMarkers: string[],
 ): string | undefined {
   const lower = text.toLowerCase();
   const startIdx = lower.indexOf(startMarker.toLowerCase());
@@ -101,7 +105,10 @@ function sliceBetween(
  * Scan the whole text for FAIL lines and try to infer category + analyte name.
  */
 function detectFailures(text: string): ParsedFailure[] {
-  const lines = text.split('\n').map((l) => l.trim()).filter(Boolean);
+  const lines = text
+    .split('\n')
+    .map((l) => l.trim())
+    .filter(Boolean);
   const failures: ParsedFailure[] = [];
 
   for (const line of lines) {
@@ -111,7 +118,14 @@ function detectFailures(text: string): ParsedFailure[] {
     let category = 'Unknown';
     const lower = line.toLowerCase();
     if (lower.includes('mycotoxin')) category = 'Mycotoxins';
-    else if (lower.includes('yeast') || lower.includes('mold') || lower.includes('bacteria') || lower.includes('salmonella') || lower.includes('coli') || lower.includes('enterobacter')) {
+    else if (
+      lower.includes('yeast') ||
+      lower.includes('mold') ||
+      lower.includes('bacteria') ||
+      lower.includes('salmonella') ||
+      lower.includes('coli') ||
+      lower.includes('enterobacter')
+    ) {
       category = 'Microbials';
     } else if (
       lower.includes('pesticide') ||
@@ -175,11 +189,9 @@ export function parseCoaText(raw: string): ParsedCOA {
     matchGroup(text, /CLIENT:\s*([A-Z0-9\s\-]+)\s*\/\//i) ??
     null;
 
-  const matrix =
-    matchGroup(text, /MATRIX:\s*([A-Z0-9 ]+)/i) ?? null;
+  const matrix = matchGroup(text, /MATRIX:\s*([A-Z0-9 ]+)/i) ?? null;
 
-  const sampleId =
-    matchGroup(text, /SAMPLE ID:\s*([A-Za-z0-9\-]+)/i) ?? null;
+  const sampleId = matchGroup(text, /SAMPLE ID:\s*([A-Za-z0-9\-]+)/i) ?? null;
 
   const collectedOn =
     matchGroup(text, /COLLECTED ON:\s*([A-Za-z]{3}\s+\d{1,2},\s+\d{4})/i) ??
@@ -227,8 +239,8 @@ export function parseCoaText(raw: string): ParsedCOA {
     batchResultRaw?.toUpperCase() === 'PASS'
       ? 'PASS'
       : batchResultRaw?.toUpperCase() === 'FAIL'
-      ? 'FAIL'
-      : 'UNKNOWN';
+        ? 'FAIL'
+        : 'UNKNOWN';
 
   const failures = detectFailures(text);
   const hasAnyFailure =
@@ -265,10 +277,7 @@ export function parseCoaText(raw: string): ParsedCOA {
     'MOISTURE CONTENT',
   ]);
 
-  const solventsSection = sliceBetween(text, 'RSOL.1:', [
-    'PST.2',
-    'MYC.1',
-  ]);
+  const solventsSection = sliceBetween(text, 'RSOL.1:', ['PST.2', 'MYC.1']);
 
   const microbialsSection = sliceBetween(text, 'TOTAL YEAST AND MOLD', [
     'NOTES',

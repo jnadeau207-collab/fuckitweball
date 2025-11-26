@@ -1,5 +1,19 @@
 {
   "pages": {
+    "/": [
+      "static/chunks/node_modules_next_dist_compiled_8ca6b690._.js",
+      "static/chunks/node_modules_next_dist_shared_lib_82dc2e9d._.js",
+      "static/chunks/node_modules_next_dist_client_d0aa886c._.js",
+      "static/chunks/node_modules_next_dist_6024eba3._.js",
+      "static/chunks/node_modules_react_e3593a73._.js",
+      "static/chunks/node_modules_react-dom_cjs_react-dom_development_2b5e0eb3.js",
+      "static/chunks/node_modules_react-dom_8a8085df._.js",
+      "static/chunks/node_modules_@react-google-maps_api_dist_esm_c16162c4.js",
+      "static/chunks/node_modules_eacb716a._.js",
+      "static/chunks/[root-of-the-server]__4557a775._.js",
+      "static/chunks/pages_index_2da965e7._.js",
+      "static/chunks/turbopack-pages_index_19292570._.js"
+    ],
     "/_app": [
       "static/chunks/node_modules_next_dist_compiled_8ca6b690._.js",
       "static/chunks/node_modules_next_dist_shared_lib_4025f6b7._.js",
@@ -69,6 +83,19 @@
       "static/chunks/pages_admin_labs_tsx_2da965e7._.js",
       "static/chunks/turbopack-pages_admin_labs_tsx_7c59ee37._.js"
     ],
+    "/admin/locations": [
+      "static/chunks/node_modules_next_dist_compiled_8ca6b690._.js",
+      "static/chunks/node_modules_next_dist_shared_lib_82dc2e9d._.js",
+      "static/chunks/node_modules_next_dist_client_d0aa886c._.js",
+      "static/chunks/node_modules_next_dist_6024eba3._.js",
+      "static/chunks/node_modules_react_e3593a73._.js",
+      "static/chunks/node_modules_react-dom_cjs_react-dom_development_2b5e0eb3.js",
+      "static/chunks/node_modules_react-dom_8a8085df._.js",
+      "static/chunks/node_modules_364a06ad._.js",
+      "static/chunks/[root-of-the-server]__44122ff5._.js",
+      "static/chunks/pages_admin_locations_tsx_2da965e7._.js",
+      "static/chunks/turbopack-pages_admin_locations_tsx_1680ba61._.js"
+    ],
     "/admin/states": [
       "static/chunks/node_modules_next_dist_compiled_8ca6b690._.js",
       "static/chunks/node_modules_next_dist_shared_lib_4025f6b7._.js",
@@ -110,20 +137,6 @@
       "static/chunks/[root-of-the-server]__a25ab67d._.js",
       "static/chunks/pages_admin_uploads_tsx_2da965e7._.js",
       "static/chunks/turbopack-pages_admin_uploads_tsx_8c3ba18e._.js"
-    ],
-    "/admin/uploads/[id]": [
-      "static/chunks/node_modules_next_dist_compiled_8ca6b690._.js",
-      "static/chunks/node_modules_next_dist_shared_lib_82dc2e9d._.js",
-      "static/chunks/node_modules_next_dist_client_d0aa886c._.js",
-      "static/chunks/node_modules_next_dist_6024eba3._.js",
-      "static/chunks/node_modules_next_router_104fab1c.js",
-      "static/chunks/node_modules_react_e3593a73._.js",
-      "static/chunks/node_modules_react-dom_cjs_react-dom_development_2b5e0eb3.js",
-      "static/chunks/node_modules_react-dom_8a8085df._.js",
-      "static/chunks/node_modules_364a06ad._.js",
-      "static/chunks/[root-of-the-server]__afb32552._.js",
-      "static/chunks/pages_admin_uploads_[id]_tsx_2da965e7._.js",
-      "static/chunks/turbopack-pages_admin_uploads_[id]_tsx_df4e7714._.js"
     ]
   },
   "devFiles": [],

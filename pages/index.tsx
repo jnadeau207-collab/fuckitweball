@@ -11,8 +11,7 @@ export default function Home() {
           </span>
 
           <h1 className="text-4xl md:text-5xl font-semibold tracking-tight">
-            The{" "}
-            <span className="text-emerald-400">Carfax for cannabis</span>
+            The <span className="text-emerald-400">Carfax for cannabis</span>
             <br />
             retailers & batches.
           </h1>

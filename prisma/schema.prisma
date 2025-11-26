@@ -137,6 +137,10 @@ model Lab {
   slug    String  @unique
   website String?
 
+  // Normalized location for state map / summaries
+  city      String?
+  stateCode String? // e.g. "ME", "CO"
+
   // Link to state lab license if available
   stateLicense   StateLicense? @relation(fields: [stateLicenseId], references: [id])
   stateLicenseId Int?
@@ -156,7 +160,9 @@ model Batch {
   id Int @id @default(autoincrement())
 
   // Core batch identity
-  batchCode       String // from COA or internal batch ID
+  batchCode    String // from COA or internal batch ID
+  jurisdiction String? // 2-letter state where batch is regulated (for map/drilldown)
+
   productName     String?
   productSku      String? // optional internal SKU
   primaryCategory String? // flower, vape, edible, etc.
@@ -165,8 +171,9 @@ model Batch {
   // Brand link
   brand   Brand? @relation(fields: [brandId], references: [id])
   brandId Int?
-  
-  stateCode          String?      // e.g. "ME", "CA", "CO"
+
+  // Legacy / secondary state field (some older code might still use this)
+  stateCode String? // e.g. "ME", "CA", "CO"
 
   // Date fields
   harvestDate    DateTime?
@@ -233,7 +240,7 @@ model LabResult {
   rawJson        Json? // original extracted JSON
   sourcePdfUrl   String? // if from remote
 
-  // 👇 1:1 relation to UploadedDocument (FK lives here)
+  // 1:1 relation to UploadedDocument (FK lives here)
   uploadedDocument   UploadedDocument? @relation(fields: [uploadedDocumentId], references: [id])
   uploadedDocumentId Int?              @unique
 
@@ -259,7 +266,7 @@ model UploadedDocument {
   createdAt     DateTime @default(now())
   verified      Boolean  @default(false)
 
-  // 👇 simple back-reference; no fields/references here
+  // Simple back-reference from LabResult
   labResult LabResult?
 }
 

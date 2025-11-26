@@ -706,7 +706,7 @@ function AdminUploads() {
                         children: "COA uploads"
                     }, void 0, false, {
                         fileName: "[project]/pages/admin/uploads.tsx",
-                        lineNumber: 299,
+                        lineNumber: 301,
                         columnNumber: 9
                     }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -714,13 +714,13 @@ function AdminUploads() {
                         children: "Upload raw PDF lab reports. CartFax will store the file, extract text, attempt to detect batch codes and lab names, and optionally create a linked batch + lab result. You can refine metadata and view a quick at-a-glance info card here, or open the full debug view for deeper parsing work."
                     }, void 0, false, {
                         fileName: "[project]/pages/admin/uploads.tsx",
-                        lineNumber: 300,
+                        lineNumber: 302,
                         columnNumber: 9
                     }, this)
                 ]
             }, void 0, true, {
                 fileName: "[project]/pages/admin/uploads.tsx",
-                lineNumber: 298,
+                lineNumber: 300,
                 columnNumber: 7
             }, this),
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("form", {
@@ -732,7 +732,7 @@ function AdminUploads() {
                         children: "Upload a COA PDF"
                     }, void 0, false, {
                         fileName: "[project]/pages/admin/uploads.tsx",
-                        lineNumber: 314,
+                        lineNumber: 316,
                         columnNumber: 9
                     }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -740,7 +740,7 @@ function AdminUploads() {
                         children: "Supports one PDF at a time. Files are hashed to avoid duplicates."
                     }, void 0, false, {
                         fileName: "[project]/pages/admin/uploads.tsx",
-                        lineNumber: 317,
+                        lineNumber: 319,
                         columnNumber: 9
                     }, this),
                     error && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -748,7 +748,7 @@ function AdminUploads() {
                         children: error
                     }, void 0, false, {
                         fileName: "[project]/pages/admin/uploads.tsx",
-                        lineNumber: 322,
+                        lineNumber: 324,
                         columnNumber: 11
                     }, this),
                     successMessage && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -756,7 +756,7 @@ function AdminUploads() {
                         children: successMessage
                     }, void 0, false, {
                         fileName: "[project]/pages/admin/uploads.tsx",
-                        lineNumber: 327,
+                        lineNumber: 329,
                         columnNumber: 11
                     }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -769,7 +769,7 @@ function AdminUploads() {
                                 className: "text-xs text-slate-200 file:border-0 file:bg-slate-800 file:text-slate-100 file:px-3 file:py-1.5 file:rounded-md file:text-xs"
                             }, void 0, false, {
                                 fileName: "[project]/pages/admin/uploads.tsx",
-                                lineNumber: 333,
+                                lineNumber: 335,
                                 columnNumber: 11
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
@@ -779,19 +779,19 @@ function AdminUploads() {
                                 children: uploading ? 'Uploading…' : 'Upload COA'
                             }, void 0, false, {
                                 fileName: "[project]/pages/admin/uploads.tsx",
-                                lineNumber: 339,
+                                lineNumber: 341,
                                 columnNumber: 11
                             }, this)
                         ]
                     }, void 0, true, {
                         fileName: "[project]/pages/admin/uploads.tsx",
-                        lineNumber: 332,
+                        lineNumber: 334,
                         columnNumber: 9
                     }, this)
                 ]
             }, void 0, true, {
                 fileName: "[project]/pages/admin/uploads.tsx",
-                lineNumber: 310,
+                lineNumber: 312,
                 columnNumber: 7
             }, this),
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -808,7 +808,7 @@ function AdminUploads() {
                                         children: "Uploaded documents"
                                     }, void 0, false, {
                                         fileName: "[project]/pages/admin/uploads.tsx",
-                                        lineNumber: 353,
+                                        lineNumber: 355,
                                         columnNumber: 13
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
@@ -817,13 +817,13 @@ function AdminUploads() {
                                         children: "Refresh"
                                     }, void 0, false, {
                                         fileName: "[project]/pages/admin/uploads.tsx",
-                                        lineNumber: 356,
+                                        lineNumber: 358,
                                         columnNumber: 13
                                     }, this)
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/pages/admin/uploads.tsx",
-                                lineNumber: 352,
+                                lineNumber: 354,
                                 columnNumber: 11
                             }, this),
                             loading && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -831,7 +831,7 @@ function AdminUploads() {
                                 children: "Loading uploads…"
                             }, void 0, false, {
                                 fileName: "[project]/pages/admin/uploads.tsx",
-                                lineNumber: 365,
+                                lineNumber: 367,
                                 columnNumber: 13
                             }, this),
                             !loading && docs.length === 0 && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -839,7 +839,7 @@ function AdminUploads() {
                                 children: "No COAs uploaded yet. Upload your first PDF above."
                             }, void 0, false, {
                                 fileName: "[project]/pages/admin/uploads.tsx",
-                                lineNumber: 369,
+                                lineNumber: 371,
                                 columnNumber: 13
                             }, this),
                             !loading && docs.length > 0 && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -856,7 +856,7 @@ function AdminUploads() {
                                                         children: "ID"
                                                     }, void 0, false, {
                                                         fileName: "[project]/pages/admin/uploads.tsx",
-                                                        lineNumber: 379,
+                                                        lineNumber: 381,
                                                         columnNumber: 21
                                                     }, this),
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("th", {
@@ -864,7 +864,7 @@ function AdminUploads() {
                                                         children: "File"
                                                     }, void 0, false, {
                                                         fileName: "[project]/pages/admin/uploads.tsx",
-                                                        lineNumber: 380,
+                                                        lineNumber: 382,
                                                         columnNumber: 21
                                                     }, this),
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("th", {
@@ -872,7 +872,7 @@ function AdminUploads() {
                                                         children: "Batch code"
                                                     }, void 0, false, {
                                                         fileName: "[project]/pages/admin/uploads.tsx",
-                                                        lineNumber: 381,
+                                                        lineNumber: 383,
                                                         columnNumber: 21
                                                     }, this),
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("th", {
@@ -880,7 +880,7 @@ function AdminUploads() {
                                                         children: "Lab name"
                                                     }, void 0, false, {
                                                         fileName: "[project]/pages/admin/uploads.tsx",
-                                                        lineNumber: 382,
+                                                        lineNumber: 384,
                                                         columnNumber: 21
                                                     }, this),
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("th", {
@@ -888,7 +888,7 @@ function AdminUploads() {
                                                         children: "Size"
                                                     }, void 0, false, {
                                                         fileName: "[project]/pages/admin/uploads.tsx",
-                                                        lineNumber: 383,
+                                                        lineNumber: 385,
                                                         columnNumber: 21
                                                     }, this),
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("th", {
@@ -896,7 +896,7 @@ function AdminUploads() {
                                                         children: "Created"
                                                     }, void 0, false, {
                                                         fileName: "[project]/pages/admin/uploads.tsx",
-                                                        lineNumber: 384,
+                                                        lineNumber: 386,
                                                         columnNumber: 21
                                                     }, this),
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("th", {
@@ -904,7 +904,7 @@ function AdminUploads() {
                                                         children: "LabResult"
                                                     }, void 0, false, {
                                                         fileName: "[project]/pages/admin/uploads.tsx",
-                                                        lineNumber: 385,
+                                                        lineNumber: 387,
                                                         columnNumber: 21
                                                     }, this),
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("th", {
@@ -912,18 +912,18 @@ function AdminUploads() {
                                                         children: "Actions"
                                                     }, void 0, false, {
                                                         fileName: "[project]/pages/admin/uploads.tsx",
-                                                        lineNumber: 386,
+                                                        lineNumber: 388,
                                                         columnNumber: 21
                                                     }, this)
                                                 ]
                                             }, void 0, true, {
                                                 fileName: "[project]/pages/admin/uploads.tsx",
-                                                lineNumber: 378,
+                                                lineNumber: 380,
                                                 columnNumber: 19
                                             }, this)
                                         }, void 0, false, {
                                             fileName: "[project]/pages/admin/uploads.tsx",
-                                            lineNumber: 377,
+                                            lineNumber: 379,
                                             columnNumber: 17
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("tbody", {
@@ -935,7 +935,7 @@ function AdminUploads() {
                                                             children: d.id
                                                         }, void 0, false, {
                                                             fileName: "[project]/pages/admin/uploads.tsx",
-                                                            lineNumber: 399,
+                                                            lineNumber: 401,
                                                             columnNumber: 23
                                                         }, this),
                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("td", {
@@ -943,7 +943,7 @@ function AdminUploads() {
                                                             children: d.fileName
                                                         }, void 0, false, {
                                                             fileName: "[project]/pages/admin/uploads.tsx",
-                                                            lineNumber: 400,
+                                                            lineNumber: 402,
                                                             columnNumber: 23
                                                         }, this),
                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("td", {
@@ -1067,29 +1067,29 @@ function AdminUploads() {
                                                     ]
                                                 }, d.id, true, {
                                                     fileName: "[project]/pages/admin/uploads.tsx",
-                                                    lineNumber: 391,
+                                                    lineNumber: 393,
                                                     columnNumber: 21
                                                 }, this))
                                         }, void 0, false, {
                                             fileName: "[project]/pages/admin/uploads.tsx",
-                                            lineNumber: 389,
+                                            lineNumber: 391,
                                             columnNumber: 17
                                         }, this)
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/pages/admin/uploads.tsx",
-                                    lineNumber: 376,
+                                    lineNumber: 378,
                                     columnNumber: 15
                                 }, this)
                             }, void 0, false, {
                                 fileName: "[project]/pages/admin/uploads.tsx",
-                                lineNumber: 375,
+                                lineNumber: 377,
                                 columnNumber: 13
                             }, this)
                         ]
                     }, void 0, true, {
                         fileName: "[project]/pages/admin/uploads.tsx",
-                        lineNumber: 351,
+                        lineNumber: 353,
                         columnNumber: 9
                     }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1475,13 +1475,13 @@ function AdminUploads() {
                 ]
             }, void 0, true, {
                 fileName: "[project]/pages/admin/uploads.tsx",
-                lineNumber: 349,
+                lineNumber: 351,
                 columnNumber: 7
             }, this)
         ]
     }, void 0, true, {
         fileName: "[project]/pages/admin/uploads.tsx",
-        lineNumber: 297,
+        lineNumber: 299,
         columnNumber: 5
     }, this);
 }

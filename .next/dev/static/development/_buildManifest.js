@@ -1,4 +1,7 @@
 self.__BUILD_MANIFEST = {
+  "/": [
+    "static/chunks/pages/index.js"
+  ],
   "/admin": [
     "static/chunks/pages/admin.js"
   ],
@@ -11,6 +14,9 @@ self.__BUILD_MANIFEST = {
   "/admin/labs": [
     "static/chunks/pages/admin/labs.js"
   ],
+  "/admin/locations": [
+    "static/chunks/pages/admin/locations.js"
+  ],
   "/admin/states": [
     "static/chunks/pages/admin/states.js"
   ],
@@ -19,9 +25,6 @@ self.__BUILD_MANIFEST = {
   ],
   "/admin/uploads": [
     "static/chunks/pages/admin/uploads.js"
-  ],
-  "/admin/uploads/[id]": [
-    "static/chunks/pages/admin/uploads/[id].js"
   ],
   "__rewrites": {
     "afterFiles": [],
@@ -52,6 +55,9 @@ self.__BUILD_MANIFEST = {
     "/api/admin/dispensaries",
     "/api/admin/lab-results/[id]",
     "/api/admin/register-upload",
+    "/api/admin/state-summary",
+    "/api/admin/states/[code].ts",
+    "/api/admin/states/[stateCode]",
     "/api/admin/uploads",
     "/api/admin/uploads/[id]",
     "/api/algolia/reindex",

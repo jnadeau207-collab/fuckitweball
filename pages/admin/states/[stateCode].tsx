@@ -74,7 +74,7 @@ export default function AdminStateDetail() {
       }
     }
     return Array.from(map.values()).sort((a, b) =>
-      a.name.localeCompare(b.name)
+      a.name.localeCompare(b.name),
     );
   }, [batches]);
 
@@ -91,7 +91,7 @@ export default function AdminStateDetail() {
         (b) =>
           b.batchCode.toLowerCase().includes(q) ||
           (b.productName || '').toLowerCase().includes(q) ||
-          (b.productCategory || '').toLowerCase().includes(q)
+          (b.productCategory || '').toLowerCase().includes(q),
       );
     }
 
@@ -102,11 +102,10 @@ export default function AdminStateDetail() {
   const totalBrands = brands.length;
   const totalLabResults = batches.reduce(
     (acc, b) => acc + (b.labResults?.length || 0),
-    0
+    0,
   );
 
-  const code =
-    typeof stateCode === 'string' ? stateCode.toUpperCase() : '??';
+  const code = typeof stateCode === 'string' ? stateCode.toUpperCase() : '??';
 
   if (!session) {
     return (
@@ -132,8 +131,8 @@ export default function AdminStateDetail() {
             {code} · batches & lab results
           </h1>
           <p className="text-sm text-slate-400">
-            Exploring all batches currently assigned to <span>{code}</span>.
-            Use brand filters and search to stay sane with large datasets.
+            Exploring all batches currently assigned to <span>{code}</span>. Use
+            brand filters and search to stay sane with large datasets.
           </p>
         </div>
       </div>
@@ -155,9 +154,7 @@ export default function AdminStateDetail() {
           </div>
         </div>
         <div className="rounded-xl border border-slate-800 bg-slate-900/70 p-3">
-          <div className="text-slate-400 text-xs mb-1">
-            Lab results linked
-          </div>
+          <div className="text-slate-400 text-xs mb-1">Lab results linked</div>
           <div className="text-xl font-semibold text-slate-100">
             {totalLabResults}
           </div>
@@ -281,14 +278,11 @@ export default function AdminStateDetail() {
                     )}
                     <div className="text-slate-400">
                       {b.productCategory || 'Uncategorized'}
-                      {b.productSubcategory
-                        ? ` · ${b.productSubcategory}`
-                        : ''}
+                      {b.productSubcategory ? ` · ${b.productSubcategory}` : ''}
                       {b.brand ? ` · ${b.brand.name}` : ''}
                     </div>
                     <div className="text-slate-500">
-                      Created{' '}
-                      {new Date(b.createdAt).toLocaleDateString()}
+                      Created {new Date(b.createdAt).toLocaleDateString()}
                     </div>
                   </div>
                   <div className="flex flex-wrap gap-2 text-[11px]">
@@ -304,7 +298,7 @@ export default function AdminStateDetail() {
                           Total cannabinoids:{' '}
                           {latestLab.totalCannabinoidsPercent != null
                             ? `${latestLab.totalCannabinoidsPercent.toFixed(
-                                1
+                                1,
                               )}%`
                             : '—'}
                         </div>

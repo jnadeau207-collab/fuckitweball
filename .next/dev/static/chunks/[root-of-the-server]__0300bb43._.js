@@ -619,7 +619,7 @@ function AdminBatches() {
                 children: "No ratings yet"
             }, void 0, false, {
                 fileName: "[project]/pages/admin/batches.tsx",
-                lineNumber: 164,
+                lineNumber: 171,
                 columnNumber: 14
             }, this);
         }
@@ -635,7 +635,7 @@ function AdminBatches() {
             ]
         }, void 0, true, {
             fileName: "[project]/pages/admin/batches.tsx",
-            lineNumber: 168,
+            lineNumber: 175,
             columnNumber: 7
         }, this);
     }
@@ -647,12 +647,12 @@ function AdminBatches() {
                 children: "Sign in as an admin to manage batches."
             }, void 0, false, {
                 fileName: "[project]/pages/admin/batches.tsx",
-                lineNumber: 177,
+                lineNumber: 184,
                 columnNumber: 9
             }, this)
         }, void 0, false, {
             fileName: "[project]/pages/admin/batches.tsx",
-            lineNumber: 176,
+            lineNumber: 183,
             columnNumber: 7
         }, this);
     }
@@ -669,7 +669,7 @@ function AdminBatches() {
                                 children: "Batches"
                             }, void 0, false, {
                                 fileName: "[project]/pages/admin/batches.tsx",
-                                lineNumber: 188,
+                                lineNumber: 195,
                                 columnNumber: 11
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -677,13 +677,13 @@ function AdminBatches() {
                                 children: "Create and manage batch records, link them to brands, and view aggregate ratings."
                             }, void 0, false, {
                                 fileName: "[project]/pages/admin/batches.tsx",
-                                lineNumber: 189,
+                                lineNumber: 196,
                                 columnNumber: 11
                             }, this)
                         ]
                     }, void 0, true, {
                         fileName: "[project]/pages/admin/batches.tsx",
-                        lineNumber: 187,
+                        lineNumber: 194,
                         columnNumber: 9
                     }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
@@ -692,13 +692,13 @@ function AdminBatches() {
                         children: "+ New batch"
                     }, void 0, false, {
                         fileName: "[project]/pages/admin/batches.tsx",
-                        lineNumber: 194,
+                        lineNumber: 201,
                         columnNumber: 9
                     }, this)
                 ]
             }, void 0, true, {
                 fileName: "[project]/pages/admin/batches.tsx",
-                lineNumber: 186,
+                lineNumber: 193,
                 columnNumber: 7
             }, this),
             editing && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -709,7 +709,7 @@ function AdminBatches() {
                         children: editing.id && editing.id !== 0 ? 'Edit batch' : 'Create new batch'
                     }, void 0, false, {
                         fileName: "[project]/pages/admin/batches.tsx",
-                        lineNumber: 205,
+                        lineNumber: 212,
                         columnNumber: 11
                     }, this),
                     error && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -717,7 +717,7 @@ function AdminBatches() {
                         children: error
                     }, void 0, false, {
                         fileName: "[project]/pages/admin/batches.tsx",
-                        lineNumber: 210,
+                        lineNumber: 217,
                         columnNumber: 13
                     }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -735,13 +735,13 @@ function AdminBatches() {
                                                 children: "*"
                                             }, void 0, false, {
                                                 fileName: "[project]/pages/admin/batches.tsx",
-                                                lineNumber: 218,
+                                                lineNumber: 225,
                                                 columnNumber: 28
                                             }, this)
                                         ]
                                     }, void 0, true, {
                                         fileName: "[project]/pages/admin/batches.tsx",
-                                        lineNumber: 217,
+                                        lineNumber: 224,
                                         columnNumber: 15
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("input", {
@@ -754,13 +754,13 @@ function AdminBatches() {
                                         className: "p-2 rounded-md bg-slate-900 border border-slate-700 text-slate-100 placeholder:text-slate-500"
                                     }, void 0, false, {
                                         fileName: "[project]/pages/admin/batches.tsx",
-                                        lineNumber: 220,
+                                        lineNumber: 227,
                                         columnNumber: 15
                                     }, this)
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/pages/admin/batches.tsx",
-                                lineNumber: 216,
+                                lineNumber: 223,
                                 columnNumber: 13
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -771,7 +771,7 @@ function AdminBatches() {
                                         children: "Product name"
                                     }, void 0, false, {
                                         fileName: "[project]/pages/admin/batches.tsx",
-                                        lineNumber: 231,
+                                        lineNumber: 238,
                                         columnNumber: 15
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("input", {
@@ -784,13 +784,13 @@ function AdminBatches() {
                                         className: "p-2 rounded-md bg-slate-900 border border-slate-700 text-slate-100 placeholder:text-slate-500"
                                     }, void 0, false, {
                                         fileName: "[project]/pages/admin/batches.tsx",
-                                        lineNumber: 232,
+                                        lineNumber: 239,
                                         columnNumber: 15
                                     }, this)
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/pages/admin/batches.tsx",
-                                lineNumber: 230,
+                                lineNumber: 237,
                                 columnNumber: 13
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -801,7 +801,7 @@ function AdminBatches() {
                                         children: "Primary category"
                                     }, void 0, false, {
                                         fileName: "[project]/pages/admin/batches.tsx",
-                                        lineNumber: 243,
+                                        lineNumber: 250,
                                         columnNumber: 15
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("input", {
@@ -814,13 +814,13 @@ function AdminBatches() {
                                         className: "p-2 rounded-md bg-slate-900 border border-slate-700 text-slate-100 placeholder:text-slate-500"
                                     }, void 0, false, {
                                         fileName: "[project]/pages/admin/batches.tsx",
-                                        lineNumber: 244,
+                                        lineNumber: 251,
                                         columnNumber: 15
                                     }, this)
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/pages/admin/batches.tsx",
-                                lineNumber: 242,
+                                lineNumber: 249,
                                 columnNumber: 13
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -831,7 +831,7 @@ function AdminBatches() {
                                         children: "Subcategory"
                                     }, void 0, false, {
                                         fileName: "[project]/pages/admin/batches.tsx",
-                                        lineNumber: 255,
+                                        lineNumber: 262,
                                         columnNumber: 15
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("input", {
@@ -844,13 +844,13 @@ function AdminBatches() {
                                         className: "p-2 rounded-md bg-slate-900 border border-slate-700 text-slate-100 placeholder:text-slate-500"
                                     }, void 0, false, {
                                         fileName: "[project]/pages/admin/batches.tsx",
-                                        lineNumber: 256,
+                                        lineNumber: 263,
                                         columnNumber: 15
                                     }, this)
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/pages/admin/batches.tsx",
-                                lineNumber: 254,
+                                lineNumber: 261,
                                 columnNumber: 13
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -861,7 +861,7 @@ function AdminBatches() {
                                         children: "Brand"
                                     }, void 0, false, {
                                         fileName: "[project]/pages/admin/batches.tsx",
-                                        lineNumber: 267,
+                                        lineNumber: 274,
                                         columnNumber: 15
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("select", {
@@ -877,7 +877,7 @@ function AdminBatches() {
                                                 children: "No brand / independent"
                                             }, void 0, false, {
                                                 fileName: "[project]/pages/admin/batches.tsx",
-                                                lineNumber: 278,
+                                                lineNumber: 285,
                                                 columnNumber: 17
                                             }, this),
                                             brands.map((b)=>/*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("option", {
@@ -885,19 +885,19 @@ function AdminBatches() {
                                                     children: b.name
                                                 }, b.id, false, {
                                                     fileName: "[project]/pages/admin/batches.tsx",
-                                                    lineNumber: 280,
+                                                    lineNumber: 287,
                                                     columnNumber: 19
                                                 }, this))
                                         ]
                                     }, void 0, true, {
                                         fileName: "[project]/pages/admin/batches.tsx",
-                                        lineNumber: 268,
+                                        lineNumber: 275,
                                         columnNumber: 15
                                     }, this)
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/pages/admin/batches.tsx",
-                                lineNumber: 266,
+                                lineNumber: 273,
                                 columnNumber: 13
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -908,7 +908,7 @@ function AdminBatches() {
                                         children: "Product SKU (optional)"
                                     }, void 0, false, {
                                         fileName: "[project]/pages/admin/batches.tsx",
-                                        lineNumber: 288,
+                                        lineNumber: 295,
                                         columnNumber: 15
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("input", {
@@ -921,13 +921,13 @@ function AdminBatches() {
                                         className: "p-2 rounded-md bg-slate-900 border border-slate-700 text-slate-100 placeholder:text-slate-500"
                                     }, void 0, false, {
                                         fileName: "[project]/pages/admin/batches.tsx",
-                                        lineNumber: 289,
+                                        lineNumber: 296,
                                         columnNumber: 15
                                     }, this)
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/pages/admin/batches.tsx",
-                                lineNumber: 287,
+                                lineNumber: 294,
                                 columnNumber: 13
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -938,7 +938,7 @@ function AdminBatches() {
                                         children: "Harvest date"
                                     }, void 0, false, {
                                         fileName: "[project]/pages/admin/batches.tsx",
-                                        lineNumber: 300,
+                                        lineNumber: 307,
                                         columnNumber: 15
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("input", {
@@ -951,13 +951,13 @@ function AdminBatches() {
                                         className: "p-2 rounded-md bg-slate-900 border border-slate-700 text-slate-100"
                                     }, void 0, false, {
                                         fileName: "[project]/pages/admin/batches.tsx",
-                                        lineNumber: 301,
+                                        lineNumber: 308,
                                         columnNumber: 15
                                     }, this)
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/pages/admin/batches.tsx",
-                                lineNumber: 299,
+                                lineNumber: 306,
                                 columnNumber: 13
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -968,7 +968,7 @@ function AdminBatches() {
                                         children: "Production date"
                                     }, void 0, false, {
                                         fileName: "[project]/pages/admin/batches.tsx",
-                                        lineNumber: 312,
+                                        lineNumber: 322,
                                         columnNumber: 15
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("input", {
@@ -981,13 +981,13 @@ function AdminBatches() {
                                         className: "p-2 rounded-md bg-slate-900 border border-slate-700 text-slate-100"
                                     }, void 0, false, {
                                         fileName: "[project]/pages/admin/batches.tsx",
-                                        lineNumber: 313,
+                                        lineNumber: 323,
                                         columnNumber: 15
                                     }, this)
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/pages/admin/batches.tsx",
-                                lineNumber: 311,
+                                lineNumber: 321,
                                 columnNumber: 13
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -998,7 +998,7 @@ function AdminBatches() {
                                         children: "Package date"
                                     }, void 0, false, {
                                         fileName: "[project]/pages/admin/batches.tsx",
-                                        lineNumber: 327,
+                                        lineNumber: 337,
                                         columnNumber: 15
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("input", {
@@ -1011,13 +1011,13 @@ function AdminBatches() {
                                         className: "p-2 rounded-md bg-slate-900 border border-slate-700 text-slate-100"
                                     }, void 0, false, {
                                         fileName: "[project]/pages/admin/batches.tsx",
-                                        lineNumber: 328,
+                                        lineNumber: 338,
                                         columnNumber: 15
                                     }, this)
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/pages/admin/batches.tsx",
-                                lineNumber: 326,
+                                lineNumber: 336,
                                 columnNumber: 13
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1028,7 +1028,7 @@ function AdminBatches() {
                                         children: "Expiration date"
                                     }, void 0, false, {
                                         fileName: "[project]/pages/admin/batches.tsx",
-                                        lineNumber: 342,
+                                        lineNumber: 352,
                                         columnNumber: 15
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("input", {
@@ -1041,13 +1041,13 @@ function AdminBatches() {
                                         className: "p-2 rounded-md bg-slate-900 border border-slate-700 text-slate-100"
                                     }, void 0, false, {
                                         fileName: "[project]/pages/admin/batches.tsx",
-                                        lineNumber: 343,
+                                        lineNumber: 353,
                                         columnNumber: 15
                                     }, this)
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/pages/admin/batches.tsx",
-                                lineNumber: 341,
+                                lineNumber: 351,
                                 columnNumber: 13
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1065,19 +1065,19 @@ function AdminBatches() {
                                             className: "h-4 w-4 rounded border-slate-600 bg-slate-900"
                                         }, void 0, false, {
                                             fileName: "[project]/pages/admin/batches.tsx",
-                                            lineNumber: 358,
+                                            lineNumber: 368,
                                             columnNumber: 17
                                         }, this),
                                         "Active batch (currently in circulation)"
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/pages/admin/batches.tsx",
-                                    lineNumber: 357,
+                                    lineNumber: 367,
                                     columnNumber: 15
                                 }, this)
                             }, void 0, false, {
                                 fileName: "[project]/pages/admin/batches.tsx",
-                                lineNumber: 356,
+                                lineNumber: 366,
                                 columnNumber: 13
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1088,7 +1088,7 @@ function AdminBatches() {
                                         children: "Notes"
                                     }, void 0, false, {
                                         fileName: "[project]/pages/admin/batches.tsx",
-                                        lineNumber: 371,
+                                        lineNumber: 381,
                                         columnNumber: 15
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("textarea", {
@@ -1101,19 +1101,19 @@ function AdminBatches() {
                                         className: "p-2 rounded-md bg-slate-900 border border-slate-700 text-slate-100 placeholder:text-slate-500 min-h-[80px]"
                                     }, void 0, false, {
                                         fileName: "[project]/pages/admin/batches.tsx",
-                                        lineNumber: 372,
+                                        lineNumber: 382,
                                         columnNumber: 15
                                     }, this)
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/pages/admin/batches.tsx",
-                                lineNumber: 370,
+                                lineNumber: 380,
                                 columnNumber: 13
                             }, this)
                         ]
                     }, void 0, true, {
                         fileName: "[project]/pages/admin/batches.tsx",
-                        lineNumber: 215,
+                        lineNumber: 222,
                         columnNumber: 11
                     }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1126,7 +1126,7 @@ function AdminBatches() {
                                 children: saving ? 'Saving...' : 'Save batch'
                             }, void 0, false, {
                                 fileName: "[project]/pages/admin/batches.tsx",
-                                lineNumber: 384,
+                                lineNumber: 394,
                                 columnNumber: 13
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
@@ -1135,19 +1135,19 @@ function AdminBatches() {
                                 children: "Cancel"
                             }, void 0, false, {
                                 fileName: "[project]/pages/admin/batches.tsx",
-                                lineNumber: 391,
+                                lineNumber: 401,
                                 columnNumber: 13
                             }, this)
                         ]
                     }, void 0, true, {
                         fileName: "[project]/pages/admin/batches.tsx",
-                        lineNumber: 383,
+                        lineNumber: 393,
                         columnNumber: 11
                     }, this)
                 ]
             }, void 0, true, {
                 fileName: "[project]/pages/admin/batches.tsx",
-                lineNumber: 204,
+                lineNumber: 211,
                 columnNumber: 9
             }, this),
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1166,7 +1166,7 @@ function AdminBatches() {
                         className: "flex-1 p-2 rounded-md bg-slate-900 border border-slate-700 text-sm text-slate-100 placeholder:text-slate-500"
                     }, void 0, false, {
                         fileName: "[project]/pages/admin/batches.tsx",
-                        lineNumber: 403,
+                        lineNumber: 413,
                         columnNumber: 9
                     }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
@@ -1175,13 +1175,13 @@ function AdminBatches() {
                         children: "Apply"
                     }, void 0, false, {
                         fileName: "[project]/pages/admin/batches.tsx",
-                        lineNumber: 415,
+                        lineNumber: 425,
                         columnNumber: 9
                     }, this)
                 ]
             }, void 0, true, {
                 fileName: "[project]/pages/admin/batches.tsx",
-                lineNumber: 402,
+                lineNumber: 412,
                 columnNumber: 7
             }, this),
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1192,7 +1192,7 @@ function AdminBatches() {
                         children: "Loading batches..."
                     }, void 0, false, {
                         fileName: "[project]/pages/admin/batches.tsx",
-                        lineNumber: 425,
+                        lineNumber: 435,
                         columnNumber: 11
                     }, this),
                     !loading && batches.length === 0 && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1200,7 +1200,7 @@ function AdminBatches() {
                         children: "No batches found. Create your first batch above."
                     }, void 0, false, {
                         fileName: "[project]/pages/admin/batches.tsx",
-                        lineNumber: 429,
+                        lineNumber: 439,
                         columnNumber: 11
                     }, this),
                     batches.map((b)=>/*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1217,7 +1217,7 @@ function AdminBatches() {
                                                     children: b.productName || b.batchCode
                                                 }, void 0, false, {
                                                     fileName: "[project]/pages/admin/batches.tsx",
-                                                    lineNumber: 441,
+                                                    lineNumber: 451,
                                                     columnNumber: 17
                                                 }, this),
                                                 !b.isActive && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -1225,13 +1225,13 @@ function AdminBatches() {
                                                     children: "Inactive"
                                                 }, void 0, false, {
                                                     fileName: "[project]/pages/admin/batches.tsx",
-                                                    lineNumber: 445,
+                                                    lineNumber: 455,
                                                     columnNumber: 19
                                                 }, this)
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/pages/admin/batches.tsx",
-                                            lineNumber: 440,
+                                            lineNumber: 450,
                                             columnNumber: 15
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1244,12 +1244,12 @@ function AdminBatches() {
                                                         children: b.batchCode
                                                     }, void 0, false, {
                                                         fileName: "[project]/pages/admin/batches.tsx",
-                                                        lineNumber: 452,
+                                                        lineNumber: 462,
                                                         columnNumber: 19
                                                     }, this)
                                                 }, void 0, false, {
                                                     fileName: "[project]/pages/admin/batches.tsx",
-                                                    lineNumber: 451,
+                                                    lineNumber: 461,
                                                     columnNumber: 17
                                                 }, this),
                                                 b.primaryCategory && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -1257,7 +1257,7 @@ function AdminBatches() {
                                                     children: b.primaryCategory
                                                 }, void 0, false, {
                                                     fileName: "[project]/pages/admin/batches.tsx",
-                                                    lineNumber: 457,
+                                                    lineNumber: 467,
                                                     columnNumber: 19
                                                 }, this),
                                                 b.brand && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -1268,26 +1268,26 @@ function AdminBatches() {
                                                     ]
                                                 }, void 0, true, {
                                                     fileName: "[project]/pages/admin/batches.tsx",
-                                                    lineNumber: 460,
+                                                    lineNumber: 470,
                                                     columnNumber: 19
                                                 }, this)
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/pages/admin/batches.tsx",
-                                            lineNumber: 450,
+                                            lineNumber: 460,
                                             columnNumber: 15
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                                             children: renderRating(b)
                                         }, void 0, false, {
                                             fileName: "[project]/pages/admin/batches.tsx",
-                                            lineNumber: 465,
+                                            lineNumber: 473,
                                             columnNumber: 15
                                         }, this)
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/pages/admin/batches.tsx",
-                                    lineNumber: 439,
+                                    lineNumber: 449,
                                     columnNumber: 13
                                 }, this),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1299,8 +1299,8 @@ function AdminBatches() {
                                             children: "View"
                                         }, void 0, false, {
                                             fileName: "[project]/pages/admin/batches.tsx",
-                                            lineNumber: 468,
-                                            columnNumber: 3
+                                            lineNumber: 476,
+                                            columnNumber: 15
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
                                             onClick: ()=>startEdit(b),
@@ -1308,8 +1308,8 @@ function AdminBatches() {
                                             children: "Edit"
                                         }, void 0, false, {
                                             fileName: "[project]/pages/admin/batches.tsx",
-                                            lineNumber: 474,
-                                            columnNumber: 3
+                                            lineNumber: 482,
+                                            columnNumber: 15
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
                                             onClick: ()=>deleteBatch(b.id),
@@ -1317,31 +1317,31 @@ function AdminBatches() {
                                             children: "Delete"
                                         }, void 0, false, {
                                             fileName: "[project]/pages/admin/batches.tsx",
-                                            lineNumber: 480,
-                                            columnNumber: 3
+                                            lineNumber: 488,
+                                            columnNumber: 15
                                         }, this)
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/pages/admin/batches.tsx",
-                                    lineNumber: 467,
+                                    lineNumber: 475,
                                     columnNumber: 13
                                 }, this)
                             ]
                         }, b.id, true, {
                             fileName: "[project]/pages/admin/batches.tsx",
-                            lineNumber: 435,
+                            lineNumber: 445,
                             columnNumber: 11
                         }, this))
                 ]
             }, void 0, true, {
                 fileName: "[project]/pages/admin/batches.tsx",
-                lineNumber: 423,
+                lineNumber: 433,
                 columnNumber: 7
             }, this)
         ]
     }, void 0, true, {
         fileName: "[project]/pages/admin/batches.tsx",
-        lineNumber: 185,
+        lineNumber: 192,
         columnNumber: 5
     }, this);
 }

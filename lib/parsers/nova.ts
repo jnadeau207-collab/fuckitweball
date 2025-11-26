@@ -45,20 +45,14 @@ export function parseNovaLabsCoa(text: string): NovaParsed {
   // TOTAL CANNABINOIDS:29.1 %
   const totalCannabinoidsPercent = matchNumber(
     /TOTAL CANNABINOIDS[:\s]+([\d.]+)\s*%/i,
-    text
+    text,
   );
 
   // Moisture line: MOISTURE9.000.0100/0.0100N/A  => 9.00 %
-  const moisturePercent = matchNumber(
-    /MOISTURE\s*([\d.]+)\s*%?/i,
-    text
-  );
+  const moisturePercent = matchNumber(/MOISTURE\s*([\d.]+)\s*%?/i, text);
 
   // Water activity: WATER ACTIVITY0.65 Aw0.54...
-  const waterActivity = matchNumber(
-    /WATER ACTIVITY\s*([\d.]+)\s*Aw/i,
-    text
-  );
+  const waterActivity = matchNumber(/WATER ACTIVITY\s*([\d.]+)\s*Aw/i, text);
 
   // Summary flags at top: PESTICIDESFAIL, MICROBIALFAIL, METALSPASS
   const pesticidesFail = /PESTICIDESFAIL/i.test(text);

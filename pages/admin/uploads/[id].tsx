@@ -153,13 +153,17 @@ export default function AdminUploadFullDebug() {
               <div>
                 <div className="text-slate-400">Batch code</div>
                 <div className="text-slate-100">
-                  {doc.batchCode || <span className="text-slate-500">Not detected</span>}
+                  {doc.batchCode || (
+                    <span className="text-slate-500">Not detected</span>
+                  )}
                 </div>
               </div>
               <div>
                 <div className="text-slate-400">Lab name</div>
                 <div className="text-slate-100">
-                  {doc.labName || <span className="text-slate-500">Not detected</span>}
+                  {doc.labName || (
+                    <span className="text-slate-500">Not detected</span>
+                  )}
                 </div>
               </div>
               <div>
@@ -227,8 +231,8 @@ export default function AdminUploadFullDebug() {
                       {doc.labResult.passed == null
                         ? 'Unknown'
                         : doc.labResult.passed
-                        ? 'Pass'
-                        : 'Fail'}
+                          ? 'Pass'
+                          : 'Fail'}
                     </div>
                   </div>
                 </div>

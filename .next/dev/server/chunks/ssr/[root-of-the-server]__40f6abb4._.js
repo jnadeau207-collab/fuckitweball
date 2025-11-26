@@ -114,12 +114,12 @@ function AdminStateDetail() {
                 children: "Sign in as an admin to view state details."
             }, void 0, false, {
                 fileName: "[project]/pages/admin/states/[stateCode].tsx",
-                lineNumber: 114,
+                lineNumber: 113,
                 columnNumber: 9
             }, this)
         }, void 0, false, {
             fileName: "[project]/pages/admin/states/[stateCode].tsx",
-            lineNumber: 113,
+            lineNumber: 112,
             columnNumber: 7
         }, this);
     }
@@ -136,7 +136,7 @@ function AdminStateDetail() {
                             children: "← Back to state map"
                         }, void 0, false, {
                             fileName: "[project]/pages/admin/states/[stateCode].tsx",
-                            lineNumber: 125,
+                            lineNumber: 124,
                             columnNumber: 11
                         }, this),
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$externals$5d2f$react$2f$jsx$2d$dev$2d$runtime__$5b$external$5d$__$28$react$2f$jsx$2d$dev$2d$runtime$2c$__cjs$29$__["jsxDEV"])("h1", {
@@ -147,7 +147,7 @@ function AdminStateDetail() {
                             ]
                         }, void 0, true, {
                             fileName: "[project]/pages/admin/states/[stateCode].tsx",
-                            lineNumber: 131,
+                            lineNumber: 130,
                             columnNumber: 11
                         }, this),
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$externals$5d2f$react$2f$jsx$2d$dev$2d$runtime__$5b$external$5d$__$28$react$2f$jsx$2d$dev$2d$runtime$2c$__cjs$29$__["jsxDEV"])("p", {
@@ -158,25 +158,25 @@ function AdminStateDetail() {
                                     children: code
                                 }, void 0, false, {
                                     fileName: "[project]/pages/admin/states/[stateCode].tsx",
-                                    lineNumber: 135,
+                                    lineNumber: 134,
                                     columnNumber: 57
                                 }, this),
                                 ". Use brand filters and search to stay sane with large datasets."
                             ]
                         }, void 0, true, {
                             fileName: "[project]/pages/admin/states/[stateCode].tsx",
-                            lineNumber: 134,
+                            lineNumber: 133,
                             columnNumber: 11
                         }, this)
                     ]
                 }, void 0, true, {
                     fileName: "[project]/pages/admin/states/[stateCode].tsx",
-                    lineNumber: 124,
+                    lineNumber: 123,
                     columnNumber: 9
                 }, this)
             }, void 0, false, {
                 fileName: "[project]/pages/admin/states/[stateCode].tsx",
-                lineNumber: 123,
+                lineNumber: 122,
                 columnNumber: 7
             }, this),
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$externals$5d2f$react$2f$jsx$2d$dev$2d$runtime__$5b$external$5d$__$28$react$2f$jsx$2d$dev$2d$runtime$2c$__cjs$29$__["jsxDEV"])("div", {
@@ -193,7 +193,7 @@ function AdminStateDetail() {
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/pages/admin/states/[stateCode].tsx",
-                                lineNumber: 144,
+                                lineNumber: 143,
                                 columnNumber: 11
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$externals$5d2f$react$2f$jsx$2d$dev$2d$runtime__$5b$external$5d$__$28$react$2f$jsx$2d$dev$2d$runtime$2c$__cjs$29$__["jsxDEV"])("div", {
@@ -201,13 +201,13 @@ function AdminStateDetail() {
                                 children: totalBatches
                             }, void 0, false, {
                                 fileName: "[project]/pages/admin/states/[stateCode].tsx",
-                                lineNumber: 147,
+                                lineNumber: 146,
                                 columnNumber: 11
                             }, this)
                         ]
                     }, void 0, true, {
                         fileName: "[project]/pages/admin/states/[stateCode].tsx",
-                        lineNumber: 143,
+                        lineNumber: 142,
                         columnNumber: 9
                     }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$externals$5d2f$react$2f$jsx$2d$dev$2d$runtime__$5b$external$5d$__$28$react$2f$jsx$2d$dev$2d$runtime$2c$__cjs$29$__["jsxDEV"])("div", {
@@ -218,7 +218,7 @@ function AdminStateDetail() {
                                 children: "Unique brands"
                             }, void 0, false, {
                                 fileName: "[project]/pages/admin/states/[stateCode].tsx",
-                                lineNumber: 152,
+                                lineNumber: 151,
                                 columnNumber: 11
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$externals$5d2f$react$2f$jsx$2d$dev$2d$runtime__$5b$external$5d$__$28$react$2f$jsx$2d$dev$2d$runtime$2c$__cjs$29$__["jsxDEV"])("div", {
@@ -226,13 +226,13 @@ function AdminStateDetail() {
                                 children: totalBrands
                             }, void 0, false, {
                                 fileName: "[project]/pages/admin/states/[stateCode].tsx",
-                                lineNumber: 153,
+                                lineNumber: 152,
                                 columnNumber: 11
                             }, this)
                         ]
                     }, void 0, true, {
                         fileName: "[project]/pages/admin/states/[stateCode].tsx",
-                        lineNumber: 151,
+                        lineNumber: 150,
                         columnNumber: 9
                     }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$externals$5d2f$react$2f$jsx$2d$dev$2d$runtime__$5b$external$5d$__$28$react$2f$jsx$2d$dev$2d$runtime$2c$__cjs$29$__["jsxDEV"])("div", {
@@ -243,7 +243,7 @@ function AdminStateDetail() {
                                 children: "Lab results linked"
                             }, void 0, false, {
                                 fileName: "[project]/pages/admin/states/[stateCode].tsx",
-                                lineNumber: 158,
+                                lineNumber: 157,
                                 columnNumber: 11
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$externals$5d2f$react$2f$jsx$2d$dev$2d$runtime__$5b$external$5d$__$28$react$2f$jsx$2d$dev$2d$runtime$2c$__cjs$29$__["jsxDEV"])("div", {
@@ -251,19 +251,19 @@ function AdminStateDetail() {
                                 children: totalLabResults
                             }, void 0, false, {
                                 fileName: "[project]/pages/admin/states/[stateCode].tsx",
-                                lineNumber: 161,
+                                lineNumber: 158,
                                 columnNumber: 11
                             }, this)
                         ]
                     }, void 0, true, {
                         fileName: "[project]/pages/admin/states/[stateCode].tsx",
-                        lineNumber: 157,
+                        lineNumber: 156,
                         columnNumber: 9
                     }, this)
                 ]
             }, void 0, true, {
                 fileName: "[project]/pages/admin/states/[stateCode].tsx",
-                lineNumber: 142,
+                lineNumber: 141,
                 columnNumber: 7
             }, this),
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$externals$5d2f$react$2f$jsx$2d$dev$2d$runtime__$5b$external$5d$__$28$react$2f$jsx$2d$dev$2d$runtime$2c$__cjs$29$__["jsxDEV"])("div", {
@@ -274,7 +274,7 @@ function AdminStateDetail() {
                         children: error
                     }, void 0, false, {
                         fileName: "[project]/pages/admin/states/[stateCode].tsx",
-                        lineNumber: 170,
+                        lineNumber: 167,
                         columnNumber: 11
                     }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$externals$5d2f$react$2f$jsx$2d$dev$2d$runtime__$5b$external$5d$__$28$react$2f$jsx$2d$dev$2d$runtime$2c$__cjs$29$__["jsxDEV"])("div", {
@@ -290,7 +290,7 @@ function AdminStateDetail() {
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/pages/admin/states/[stateCode].tsx",
-                                    lineNumber: 177,
+                                    lineNumber: 174,
                                     columnNumber: 13
                                 }, this),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$externals$5d2f$react$2f$jsx$2d$dev$2d$runtime__$5b$external$5d$__$28$react$2f$jsx$2d$dev$2d$runtime$2c$__cjs$29$__["jsxDEV"])("input", {
@@ -300,18 +300,18 @@ function AdminStateDetail() {
                                     className: "w-full p-1.5 rounded-md bg-slate-950 border border-slate-700 text-slate-100 placeholder:text-slate-500"
                                 }, void 0, false, {
                                     fileName: "[project]/pages/admin/states/[stateCode].tsx",
-                                    lineNumber: 180,
+                                    lineNumber: 177,
                                     columnNumber: 13
                                 }, this)
                             ]
                         }, void 0, true, {
                             fileName: "[project]/pages/admin/states/[stateCode].tsx",
-                            lineNumber: 176,
+                            lineNumber: 173,
                             columnNumber: 11
                         }, this)
                     }, void 0, false, {
                         fileName: "[project]/pages/admin/states/[stateCode].tsx",
-                        lineNumber: 175,
+                        lineNumber: 172,
                         columnNumber: 9
                     }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$externals$5d2f$react$2f$jsx$2d$dev$2d$runtime__$5b$external$5d$__$28$react$2f$jsx$2d$dev$2d$runtime$2c$__cjs$29$__["jsxDEV"])("div", {
@@ -326,7 +326,7 @@ function AdminStateDetail() {
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/pages/admin/states/[stateCode].tsx",
-                                lineNumber: 191,
+                                lineNumber: 188,
                                 columnNumber: 11
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$externals$5d2f$react$2f$jsx$2d$dev$2d$runtime__$5b$external$5d$__$28$react$2f$jsx$2d$dev$2d$runtime$2c$__cjs$29$__["jsxDEV"])("div", {
@@ -338,7 +338,7 @@ function AdminStateDetail() {
                                         children: "All brands"
                                     }, void 0, false, {
                                         fileName: "[project]/pages/admin/states/[stateCode].tsx",
-                                        lineNumber: 195,
+                                        lineNumber: 192,
                                         columnNumber: 13
                                     }, this),
                                     brands.map((b)=>/*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$externals$5d2f$react$2f$jsx$2d$dev$2d$runtime__$5b$external$5d$__$28$react$2f$jsx$2d$dev$2d$runtime$2c$__cjs$29$__["jsxDEV"])("button", {
@@ -347,25 +347,25 @@ function AdminStateDetail() {
                                             children: b.name
                                         }, b.id, false, {
                                             fileName: "[project]/pages/admin/states/[stateCode].tsx",
-                                            lineNumber: 206,
+                                            lineNumber: 203,
                                             columnNumber: 15
                                         }, this))
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/pages/admin/states/[stateCode].tsx",
-                                lineNumber: 194,
+                                lineNumber: 191,
                                 columnNumber: 11
                             }, this)
                         ]
                     }, void 0, true, {
                         fileName: "[project]/pages/admin/states/[stateCode].tsx",
-                        lineNumber: 190,
+                        lineNumber: 187,
                         columnNumber: 9
                     }, this)
                 ]
             }, void 0, true, {
                 fileName: "[project]/pages/admin/states/[stateCode].tsx",
-                lineNumber: 168,
+                lineNumber: 165,
                 columnNumber: 7
             }, this),
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$externals$5d2f$react$2f$jsx$2d$dev$2d$runtime__$5b$external$5d$__$28$react$2f$jsx$2d$dev$2d$runtime$2c$__cjs$29$__["jsxDEV"])("div", {
@@ -383,7 +383,7 @@ function AdminStateDetail() {
                                         children: filteredBatches.length
                                     }, void 0, false, {
                                         fileName: "[project]/pages/admin/states/[stateCode].tsx",
-                                        lineNumber: 227,
+                                        lineNumber: 224,
                                         columnNumber: 13
                                     }, this),
                                     ' ',
@@ -393,7 +393,7 @@ function AdminStateDetail() {
                                         children: totalBatches
                                     }, void 0, false, {
                                         fileName: "[project]/pages/admin/states/[stateCode].tsx",
-                                        lineNumber: 230,
+                                        lineNumber: 227,
                                         columnNumber: 16
                                     }, this),
                                     " batches in",
@@ -402,7 +402,7 @@ function AdminStateDetail() {
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/pages/admin/states/[stateCode].tsx",
-                                lineNumber: 225,
+                                lineNumber: 222,
                                 columnNumber: 11
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$externals$5d2f$react$2f$jsx$2d$dev$2d$runtime__$5b$external$5d$__$28$react$2f$jsx$2d$dev$2d$runtime$2c$__cjs$29$__["jsxDEV"])("button", {
@@ -411,13 +411,13 @@ function AdminStateDetail() {
                                 children: "Refresh"
                             }, void 0, false, {
                                 fileName: "[project]/pages/admin/states/[stateCode].tsx",
-                                lineNumber: 233,
+                                lineNumber: 230,
                                 columnNumber: 11
                             }, this)
                         ]
                     }, void 0, true, {
                         fileName: "[project]/pages/admin/states/[stateCode].tsx",
-                        lineNumber: 224,
+                        lineNumber: 221,
                         columnNumber: 9
                     }, this),
                     loading && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$externals$5d2f$react$2f$jsx$2d$dev$2d$runtime__$5b$external$5d$__$28$react$2f$jsx$2d$dev$2d$runtime$2c$__cjs$29$__["jsxDEV"])("div", {
@@ -425,7 +425,7 @@ function AdminStateDetail() {
                         children: "Loading batches…"
                     }, void 0, false, {
                         fileName: "[project]/pages/admin/states/[stateCode].tsx",
-                        lineNumber: 246,
+                        lineNumber: 243,
                         columnNumber: 11
                     }, this),
                     !loading && filteredBatches.length === 0 && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$externals$5d2f$react$2f$jsx$2d$dev$2d$runtime__$5b$external$5d$__$28$react$2f$jsx$2d$dev$2d$runtime$2c$__cjs$29$__["jsxDEV"])("div", {
@@ -437,7 +437,7 @@ function AdminStateDetail() {
                         ]
                     }, void 0, true, {
                         fileName: "[project]/pages/admin/states/[stateCode].tsx",
-                        lineNumber: 250,
+                        lineNumber: 247,
                         columnNumber: 11
                     }, this),
                     !loading && filteredBatches.length > 0 && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$externals$5d2f$react$2f$jsx$2d$dev$2d$runtime__$5b$external$5d$__$28$react$2f$jsx$2d$dev$2d$runtime$2c$__cjs$29$__["jsxDEV"])("div", {
@@ -458,7 +458,7 @@ function AdminStateDetail() {
                                                         children: b.batchCode
                                                     }, void 0, false, {
                                                         fileName: "[project]/pages/admin/states/[stateCode].tsx",
-                                                        lineNumber: 270,
+                                                        lineNumber: 267,
                                                         columnNumber: 23
                                                     }, this),
                                                     b.isActive && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$externals$5d2f$react$2f$jsx$2d$dev$2d$runtime__$5b$external$5d$__$28$react$2f$jsx$2d$dev$2d$runtime$2c$__cjs$29$__["jsxDEV"])("span", {
@@ -466,13 +466,13 @@ function AdminStateDetail() {
                                                         children: "Active"
                                                     }, void 0, false, {
                                                         fileName: "[project]/pages/admin/states/[stateCode].tsx",
-                                                        lineNumber: 274,
+                                                        lineNumber: 271,
                                                         columnNumber: 25
                                                     }, this)
                                                 ]
                                             }, void 0, true, {
                                                 fileName: "[project]/pages/admin/states/[stateCode].tsx",
-                                                lineNumber: 269,
+                                                lineNumber: 266,
                                                 columnNumber: 21
                                             }, this),
                                             b.productName && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$externals$5d2f$react$2f$jsx$2d$dev$2d$runtime__$5b$external$5d$__$28$react$2f$jsx$2d$dev$2d$runtime$2c$__cjs$29$__["jsxDEV"])("div", {
@@ -480,7 +480,7 @@ function AdminStateDetail() {
                                                 children: b.productName
                                             }, void 0, false, {
                                                 fileName: "[project]/pages/admin/states/[stateCode].tsx",
-                                                lineNumber: 280,
+                                                lineNumber: 277,
                                                 columnNumber: 23
                                             }, this),
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$externals$5d2f$react$2f$jsx$2d$dev$2d$runtime__$5b$external$5d$__$28$react$2f$jsx$2d$dev$2d$runtime$2c$__cjs$29$__["jsxDEV"])("div", {
@@ -492,25 +492,24 @@ function AdminStateDetail() {
                                                 ]
                                             }, void 0, true, {
                                                 fileName: "[project]/pages/admin/states/[stateCode].tsx",
-                                                lineNumber: 282,
+                                                lineNumber: 279,
                                                 columnNumber: 21
                                             }, this),
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$externals$5d2f$react$2f$jsx$2d$dev$2d$runtime__$5b$external$5d$__$28$react$2f$jsx$2d$dev$2d$runtime$2c$__cjs$29$__["jsxDEV"])("div", {
                                                 className: "text-slate-500",
                                                 children: [
-                                                    "Created",
-                                                    ' ',
+                                                    "Created ",
                                                     new Date(b.createdAt).toLocaleDateString()
                                                 ]
                                             }, void 0, true, {
                                                 fileName: "[project]/pages/admin/states/[stateCode].tsx",
-                                                lineNumber: 289,
+                                                lineNumber: 284,
                                                 columnNumber: 21
                                             }, this)
                                         ]
                                     }, void 0, true, {
                                         fileName: "[project]/pages/admin/states/[stateCode].tsx",
-                                        lineNumber: 268,
+                                        lineNumber: 265,
                                         columnNumber: 19
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$externals$5d2f$react$2f$jsx$2d$dev$2d$runtime__$5b$external$5d$__$28$react$2f$jsx$2d$dev$2d$runtime$2c$__cjs$29$__["jsxDEV"])("div", {
@@ -527,7 +526,7 @@ function AdminStateDetail() {
                                                         ]
                                                     }, void 0, true, {
                                                         fileName: "[project]/pages/admin/states/[stateCode].tsx",
-                                                        lineNumber: 297,
+                                                        lineNumber: 291,
                                                         columnNumber: 25
                                                     }, this),
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$externals$5d2f$react$2f$jsx$2d$dev$2d$runtime__$5b$external$5d$__$28$react$2f$jsx$2d$dev$2d$runtime$2c$__cjs$29$__["jsxDEV"])("div", {
@@ -539,7 +538,7 @@ function AdminStateDetail() {
                                                         ]
                                                     }, void 0, true, {
                                                         fileName: "[project]/pages/admin/states/[stateCode].tsx",
-                                                        lineNumber: 303,
+                                                        lineNumber: 297,
                                                         columnNumber: 25
                                                     }, this),
                                                     latestLab.passed != null && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$externals$5d2f$react$2f$jsx$2d$dev$2d$runtime__$5b$external$5d$__$28$react$2f$jsx$2d$dev$2d$runtime$2c$__cjs$29$__["jsxDEV"])("div", {
@@ -547,7 +546,7 @@ function AdminStateDetail() {
                                                         children: latestLab.passed ? 'Pass' : 'Fail'
                                                     }, void 0, false, {
                                                         fileName: "[project]/pages/admin/states/[stateCode].tsx",
-                                                        lineNumber: 312,
+                                                        lineNumber: 306,
                                                         columnNumber: 27
                                                     }, this)
                                                 ]
@@ -557,37 +556,37 @@ function AdminStateDetail() {
                                                 children: "No lab result linked"
                                             }, void 0, false, {
                                                 fileName: "[project]/pages/admin/states/[stateCode].tsx",
-                                                lineNumber: 325,
+                                                lineNumber: 319,
                                                 columnNumber: 23
                                             }, this)
                                         ]
                                     }, void 0, true, {
                                         fileName: "[project]/pages/admin/states/[stateCode].tsx",
-                                        lineNumber: 294,
+                                        lineNumber: 288,
                                         columnNumber: 19
                                     }, this)
                                 ]
                             }, b.id, true, {
                                 fileName: "[project]/pages/admin/states/[stateCode].tsx",
-                                lineNumber: 264,
+                                lineNumber: 261,
                                 columnNumber: 17
                             }, this);
                         })
                     }, void 0, false, {
                         fileName: "[project]/pages/admin/states/[stateCode].tsx",
-                        lineNumber: 256,
+                        lineNumber: 253,
                         columnNumber: 11
                     }, this)
                 ]
             }, void 0, true, {
                 fileName: "[project]/pages/admin/states/[stateCode].tsx",
-                lineNumber: 223,
+                lineNumber: 220,
                 columnNumber: 7
             }, this)
         ]
     }, void 0, true, {
         fileName: "[project]/pages/admin/states/[stateCode].tsx",
-        lineNumber: 122,
+        lineNumber: 121,
         columnNumber: 5
     }, this);
 }

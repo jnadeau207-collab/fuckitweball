@@ -1,6 +1,7 @@
 # CartFax — Complete v2
 
 This snapshot includes:
+
 - Admin CRUD UIs for Dispensaries & Batches (Next.js pages)
 - Hardened admin API middleware (session + role check)
 - S3 presigned POST upload endpoint and front-end integration

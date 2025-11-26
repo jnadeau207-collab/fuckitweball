@@ -124,8 +124,9 @@ export default function AdminBatchDetail() {
   const [error, setError] = useState<string | null>(null);
 
   // NEW: track which lab result is being deleted
-  const [deletingLabResultId, setDeletingLabResultId] =
-    useState<number | null>(null);
+  const [deletingLabResultId, setDeletingLabResultId] = useState<number | null>(
+    null,
+  );
 
   useEffect(() => {
     if (!id || !session) return;
@@ -158,7 +159,7 @@ export default function AdminBatchDetail() {
 
     if (typeof window !== 'undefined') {
       const ok = window.confirm(
-        'Delete this COA and its lab result from this batch? This cannot be undone.'
+        'Delete this COA and its lab result from this batch? This cannot be undone.',
       );
       if (!ok) return;
     }
@@ -238,9 +239,7 @@ export default function AdminBatchDetail() {
           </h1>
           <p className="text-sm text-slate-400">
             Batch code{' '}
-            <span className="font-mono text-slate-200">
-              {batch.batchCode}
-            </span>
+            <span className="font-mono text-slate-200">{batch.batchCode}</span>
             {batch.brand && (
               <>
                 {' '}
@@ -258,10 +257,10 @@ export default function AdminBatchDetail() {
                 status === 'VERIFIED'
                   ? 'border-emerald-500 text-emerald-300'
                   : status === 'RECALLED'
-                  ? 'border-red-500 text-red-300'
-                  : status === 'FLAGGED' || status === 'REJECTED'
-                  ? 'border-amber-500 text-amber-300'
-                  : 'border-slate-600 text-slate-300'
+                    ? 'border-red-500 text-red-300'
+                    : status === 'FLAGGED' || status === 'REJECTED'
+                      ? 'border-amber-500 text-amber-300'
+                      : 'border-slate-600 text-slate-300'
               }`}
             >
               {status}
@@ -278,10 +277,7 @@ export default function AdminBatchDetail() {
             <div className="text-xs text-emerald-300">
               ★ {batch.reviewAggregate.ratingAvg.toFixed(1)} / 5 ({' '}
               {batch.reviewAggregate.ratingCount}{' '}
-              {batch.reviewAggregate.ratingCount === 1
-                ? 'rating'
-                : 'ratings'}
-              )
+              {batch.reviewAggregate.ratingCount === 1 ? 'rating' : 'ratings'})
             </div>
           ) : (
             <div className="text-xs text-slate-500">No ratings yet</div>
@@ -306,30 +302,22 @@ export default function AdminBatchDetail() {
           <div className="grid text-sm gap-2 md:grid-cols-2">
             <div>
               <div className="text-xs text-slate-400">Batch code</div>
-              <div className="font-mono text-slate-100">
-                {batch.batchCode}
-              </div>
+              <div className="font-mono text-slate-100">{batch.batchCode}</div>
             </div>
             <div>
               <div className="text-xs text-slate-400">Product</div>
-              <div className="text-slate-100">
-                {batch.productName || '—'}
-              </div>
+              <div className="text-slate-100">{batch.productName || '—'}</div>
             </div>
             <div>
               <div className="text-xs text-slate-400">Category</div>
               <div className="text-slate-100">
                 {batch.primaryCategory || '—'}
-                {batch.subCategory
-                  ? ` · ${batch.subCategory}`
-                  : ''}
+                {batch.subCategory ? ` · ${batch.subCategory}` : ''}
               </div>
             </div>
             <div>
               <div className="text-xs text-slate-400">SKU</div>
-              <div className="text-slate-100">
-                {batch.productSku || '—'}
-              </div>
+              <div className="text-slate-100">{batch.productSku || '—'}</div>
             </div>
             <div>
               <div className="text-xs text-slate-400">Harvest date</div>
@@ -338,9 +326,7 @@ export default function AdminBatchDetail() {
               </div>
             </div>
             <div>
-              <div className="text-xs text-slate-400">
-                Production date
-              </div>
+              <div className="text-xs text-slate-400">Production date</div>
               <div className="text-slate-100">
                 {formatDate(batch.productionDate)}
               </div>
@@ -378,9 +364,7 @@ export default function AdminBatchDetail() {
             </h2>
             {ver ? (
               <div className="space-y-1">
-                <div className="text-xs text-slate-400">
-                  Latest status
-                </div>
+                <div className="text-xs text-slate-400">Latest status</div>
                 <div className="text-slate-100">
                   {ver.status}{' '}
                   <span className="text-xs text-slate-500">
@@ -511,9 +495,7 @@ export default function AdminBatchDetail() {
                       )}
                     </td>
                     <td className="py-2 pr-3 text-slate-200">
-                      {lr.uploadedDocument
-                        ? lr.uploadedDocument.fileName
-                        : '—'}
+                      {lr.uploadedDocument ? lr.uploadedDocument.fileName : '—'}
                     </td>
                     <td className="py-2 pr-3">
                       {lr.uploadedDocument ? (
@@ -556,12 +538,9 @@ export default function AdminBatchDetail() {
                 key={bl.id}
                 className="border border-slate-800 rounded-md px-3 py-2"
               >
-                <div className="text-slate-100">
-                  {bl.location.name}
-                </div>
+                <div className="text-slate-100">{bl.location.name}</div>
                 <div className="text-slate-400">
-                  {bl.location.city || '—'},{' '}
-                  {bl.location.state || '—'}
+                  {bl.location.city || '—'}, {bl.location.state || '—'}
                 </div>
                 <div className="text-[10px] text-slate-500 mt-1">
                   Type: {bl.location.type}
@@ -584,10 +563,7 @@ export default function AdminBatchDetail() {
               ★ {batch.reviewAggregate.ratingAvg.toFixed(1)} / 5
             </span>{' '}
             ({batch.reviewAggregate.ratingCount}{' '}
-            {batch.reviewAggregate.ratingCount === 1
-              ? 'rating'
-              : 'ratings'}
-            )
+            {batch.reviewAggregate.ratingCount === 1 ? 'rating' : 'ratings'})
           </div>
         ) : (
           <div className="text-xs text-slate-500 mb-2">
@@ -611,8 +587,7 @@ export default function AdminBatchDetail() {
                   ★ {rs.ratingAvg.toFixed(1)} / 5
                 </div>
                 <div className="text-slate-500">
-                  {rs.ratingCount}{' '}
-                  {rs.ratingCount === 1 ? 'rating' : 'ratings'}
+                  {rs.ratingCount} {rs.ratingCount === 1 ? 'rating' : 'ratings'}
                 </div>
               </div>
             ))}
@@ -644,9 +619,7 @@ export default function AdminBatchDetail() {
                   </div>
                 </div>
                 {v.reason && (
-                  <div className="text-slate-300 mt-1">
-                    {v.reason}
-                  </div>
+                  <div className="text-slate-300 mt-1">{v.reason}</div>
                 )}
               </div>
             ))}

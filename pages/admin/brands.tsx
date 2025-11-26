@@ -24,8 +24,7 @@ export default function AdminBrands() {
       <div className="rounded-xl border border-slate-800 bg-slate-900/70 p-4 text-sm text-slate-300">
         <p>
           <span className="font-semibold">Coming soon:</span> brand CRUD,
-          website/logo fields, and integration with batch and location
-          metadata.
+          website/logo fields, and integration with batch and location metadata.
         </p>
       </div>
     </div>
