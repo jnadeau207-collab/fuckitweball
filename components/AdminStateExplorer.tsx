@@ -1,466 +1,872 @@
-// components/admin/AdminStateExplorer.tsx
-import React, { useMemo, useState } from 'react';
-import { useRouter } from 'next/router';
-import Link from 'next/link';
+// components/AdminStateExplorer.tsx
+
+import React, { useMemo, useRef, useState } from 'react';
+import { ComposableMap, Geographies, Geography } from 'react-simple-maps';
 import { useSession } from 'next-auth/react';
+import Link from 'next/link';
 
-type Region = 'west' | 'midwest' | 'south' | 'northeast' | 'pacific';
+const GEO_URL = 'https://cdn.jsdelivr.net/npm/us-atlas@3/states-10m.json';
 
-type StateRow = {
-  region: Region;
-  y: number; // vertical position as % within the map box
-  startX: number; // starting x%
-  spacing: number; // x% between bubbles
-  states: { code: string; name: string }[];
+const NAME_TO_CODE: Record<string, string> = {
+  Alabama: 'AL',
+  Alaska: 'AK',
+  Arizona: 'AZ',
+  Arkansas: 'AR',
+  California: 'CA',
+  Colorado: 'CO',
+  Connecticut: 'CT',
+  Delaware: 'DE',
+  'District of Columbia': 'DC',
+  Florida: 'FL',
+  Georgia: 'GA',
+  Hawaii: 'HI',
+  Idaho: 'ID',
+  Illinois: 'IL',
+  Indiana: 'IN',
+  Iowa: 'IA',
+  Kansas: 'KS',
+  Kentucky: 'KY',
+  Louisiana: 'LA',
+  Maine: 'ME',
+  Maryland: 'MD',
+  Massachusetts: 'MA',
+  Michigan: 'MI',
+  Minnesota: 'MN',
+  Mississippi: 'MS',
+  Missouri: 'MO',
+  Montana: 'MT',
+  Nebraska: 'NE',
+  Nevada: 'NV',
+  'New Hampshire': 'NH',
+  'New Jersey': 'NJ',
+  'New Mexico': 'NM',
+  'New York': 'NY',
+  'North Carolina': 'NC',
+  'North Dakota': 'ND',
+  Ohio: 'OH',
+  Oklahoma: 'OK',
+  Oregon: 'OR',
+  Pennsylvania: 'PA',
+  'Rhode Island': 'RI',
+  'South Carolina': 'SC',
+  'South Dakota': 'SD',
+  Tennessee: 'TN',
+  Texas: 'TX',
+  Utah: 'UT',
+  Vermont: 'VT',
+  Virginia: 'VA',
+  Washington: 'WA',
+  'West Virginia': 'WV',
+  Wisconsin: 'WI',
+  Wyoming: 'WY',
+  'Puerto Rico': 'PR',
 };
 
-type StateBubble = {
+type StateInfo = {
   code: string;
   name: string;
-  region: Region;
-  x: number;
-  y: number;
-  rowIndex: number;
-  colIndex: number;
 };
 
-type StateStats = {
-  batches: number;
-  activeBatches: number;
-  labs: number;
-  labResults: number;
-  flaggedBatches: number;
+/**
+ * Approximate state centers, used only for animation
+ * (map shapes are still the exact official outlines).
+ */
+const STATE_POSITIONS: Record<string, { x: number; y: number }> = {
+  // West / AK / HI
+  WA: { x: 10, y: 18 },
+  OR: { x: 13, y: 25 },
+  CA: { x: 13, y: 40 },
+  NV: { x: 21, y: 35 },
+  AZ: { x: 23, y: 49 },
+  UT: { x: 23, y: 39 },
+  CO: { x: 30, y: 38 },
+  NM: { x: 30, y: 50 },
+  AK: { x: 10, y: 85 },
+  HI: { x: 21, y: 88 },
+  ID: { x: 19, y: 27 },
+  MT: { x: 26, y: 20 },
+  WY: { x: 26, y: 30 },
+
+  // Rockies / Plains / Upper Midwest
+  ND: { x: 36, y: 20 },
+  SD: { x: 36, y: 28 },
+  NE: { x: 36, y: 36 },
+  KS: { x: 36, y: 44 },
+  MN: { x: 44, y: 22 },
+  IA: { x: 44, y: 30 },
+  MO: { x: 44, y: 40 },
+  WI: { x: 50, y: 22 },
+  IL: { x: 50, y: 32 },
+  MI: { x: 58, y: 22 },
+  IN: { x: 58, y: 32 },
+  OH: { x: 62, y: 32 },
+
+  // South / Gulf / Lower Midwest
+  TX: { x: 40, y: 60 },
+  OK: { x: 39, y: 52 },
+  AR: { x: 44, y: 48 },
+  LA: { x: 44, y: 58 },
+  MS: { x: 50, y: 54 },
+  AL: { x: 54, y: 54 },
+  TN: { x: 56, y: 46 },
+  KY: { x: 58, y: 40 },
+  GA: { x: 60, y: 60 },
+  FL: { x: 62, y: 72 },
+  SC: { x: 64, y: 58 },
+  NC: { x: 68, y: 52 },
+  VA: { x: 70, y: 44 },
+  WV: { x: 66, y: 40 },
+
+  // Northeast / Mid-Atlantic
+  PA: { x: 66, y: 34 },
+  NY: { x: 68, y: 26 },
+  VT: { x: 70, y: 20 },
+  NH: { x: 73, y: 19 },
+  ME: { x: 80, y: 15 },
+  MA: { x: 75, y: 24 },
+  RI: { x: 77, y: 26 },
+  CT: { x: 75, y: 28 },
+  NJ: { x: 72, y: 30 },
+  DE: { x: 73, y: 34 },
+  MD: { x: 71, y: 36 },
+  DC: { x: 70, y: 38 },
+  PR: { x: 78, y: 80 },
 };
 
-const STATE_ROWS: StateRow[] = [
+// Dense cluster (New England / Mid-Atlantic)
+const DENSE_STATES = new Set<string>([
+  'RI',
+  'CT',
+  'MA',
+  'NH',
+  'VT',
+  'NJ',
+  'DE',
+  'MD',
+  'DC',
+  'NY',
+]);
+
+// Tiny states that should blow up on hover
+const TINY_STATES = new Set<string>(['RI', 'CT', 'DE', 'NJ', 'MA', 'DC']);
+
+// New England detached to the right
+const NEW_ENGLAND_DETACHED = new Set<string>(['ME', 'NH', 'VT', 'MA', 'RI', 'CT']);
+
+// Layout offsets for detached New England — pulled in so they’re fully in-frame
+const NEW_ENGLAND_LAYOUT: Record<string, { dx: number; dy: number }> = {
+  ME: { dx: 45, dy: -60 },
+  NH: { dx: 45, dy: -25 },
+  VT: { dx: 45, dy: 10 },
+  MA: { dx: 45, dy: 45 },
+  RI: { dx: 45, dy: 80 },
+  CT: { dx: 45, dy: 115 },
+};
+
+function generateMetrics(code: string) {
+  const base = code.charCodeAt(0) + code.charCodeAt(1);
+  const clamp = (v: number, min: number, max: number) =>
+    Math.min(max, Math.max(min, v));
+
+  return {
+    batchesTracked: clamp(260 + (base % 320), 120, 580),
+    labsReporting: clamp(3 + (base % 9), 2, 14),
+    recentRecalls: base % 6,
+    passingRate: clamp(82 + (base % 11), 78, 97),
+  };
+}
+
+function getGeographyStyle(isSelected: boolean, transform: string) {
+  // Default stroke: same family of blue as hover halo so it looks cohesive even at rest
+  const baseStroke = isSelected ? '#0ea5e9' : '#38bdf8';
+
+  const shared = {
+    transform,
+    transformBox: 'fill-box' as const,
+    transformOrigin: 'center',
+    shapeRendering: 'geometricPrecision' as const,
+    vectorEffect: 'non-scaling-stroke' as const,
+    strokeLinejoin: 'round' as const,
+    strokeLinecap: 'round' as const,
+    outline: 'none',
+    willChange: 'transform, filter' as const,
+    transition:
+      'fill 140ms ease-out, stroke 140ms ease-out, filter 140ms ease-out, transform 120ms ease-out',
+  };
+
+  return {
+    default: {
+      ...shared,
+      fill: 'url(#stateGlass)',
+      stroke: baseStroke,
+      strokeWidth: 1,
+      filter: 'drop-shadow(0 4px 7px rgba(15,23,42,0.65))',
+    },
+    hover: {
+      ...shared,
+      fill: 'url(#stateGlassHover)',
+      stroke: '#e5f5ff',
+      strokeWidth: 1.15,
+      cursor: 'pointer',
+      filter: 'drop-shadow(0 9px 16px rgba(37,99,235,0.9))',
+    },
+    pressed: {
+      ...shared,
+      fill: 'url(#stateGlassActive)',
+      stroke: '#020617',
+      strokeWidth: 1.1,
+      filter: 'drop-shadow(0 11px 20px rgba(22,101,52,0.9))',
+    },
+  } as const;
+}
+
+const DEFAULT_STATE: StateInfo = {
+  code: 'CA',
+  name: 'California',
+};
+
+const REGIONS = [
   {
-    region: 'west',
-    y: 30,
-    startX: 10,
-    spacing: 6.2,
-    states: [
-      { code: 'WA', name: 'Washington' },
-      { code: 'OR', name: 'Oregon' },
-      { code: 'CA', name: 'California' },
-      { code: 'NV', name: 'Nevada' },
-      { code: 'ID', name: 'Idaho' },
-      { code: 'MT', name: 'Montana' },
-      { code: 'WY', name: 'Wyoming' },
-      { code: 'UT', name: 'Utah' },
-      { code: 'CO', name: 'Colorado' },
-      { code: 'AZ', name: 'Arizona' },
-      { code: 'NM', name: 'New Mexico' },
-    ],
+    id: 'us',
+    label: 'United States',
+    pill: 'US · States',
+    earthPosition: '42% 52%',
   },
   {
-    region: 'midwest',
-    y: 48,
-    startX: 18,
-    spacing: 5.7,
-    states: [
-      { code: 'ND', name: 'North Dakota' },
-      { code: 'SD', name: 'South Dakota' },
-      { code: 'NE', name: 'Nebraska' },
-      { code: 'KS', name: 'Kansas' },
-      { code: 'MN', name: 'Minnesota' },
-      { code: 'IA', name: 'Iowa' },
-      { code: 'MO', name: 'Missouri' },
-      { code: 'WI', name: 'Wisconsin' },
-      { code: 'IL', name: 'Illinois' },
-      { code: 'MI', name: 'Michigan' },
-      { code: 'IN', name: 'Indiana' },
-      { code: 'OH', name: 'Ohio' },
-    ],
-  },
-  {
-    region: 'south',
-    y: 66,
-    startX: 16,
-    spacing: 5.9,
-    states: [
-      { code: 'TX', name: 'Texas' },
-      { code: 'OK', name: 'Oklahoma' },
-      { code: 'AR', name: 'Arkansas' },
-      { code: 'LA', name: 'Louisiana' },
-      { code: 'MS', name: 'Mississippi' },
-      { code: 'AL', name: 'Alabama' },
-      { code: 'TN', name: 'Tennessee' },
-      { code: 'KY', name: 'Kentucky' },
-      { code: 'GA', name: 'Georgia' },
-      { code: 'SC', name: 'South Carolina' },
-      { code: 'NC', name: 'North Carolina' },
-      { code: 'VA', name: 'Virginia' },
-      { code: 'WV', name: 'West Virginia' },
-      { code: 'MD', name: 'Maryland' },
-      { code: 'DC', name: 'District of Columbia' },
-      { code: 'DE', name: 'Delaware' },
-    ],
-  },
-  {
-    region: 'northeast',
-    y: 34,
-    startX: 58,
-    spacing: 4.8,
-    states: [
-      { code: 'PA', name: 'Pennsylvania' },
-      { code: 'NJ', name: 'New Jersey' },
-      { code: 'NY', name: 'New York' },
-      { code: 'CT', name: 'Connecticut' },
-      { code: 'RI', name: 'Rhode Island' },
-      { code: 'MA', name: 'Massachusetts' },
-      { code: 'VT', name: 'Vermont' },
-      { code: 'NH', name: 'New Hampshire' },
-      { code: 'ME', name: 'Maine' },
-    ],
-  },
-  {
-    region: 'pacific',
-    y: 80,
-    startX: 14,
-    spacing: 10,
-    states: [
-      { code: 'AK', name: 'Alaska' },
-      { code: 'HI', name: 'Hawaii' },
-    ],
+    id: 'ca',
+    label: 'Canada',
+    pill: 'Canada · Provinces',
+    earthPosition: '58% 50%',
   },
 ];
 
-// Tiny helper to keep classNames readable
-function cn(...classes: (string | false | null | undefined)[]) {
-  return classes.filter(Boolean).join(' ');
-}
-
-// Soft mock stats so the UI feels alive
-const DEFAULT_STATS: StateStats = {
-  batches: 0,
-  activeBatches: 0,
-  labs: 0,
-  labResults: 0,
-  flaggedBatches: 0,
-};
-
-const MOCK_STATE_STATS: Record<string, StateStats> = {
-  ME: {
-    batches: 1,
-    activeBatches: 1,
-    labs: 1,
-    labResults: 1,
-    flaggedBatches: 0,
-  },
-};
-
-const REGION_GRADIENT: Record<Region, string> = {
-  west: 'from-cyan-300/85 via-sky-400/40 to-indigo-500/90',
-  midwest: 'from-teal-300/90 via-emerald-300/40 to-sky-500/90',
-  south: 'from-amber-300/85 via-orange-400/40 to-rose-400/85',
-  northeast: 'from-fuchsia-300/85 via-violet-400/40 to-sky-400/90',
-  pacific: 'from-cyan-200/80 via-sky-300/40 to-indigo-400/90',
-};
-
-const bubbleLayout: StateBubble[] = STATE_ROWS.flatMap((row, rowIndex) =>
-  row.states.map((s, colIndex) => ({
-    code: s.code,
-    name: s.name,
-    region: row.region,
-    x: row.startX + row.spacing * colIndex,
-    y: row.y + Math.sin((colIndex + rowIndex) * 0.7) * 3, // tiny wave so it feels organic
-    rowIndex,
-    colIndex,
-  }))
-);
-
 export default function AdminStateExplorer() {
-  const router = useRouter();
-  const { data: session } = useSession();
+  const { data: session, status } = useSession();
+  const isLoggedIn = status === 'authenticated';
 
-  const [selectedCode, setSelectedCode] = useState<string>('ME');
+  const [selectedState, setSelectedState] = useState<StateInfo>(DEFAULT_STATE);
   const [hoveredCode, setHoveredCode] = useState<string | null>(null);
+  const [pointer, setPointer] = useState<{ x: number; y: number } | null>(null);
+  const [tilt, setTilt] = useState<{ x: number; y: number }>({ x: 0, y: 0 });
 
-  const ADMIN_EMAILS = useMemo(
-    () =>
-      (process.env.NEXT_PUBLIC_ADMIN_EMAILS || '')
-        .split(',')
-        .map((s) => s.trim().toLowerCase())
-        .filter(Boolean),
-    []
+  const [detailPanel, setDetailPanel] = useState<{
+    state: StateInfo;
+    x: number;
+    y: number;
+  } | null>(null);
+
+  const [regionIndex, setRegionIndex] = useState(0);
+  const activeRegion = REGIONS[regionIndex];
+
+  const metrics = useMemo(
+    () => generateMetrics(selectedState.code),
+    [selectedState.code],
   );
 
-  // If no admin email list is configured, any signed-in user is treated as admin.
-  const isAdmin =
-    !!session &&
-    (ADMIN_EMAILS.length === 0 ||
-      !!session.user?.email &&
-        ADMIN_EMAILS.includes(session.user.email.toLowerCase()));
+  const mapCardRef = useRef<HTMLDivElement | null>(null);
 
-  const selectedBubble =
-    bubbleLayout.find((b) => b.code === selectedCode) ?? bubbleLayout[0];
-  const selectedStats = MOCK_STATE_STATS[selectedCode] ?? DEFAULT_STATS;
+  const handleMapMouseMove = (
+    event: React.MouseEvent<HTMLDivElement, MouseEvent>,
+  ) => {
+    const rect = mapCardRef.current?.getBoundingClientRect();
+    if (!rect) return;
 
-  function handleOpenStateDataset() {
-    router.push(`/admin/states/${selectedCode}`);
-  }
+    const x = (event.clientX - rect.left) / rect.width;
+    const y = (event.clientY - rect.top) / rect.height;
+    setPointer({ x, y });
+
+    const rotateX = (y - 0.5) * 5;
+    const rotateY = (0.5 - x) * 9;
+    setTilt({ x: rotateY, y: rotateX });
+  };
+
+  const handleMapMouseLeave = () => {
+    setPointer(null);
+    setTilt({ x: 0, y: 0 });
+  };
+
+  const handleStateClick = (code: string, name: string, evt?: any) => {
+    const nextState = { code, name };
+    setSelectedState(nextState);
+
+    if (mapCardRef.current && evt && typeof evt.clientX === 'number') {
+      const rect = mapCardRef.current.getBoundingClientRect();
+      const x = (evt.clientX - rect.left) / rect.width;
+      const y = (evt.clientY - rect.top) / rect.height;
+      const clampedX = Math.min(0.8, Math.max(0.2, x));
+      const clampedY = Math.min(0.8, Math.max(0.2, y));
+      setDetailPanel({ state: nextState, x: clampedX, y: clampedY });
+    } else {
+      setDetailPanel({ state: nextState, x: 0.5, y: 0.5 });
+    }
+  };
+
+  const handleClosePanel = () => setDetailPanel(null);
+
+  const currentLabel = `${selectedState.code} · ${selectedState.name}`;
+
+  void pointer;
 
   return (
-    <main className="min-h-screen bg-[radial-gradient(circle_at_top,_rgba(56,189,248,0.16),transparent_55%),radial-gradient(circle_at_bottom,_rgba(236,72,153,0.12),transparent_60%)] bg-slate-950 text-slate-50">
-      {/* Top nav / brand bar */}
-      <header className="border-b border-slate-800/60 bg-slate-950/70 backdrop-blur-xl">
-        <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-3">
-          <div className="flex items-center gap-3">
-            <div className="flex h-9 w-9 items-center justify-center rounded-2xl bg-gradient-to-br from-emerald-400 to-sky-500 shadow-[0_0_40px_rgba(56,189,248,0.65)]">
-              <span className="text-lg font-black tracking-tight text-slate-950">
-                C
-              </span>
-            </div>
-            <div className="flex flex-col leading-tight">
-              <span className="text-sm font-semibold text-slate-50">
-                CartFax
-              </span>
-              <span className="text-[11px] font-medium text-slate-400">
-                Cannabis Retail Transparency
-              </span>
-            </div>
-          </div>
+    <div className="min-h-screen bg-[#f6f7f8] text-slate-900">
+      <main className="mx-auto flex max-w-6xl flex-col gap-4 px-4 pb-16 pt-4 md:px-8">
+        {/* Heading */}
+        <section className="pt-1">
+          <h1 className="text-balance text-2xl font-semibold tracking-tight text-slate-900 md:text-3xl lg:text-4xl">
+            Regional cannabis safety &amp; COA explorer
+          </h1>
+        </section>
 
-          <div className="flex items-center gap-2 text-[11px]">
-            <span className="rounded-full bg-slate-900/80 px-3 py-1 text-slate-300">
-              Atlas
-            </span>
-            {isAdmin && (
-              <Link
-                href="/admin/batches"
-                className="rounded-full bg-sky-500/10 px-3 py-1 font-medium text-sky-300 ring-1 ring-sky-500/40 hover:bg-sky-500/20"
-              >
-                Admin data tools
-              </Link>
-            )}
-          </div>
-        </div>
-      </header>
+        {/* MAP CARD */}
+        <section className="relative mt-1">
+          {/* Soft halo behind card */}
+          <div className="pointer-events-none absolute inset-x-6 top-[-64px] h-72 rounded-[80px] bg-[radial-gradient(circle_at_0%_0%,rgba(59,130,246,0.35),transparent_55%),radial-gradient(circle_at_100%_100%,rgba(56,189,248,0.35),transparent_55%)] blur-3xl" />
 
-      <section className="mx-auto flex max-w-6xl flex-col gap-8 px-4 pb-10 pt-8 lg:flex-row">
-        {/* Left: soft-tile map */}
-        <div className="relative flex-1 rounded-[40px] border border-slate-800/80 bg-[radial-gradient(circle_at_top,_rgba(56,189,248,0.18),transparent_55%),radial-gradient(circle_at_bottom,_rgba(129,140,248,0.14),transparent_60%)] bg-slate-950/80 p-5 shadow-[0_40px_120px_rgba(15,23,42,0.9)]">
-          <div className="mb-4 flex items-center justify-between gap-4">
-            <div>
-              <div className="inline-flex items-center gap-2 rounded-full bg-slate-900/80 px-3 py-1 text-[11px] font-medium text-slate-300">
-                <span className="inline-block h-1.5 w-1.5 rounded-full bg-emerald-400 shadow-[0_0_12px_rgba(74,222,128,0.8)]" />
-                CartFax • Atlas
-              </div>
-              <h1 className="mt-3 text-2xl font-semibold text-slate-50">
-                United States Cannabis Safety Atlas
-              </h1>
-              <p className="mt-1 max-w-xl text-sm text-slate-400">
-                A soft, breathing field of state bubbles. Hover to bring a state
-                forward. Click to lock focus and open its dataset.
-              </p>
-            </div>
-
-            <div className="hidden flex-col items-end gap-2 text-[11px] text-slate-400 sm:flex">
-              <div className="flex items-center gap-2">
-                <span className="inline-flex h-2 w-2 rounded-full bg-emerald-400 shadow-[0_0_8px_rgba(74,222,128,0.9)]" />
-                Active batches
-              </div>
-              <div className="flex items-center gap-2">
-                <span className="inline-flex h-2 w-2 rounded-full bg-rose-400 shadow-[0_0_8px_rgba(248,113,113,0.9)]" />
-                Flagged lots
-              </div>
-            </div>
-          </div>
-
-          <div className="relative mt-4 h-[420px] overflow-visible">
-            {/* soft background glow */}
-            <div className="pointer-events-none absolute inset-[10%] rounded-[50px] bg-[radial-gradient(circle_at_center,_rgba(56,189,248,0.08),transparent_65%)] blur-3xl" />
-
-            {bubbleLayout.map((bubble) => {
-              const isSelected = bubble.code === selectedCode;
-              const isHovered = bubble.code === hoveredCode;
-              const stats = MOCK_STATE_STATS[bubble.code] ?? DEFAULT_STATS;
-
-              const baseZ =
-                10 + bubble.rowIndex * 2 + bubble.colIndex * 0.2;
-              const zIndex = isHovered ? 60 : isSelected ? 50 : baseZ;
-
-              const scale = isHovered || isSelected ? 1.08 : 1;
-              const glowOpacity =
-                stats.flaggedBatches > 0 ? 0.9 : stats.activeBatches > 0 ? 0.7 : 0.25;
-
-              const regionGradient = REGION_GRADIENT[bubble.region];
-
-              return (
-                <button
-                  key={bubble.code}
-                  type="button"
-                  onClick={() => setSelectedCode(bubble.code)}
-                  onMouseEnter={() => setHoveredCode(bubble.code)}
-                  onMouseLeave={() => setHoveredCode(null)}
-                  className="group absolute"
-                  style={{
-                    left: `${bubble.x}%`,
-                    top: `${bubble.y}%`,
-                    transform: `translate(-50%, -50%) scale(${scale})`,
-                    zIndex,
-                    transition:
-                      'transform 160ms ease-out, box-shadow 160ms ease-out',
-                  }}
-                >
-                  {/* glow halo */}
-                  <div
-                    className="pointer-events-none absolute inset-0 rounded-[999px] blur-xl"
-                    style={{
-                      opacity: glowOpacity,
-                      background:
-                        'radial-gradient(circle at center, rgba(56,189,248,0.35), transparent 60%)',
-                    }}
-                  />
-
-                  {/* glass bubble */}
-                  <div
-                    className={cn(
-                      'relative flex min-w-[3.1rem] items-center justify-center rounded-[999px] border border-white/16 px-4 py-2.5 text-xs font-semibold tracking-[0.24em] uppercase text-slate-50 backdrop-blur-xl shadow-[0_20px_50px_rgba(15,23,42,0.9)]',
-                      'bg-gradient-to-br',
-                      regionGradient,
-                      isSelected &&
-                        'ring-2 ring-sky-300/80 shadow-[0_0_48px_rgba(56,189,248,0.9)]',
-                      isHovered && !isSelected && 'ring-1 ring-sky-200/60'
-                    )}
-                  >
-                    <span className="drop-shadow-[0_0_8px_rgba(15,23,42,0.8)]">
-                      {bubble.code}
-                    </span>
-                    {stats.flaggedBatches > 0 && (
-                      <span className="ml-2 inline-flex h-1.5 w-1.5 rounded-full bg-rose-400 shadow-[0_0_10px_rgba(248,113,113,0.9)]" />
-                    )}
-                    {stats.activeBatches > 0 && stats.flaggedBatches === 0 && (
-                      <span className="ml-2 inline-flex h-1.5 w-1.5 rounded-full bg-emerald-400 shadow-[0_0_10px_rgba(74,222,128,0.9)]" />
-                    )}
+          {/* Outer card – river rock gray, gradient into white, blue border */}
+          <div
+            ref={mapCardRef}
+            onMouseMove={handleMapMouseMove}
+            onMouseLeave={handleMapMouseLeave}
+            className="relative mx-auto max-w-6xl rounded-[48px] border border-sky-400/45 bg-gradient-to-b from-slate-200 via-slate-100 to-slate-50/0 px-[1.5px] pb-[1.5px] pt-[1.5px] shadow-[0_40px_120px_rgba(15,23,42,0.18)]"
+          >
+            <div className="relative overflow-hidden rounded-[46px] bg-gradient-to-b from-slate-100 via-slate-50 to-transparent px-5 pb-6 pt-5 md:px-7 md:pb-8 md:pt-6">
+              <div className="relative z-10 mx-auto flex max-w-5xl flex-col gap-4">
+                {/* Top row inside card */}
+                <div className="flex flex-wrap items-center justify-between gap-3 px-1">
+                  <div className="space-y-1">
+                    <p className="text-[11px] font-semibold uppercase tracking-[0.24em] text-sky-600">
+                      {activeRegion.pill}
+                    </p>
+                    <p className="text-xs text-slate-600">
+                      {currentLabel} · True state boundaries on a glass atlas.
+                      Hover to tease them apart, click to drill in.
+                    </p>
                   </div>
-                </button>
-              );
-            })}
-          </div>
-        </div>
+                  <div className="flex items-center gap-2 text-[11px] font-medium text-slate-500">
+                    <span className="inline-flex h-2 w-2 rounded-full bg-sky-500 shadow-[0_0_0_4px_rgba(56,189,248,0.35)]" />
+                    <span>Move your mouse · Click a state</span>
+                  </div>
+                </div>
 
-        {/* Right: selected state & admin tools */}
-        <aside className="flex w-full max-w-md flex-col gap-4 lg:w-[360px]">
-          {/* Selected state summary */}
-          <div className="rounded-[32px] border border-slate-800/80 bg-slate-950/80 p-5 shadow-[0_30px_80px_rgba(15,23,42,0.9)]">
-            <div className="mb-4 flex items-center justify-between gap-3">
-              <div className="flex items-center gap-2">
-                <span className="rounded-full bg-slate-900/80 px-2.5 py-1 text-[11px] font-medium text-slate-300">
-                  Selected state
-                </span>
+                {/* Region carousel controls */}
+                <div className="flex flex-wrap items-center gap-2 px-1">
+                  {REGIONS.map((region, idx) => {
+                    const active = idx === regionIndex;
+                    return (
+                      <button
+                        key={region.id}
+                        type="button"
+                        onClick={() => setRegionIndex(idx)}
+                        className={
+                          'inline-flex items-center gap-2 rounded-full border px-3 py-1 text-xs font-semibold transition-colors ' +
+                          (active
+                            ? 'border-sky-500 bg-sky-500 text-white shadow-[0_10px_30px_rgba(56,189,248,0.55)]'
+                            : 'border-slate-300 bg-white/80 text-slate-700 hover:border-sky-400 hover:text-sky-700')
+                        }
+                      >
+                        <span>{region.label}</span>
+                      </button>
+                    );
+                  })}
+                </div>
+
+                {/* Map block – Earth background + carousel + tilting map */}
+                <div className="relative mx-auto mt-2 aspect-[19/10] w-full">
+                  {/* Earth background, stretched into our ellipse, rotates via background-position */}
+                  <div
+                    className="pointer-events-none absolute inset-[14px] rounded-[999px] bg-[url('/earth-hero.jpg')] bg-cover bg-no-repeat"
+                    style={{
+                      backgroundPosition: activeRegion.earthPosition,
+                      transition: 'background-position 600ms ease-out',
+                    }}
+                  >
+                    {/* Soft white/silver/blue wash over the Earth for consistency with the UI */}
+                    <div className="absolute inset-0 rounded-[999px] bg-[radial-gradient(circle_at_30%_18%,rgba(255,255,255,0.9),transparent_60%),radial-gradient(circle_at_70%_82%,rgba(148,163,184,0.65),transparent_60%),radial-gradient(circle_at_center,rgba(59,130,246,0.6),transparent_70%)] mix-blend-soft-light" />
+                  </div>
+
+                  {/* Ground shadow */}
+                  <div className="pointer-events-none absolute inset-x-20 bottom-4 h-24 rounded-[999px] bg-gradient-to-b from-transparent via-slate-700/35 to-black/75 blur-2xl" />
+
+                  {/* Carousel container */}
+                  <div className="relative z-10 h-full w-full overflow-hidden">
+                    <div
+                      className="flex h-full w-full transition-transform duration-500 ease-out"
+                      style={{
+                        transform: `translateX(-${regionIndex * 100}%)`,
+                      }}
+                    >
+                      {/* Slide 1: United States map */}
+                      <div className="h-full w-full flex-none">
+                        <div
+                          style={{
+                            transform: `perspective(1600px) rotateX(${tilt.y}deg) rotateY(${tilt.x}deg) rotateZ(-3deg)`,
+                          }}
+                          className="h-full w-full transition-transform duration-150 ease-out"
+                        >
+                          <ComposableMap
+                            projection="geoAlbersUsa"
+                            projectionConfig={{
+                              scale: 1300,
+                            }}
+                            width={975}
+                            height={610}
+                            className="relative h-full w-full"
+                          >
+                            <defs>
+                              {/* Default glass: subtle forest green, mostly white/silver/blue */}
+                              <radialGradient
+                                id="stateGlass"
+                                cx="30%"
+                                cy="20%"
+                                r="98%"
+                              >
+                                <stop
+                                  offset="0%"
+                                  stopColor="#f9fafb"
+                                  stopOpacity="1"
+                                />
+                                <stop
+                                  offset="24%"
+                                  stopColor="#e5e7eb"
+                                  stopOpacity="0.98"
+                                />
+                                <stop
+                                  offset="50%"
+                                  stopColor="#ffffff"
+                                  stopOpacity="1"
+                                />
+                                <stop
+                                  offset="70%"
+                                  stopColor="#e5e7eb"
+                                  stopOpacity="0.96"
+                                />
+                                <stop
+                                  offset="82%"
+                                  stopColor="#166534"
+                                  stopOpacity="0.22"
+                                />
+                                <stop
+                                  offset="100%"
+                                  stopColor="#38bdf8"
+                                  stopOpacity="0.98"
+                                />
+                              </radialGradient>
+
+                              {/* Hovered glass: brighter blue, slightly stronger green rim */}
+                              <radialGradient
+                                id="stateGlassHover"
+                                cx="28%"
+                                cy="18%"
+                                r="100%"
+                              >
+                                <stop
+                                  offset="0%"
+                                  stopColor="#ffffff"
+                                  stopOpacity="1"
+                                />
+                                <stop
+                                  offset="30%"
+                                  stopColor="#e0f2fe"
+                                  stopOpacity="1"
+                                />
+                                <stop
+                                  offset="60%"
+                                  stopColor="#60a5fa"
+                                  stopOpacity="0.99"
+                                />
+                                <stop
+                                  offset="82%"
+                                  stopColor="#22c55e"
+                                  stopOpacity="0.8"
+                                />
+                                <stop
+                                  offset="100%"
+                                  stopColor="#14532d"
+                                  stopOpacity="0.9"
+                                />
+                              </radialGradient>
+
+                              {/* Active / selected glass: deeper core */}
+                              <radialGradient
+                                id="stateGlassActive"
+                                cx="30%"
+                                cy="18%"
+                                r="100%"
+                              >
+                                <stop
+                                  offset="0%"
+                                  stopColor="#f0fdf4"
+                                  stopOpacity="1"
+                                />
+                                <stop
+                                  offset="30%"
+                                  stopColor="#bbf7d0"
+                                  stopOpacity="1"
+                                />
+                                <stop
+                                  offset="60%"
+                                  stopColor="#38bdf8"
+                                  stopOpacity="0.99"
+                                />
+                                <stop
+                                  offset="86%"
+                                  stopColor="#166534"
+                                  stopOpacity="0.82"
+                                />
+                                <stop
+                                  offset="100%"
+                                  stopColor="#020617"
+                                  stopOpacity="1"
+                                />
+                              </radialGradient>
+                            </defs>
+
+                            <Geographies geography={GEO_URL}>
+                              {({ geographies }) => {
+                                const hoverPos = hoveredCode
+                                  ? STATE_POSITIONS[hoveredCode]
+                                  : null;
+                                const hoveredIsTiny = hoveredCode
+                                  ? TINY_STATES.has(hoveredCode)
+                                  : false;
+                                const hoveredIsDense = hoveredCode
+                                  ? DENSE_STATES.has(hoveredCode)
+                                  : false;
+
+                                const items = geographies
+                                  .map((geo) => {
+                                    const name = (geo.properties as any)
+                                      ?.name as string | undefined;
+                                    if (!name) return null;
+
+                                    const code = NAME_TO_CODE[name] ?? name;
+                                    const isSelected =
+                                      code === selectedState.code;
+                                    const isTiny = TINY_STATES.has(code);
+                                    const isDetachedNE =
+                                      NEW_ENGLAND_DETACHED.has(code);
+
+                                    const pos = STATE_POSITIONS[code] ?? {
+                                      x: 50,
+                                      y: 50,
+                                    };
+                                    const sx = pos.x / 100;
+                                    const sy = pos.y / 100;
+
+                                    // Base: pull detached New England out into a clean column on the right
+                                    let baseTx = 0;
+                                    let baseTy = 0;
+                                    if (isDetachedNE) {
+                                      const layout =
+                                        NEW_ENGLAND_LAYOUT[code];
+                                      if (layout) {
+                                        baseTx += layout.dx;
+                                        baseTy += layout.dy;
+                                      }
+                                    }
+
+                                    const baseScale = isDetachedNE ? 1.3 : 1.0;
+                                    let scale = baseScale;
+                                    let tx = baseTx;
+                                    let ty = baseTy;
+
+                                    if (hoverPos) {
+                                      const cx = hoverPos.x / 100;
+                                      const cy = hoverPos.y / 100;
+                                      const dx = sx - cx;
+                                      const dy = sy - cy;
+                                      const dist =
+                                        Math.sqrt(dx * dx + dy * dy) ||
+                                        0.0001;
+
+                                      const isHover = code === hoveredCode;
+
+                                      // Smooth radial “break apart” from hovered center
+                                      const radius = 0.6;
+                                      const influence = Math.max(
+                                        0,
+                                        1 - dist / radius,
+                                      );
+
+                                      let sepAmp = 16;
+                                      if (DENSE_STATES.has(code)) sepAmp = 20;
+                                      if (isTiny) sepAmp = 22;
+                                      if (isDetachedNE) sepAmp *= 0.9;
+
+                                      const separation = influence * sepAmp;
+                                      const nx = dx / dist;
+                                      const ny = dy / dist;
+
+                                      if (!isHover) {
+                                        tx += separation * nx;
+                                        ty += separation * ny;
+                                      }
+
+                                      const neighborRadius = hoveredIsTiny
+                                        ? 0.24
+                                        : 0.18;
+                                      const isNeighbor =
+                                        !isHover && dist < neighborRadius;
+
+                                      if (isHover) {
+                                        if (isTiny) {
+                                          // Rhode Island etc – big but still elegant
+                                          scale = baseScale * 2.4;
+                                        } else if (
+                                          DENSE_STATES.has(code)
+                                        ) {
+                                          scale = baseScale * 1.3;
+                                        } else {
+                                          scale = baseScale * 1.18;
+                                        }
+                                      } else if (isNeighbor) {
+                                        if (
+                                          hoveredIsTiny ||
+                                          hoveredIsDense ||
+                                          isTiny
+                                        ) {
+                                          scale = baseScale * 1.16;
+                                        } else {
+                                          scale = baseScale * 1.08;
+                                        }
+                                      }
+                                    }
+
+                                    if (isSelected) {
+                                      scale *= 1.03;
+                                    }
+
+                                    const transformStr =
+                                      `translate3d(${tx.toFixed(
+                                        2,
+                                      )}px, ${ty.toFixed(
+                                        2,
+                                      )}px, 0) scale(${scale.toFixed(3)})`;
+
+                                    const style = getGeographyStyle(
+                                      isSelected,
+                                      transformStr,
+                                    );
+
+                                    return {
+                                      geo,
+                                      name,
+                                      code,
+                                      style,
+                                    };
+                                  })
+                                  .filter(Boolean) as {
+                                  geo: any;
+                                  name: string;
+                                  code: string;
+                                  style: ReturnType<typeof getGeographyStyle>;
+                                }[];
+
+                                const hoveredItem = hoveredCode
+                                  ? items.find(
+                                      (i) => i.code === hoveredCode,
+                                    )
+                                  : null;
+
+                                const baseItems = hoveredCode
+                                  ? items.filter(
+                                      (i) => i.code !== hoveredCode,
+                                    )
+                                  : items;
+
+                                const renderGeo = (
+                                  item: (typeof items)[number],
+                                  suffix: string,
+                                ) => (
+                                  <Geography
+                                    key={item.geo.rsmKey + suffix}
+                                    geography={item.geo}
+                                    onMouseEnter={() =>
+                                      setHoveredCode(item.code)
+                                    }
+                                    onMouseLeave={() =>
+                                      setHoveredCode((prev) =>
+                                        prev === item.code ? null : prev,
+                                      )
+                                    }
+                                    onClick={(_geo, evt) =>
+                                      handleStateClick(
+                                        item.code,
+                                        item.name,
+                                        evt,
+                                      )
+                                    }
+                                    style={item.style}
+                                    className="transition-transform duration-150 ease-out [transform-origin:center]"
+                                  />
+                                );
+
+                                return (
+                                  <>
+                                    {baseItems.map((item) =>
+                                      renderGeo(item, '-base'),
+                                    )}
+                                    {hoveredItem &&
+                                      renderGeo(hoveredItem, '-hovered')}
+                                  </>
+                                );
+                              }}
+                            </Geographies>
+                          </ComposableMap>
+                        </div>
+                      </div>
+
+                      {/* Slide 2: Canada placeholder (future expansion) */}
+                      <div className="h-full w-full flex-none">
+                        <div className="flex h-full w-full flex-col items-center justify-center gap-4 rounded-[40px] bg-white/70 backdrop-blur-md">
+                          <p className="text-[11px] font-semibold uppercase tracking-[0.24em] text-slate-500">
+                            Canada · Provinces
+                          </p>
+                          <h2 className="text-xl font-semibold text-slate-800">
+                            Canada coverage coming soon
+                          </h2>
+                          <p className="max-w-sm text-center text-sm text-slate-500">
+                            This carousel is wired for additional regions. When
+                            you&apos;re ready, we&apos;ll plug in a province-level
+                            safety atlas here with the same glass-map treatment.
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Floating detail panel over the map */}
+                  {detailPanel && activeRegion.id === 'us' && (
+                    <div className="pointer-events-none absolute inset-0 z-30">
+                      <div
+                        className="pointer-events-auto max-w-sm rounded-3xl border border-slate-200/70 bg-white/95 p-5 shadow-[0_26px_80px_rgba(15,23,42,0.18)] backdrop-blur-xl"
+                        style={{
+                          position: 'absolute',
+                          left: `${detailPanel.x * 100}%`,
+                          top: `${detailPanel.y * 100}%`,
+                          transform: 'translate(-50%, -50%)',
+                        }}
+                      >
+                        <div className="flex items-start justify-between gap-3">
+                          <div>
+                            <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-sky-600">
+                              {detailPanel.state.code} ·{' '}
+                              {detailPanel.state.name}
+                            </p>
+                            <h2 className="mt-2 text-base font-semibold text-slate-900">
+                              Safety snapshot &amp; batch activity
+                            </h2>
+                          </div>
+                          <button
+                            type="button"
+                            onClick={handleClosePanel}
+                            className="ml-2 inline-flex h-7 w-7 items-center justify-center rounded-full bg-slate-200 text-xs text-slate-600 hover:bg-slate-300 hover:text-slate-900"
+                          >
+                            ×
+                          </button>
+                        </div>
+
+                        <div className="mt-4 grid gap-3 text-sm text-slate-800">
+                          <div>
+                            <p className="text-[11px] uppercase tracking-[0.18em] text-slate-500">
+                              Batches tracked
+                            </p>
+                            <p className="mt-1 text-2xl font-semibold text-sky-700">
+                              {metrics.batchesTracked.toLocaleString()}
+                            </p>
+                          </div>
+                          <div className="grid grid-cols-2 gap-3 text-xs">
+                            <div>
+                              <p className="uppercase tracking-[0.16em] text-slate-500">
+                                Labs reporting
+                              </p>
+                              <p className="mt-1 text-lg font-semibold text-slate-800">
+                                {metrics.labsReporting}
+                              </p>
+                            </div>
+                            <div>
+                              <p className="uppercase tracking-[0.16em] text-slate-500">
+                                Recalls watched
+                              </p>
+                              <p className="mt-1 text-lg font-semibold text-indigo-600">
+                                {metrics.recentRecalls}
+                              </p>
+                            </div>
+                          </div>
+                          <div>
+                            <p className="text-[11px] uppercase tracking-[0.18em] text-slate-500">
+                              Passing rate
+                            </p>
+                            <p className="mt-1 text-lg font-semibold text-sky-700">
+                              {metrics.passingRate}%{' '}
+                              <span className="text-[11px] font-normal text-slate-500">
+                                of COAs marked passing
+                              </span>
+                            </p>
+                          </div>
+                        </div>
+
+                        <div className="mt-4 flex items-center justify-between gap-3">
+                          <p className="max-w-[60%] text-[11px] text-slate-500">
+                            These are illustrative numbers for now. Wire them to
+                            your real CartFax batch &amp; recall APIs when
+                            you&apos;re ready.
+                          </p>
+                          <Link
+                            href="/admin"
+                            className="inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-sky-500 to-slate-100 px-3.5 py-1.5 text-[11px] font-semibold text-slate-950 shadow-[0_14px_40px_rgba(148,163,184,0.6)] hover:from-sky-400 hover:to-white"
+                          >
+                            <span>Open admin backend</span>
+                            <span className="text-[14px]">↗</span>
+                          </Link>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                </div>
               </div>
-              <span className="rounded-full bg-slate-900/80 px-2.5 py-1 text-[11px] font-semibold text-sky-200">
-                {selectedBubble.code}
-              </span>
             </div>
+          </div>
+        </section>
 
-            <h2 className="text-lg font-semibold text-slate-50">
-              {selectedBubble.name}
-            </h2>
-            <p className="mt-1 text-sm text-slate-400">
-              Exploring all batches CartFax currently has mapped into{' '}
-              <span className="font-medium text-sky-200">
-                {selectedBubble.code}
-              </span>
-              . Use this as a jumping-off point into messy datasets.
+        {/* Admin hub */}
+        <section className="mt-6">
+          <div className="rounded-3xl border border-slate-200 bg-white p-6 shadow-[0_24px_60px_rgba(15,23,42,0.12)]">
+            <p className="mb-2 text-[11px] font-semibold uppercase tracking-[0.24em] text-sky-700">
+              Admin data tools
+            </p>
+            <h2 className="text-lg font-semibold text-slate-900">Admin hub</h2>
+            <p className="mt-2 text-sm text-slate-600">
+              When you&apos;re signed in as an admin, the hub opens the full
+              CartFax backend: batches, COAs, brands, locations, and more.
             </p>
 
-            <div className="mt-4 grid grid-cols-2 gap-3 text-xs">
-              <div className="rounded-2xl bg-slate-900/80 p-3">
-                <div className="text-[11px] text-slate-400">Active batches</div>
-                <div className="mt-1 text-lg font-semibold text-emerald-300">
-                  {selectedStats.activeBatches}
-                </div>
-              </div>
-              <div className="rounded-2xl bg-slate-900/80 p-3">
-                <div className="text-[11px] text-slate-400">
-                  Lab results linked
-                </div>
-                <div className="mt-1 text-lg font-semibold text-sky-300">
-                  {selectedStats.labResults}
-                </div>
-              </div>
-              <div className="rounded-2xl bg-slate-900/80 p-3">
-                <div className="text-[11px] text-slate-400">Labs in atlas</div>
-                <div className="mt-1 text-lg font-semibold text-fuchsia-300">
-                  {selectedStats.labs}
-                </div>
-              </div>
-              <div className="rounded-2xl bg-slate-900/80 p-3">
-                <div className="text-[11px] text-slate-400">
-                  Flagged batches
-                </div>
-                <div className="mt-1 text-lg font-semibold text-rose-300">
-                  {selectedStats.flaggedBatches}
-                </div>
-              </div>
-            </div>
-
-            <button
-              type="button"
-              onClick={handleOpenStateDataset}
-              className="mt-5 inline-flex w-full items-center justify-center gap-2 rounded-full bg-gradient-to-r from-sky-400 to-emerald-400 px-4 py-2.5 text-sm font-semibold text-slate-950 shadow-[0_15px_45px_rgba(56,189,248,0.85)] hover:brightness-110 focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-300"
-            >
-              Open {selectedBubble.code} dataset
-              <span className="text-xs" aria-hidden>
-                ↗
-              </span>
-            </button>
-          </div>
-
-          {/* Admin tools panel */}
-          {isAdmin && (
-            <div className="rounded-[28px] border border-slate-800/80 bg-slate-950/85 p-4 text-xs shadow-[0_24px_70px_rgba(15,23,42,0.9)]">
-              <div className="mb-3 flex items-center justify-between gap-2">
-                <h3 className="text-[13px] font-semibold text-slate-100">
-                  Atlas data tools
-                </h3>
-                <span className="rounded-full bg-emerald-500/15 px-2 py-0.5 text-[10px] font-medium text-emerald-300 ring-1 ring-emerald-400/40">
-                  Admin
+            <div className="mt-4 flex flex-wrap items-center justify-between gap-3">
+              <div className="flex items-center gap-2 text-xs text-slate-500">
+                <span
+                  className={
+                    'inline-flex h-2 w-2 rounded-full shadow-[0_0_0_4px_rgba(56,189,248,0.25)] ' +
+                    (isLoggedIn ? 'bg-sky-500' : 'bg-slate-400')
+                  }
+                />
+                <span>
+                  {isLoggedIn
+                    ? 'Admin mode unlocked. Data editing enabled.'
+                    : 'Sign in with your admin account to unlock editing.'}
                 </span>
               </div>
 
-              <p className="mb-3 text-[11px] leading-relaxed text-slate-400">
-                Shortcuts into the messy bits: COAs, batches, and state-level
-                rollups. These will grow as we wire in more scrapers and
-                parsers.
-              </p>
-
-              <div className="space-y-2">
-                <button
-                  type="button"
-                  onClick={handleOpenStateDataset}
-                  className="flex w-full items-center justify-between rounded-2xl bg-slate-900/90 px-3 py-2.5 text-left text-[11px] text-slate-200 hover:bg-slate-800/80"
-                >
-                  <span>
-                    Open{' '}
-                    <span className="font-semibold">{selectedBubble.code}</span>{' '}
-                    batches & lab results
-                  </span>
-                  <span className="text-xs text-sky-300">↗</span>
-                </button>
-
-                <Link
-                  href="/admin/uploads"
-                  className="flex w-full items-center justify-between rounded-2xl bg-slate-900/90 px-3 py-2.5 text-[11px] text-slate-200 hover:bg-slate-800/80"
-                >
-                  <span>COA uploads & parsing</span>
-                  <span className="text-xs text-sky-300">↗</span>
-                </Link>
-
-                <Link
-                  href="/admin/batches"
-                  className="flex w-full items-center justify-between rounded-2xl bg-slate-900/90 px-3 py-2.5 text-[11px] text-slate-200 hover:bg-slate-800/80"
-                >
-                  <span>Global batch catalog</span>
-                  <span className="text-xs text-sky-300">↗</span>
-                </Link>
-              </div>
+              <Link
+                href="/admin"
+                className="inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-sky-500 to-slate-100 px-4 py-2 text-xs font-semibold text-slate-950 shadow-[0_12px_35px_rgba(148,163,184,0.5)] hover:from-sky-400 hover:to-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-400 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-50"
+              >
+                <span>Open admin hub</span>
+                <span className="text-[15px]">↗</span>
+              </Link>
             </div>
-          )}
-        </aside>
-      </section>
-    </main>
+          </div>
+        </section>
+      </main>
+    </div>
   );
 }

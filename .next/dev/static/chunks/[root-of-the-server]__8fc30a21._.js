@@ -465,973 +465,1412 @@ function triggerUpdate(msg) {
 "[project]/components/AdminStateExplorer.tsx [client] (ecmascript)", ((__turbopack_context__) => {
 "use strict";
 
-// components/admin/AdminStateExplorer.tsx
+// components/AdminStateExplorer.tsx
 __turbopack_context__.s([
     "default",
     ()=>AdminStateExplorer
 ]);
-var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$build$2f$polyfills$2f$process$2e$js__$5b$client$5d$__$28$ecmascript$29$__ = /*#__PURE__*/ __turbopack_context__.i("[project]/node_modules/next/dist/build/polyfills/process.js [client] (ecmascript)");
 var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/node_modules/react/jsx-dev-runtime.js [client] (ecmascript)");
 var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$index$2e$js__$5b$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/node_modules/react/index.js [client] (ecmascript)");
-var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$router$2e$js__$5b$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/node_modules/next/router.js [client] (ecmascript)");
-var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$link$2e$js__$5b$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/node_modules/next/link.js [client] (ecmascript)");
+var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2d$simple$2d$maps$2f$dist$2f$index$2e$umd$2e$js__$5b$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/node_modules/react-simple-maps/dist/index.umd.js [client] (ecmascript)");
 var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2d$auth$2f$react$2f$index$2e$js__$5b$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/node_modules/next-auth/react/index.js [client] (ecmascript)");
+var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$link$2e$js__$5b$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/node_modules/next/link.js [client] (ecmascript)");
 ;
 var _s = __turbopack_context__.k.signature();
 ;
 ;
 ;
 ;
-const STATE_ROWS = [
+const GEO_URL = 'https://cdn.jsdelivr.net/npm/us-atlas@3/states-10m.json';
+const NAME_TO_CODE = {
+    Alabama: 'AL',
+    Alaska: 'AK',
+    Arizona: 'AZ',
+    Arkansas: 'AR',
+    California: 'CA',
+    Colorado: 'CO',
+    Connecticut: 'CT',
+    Delaware: 'DE',
+    'District of Columbia': 'DC',
+    Florida: 'FL',
+    Georgia: 'GA',
+    Hawaii: 'HI',
+    Idaho: 'ID',
+    Illinois: 'IL',
+    Indiana: 'IN',
+    Iowa: 'IA',
+    Kansas: 'KS',
+    Kentucky: 'KY',
+    Louisiana: 'LA',
+    Maine: 'ME',
+    Maryland: 'MD',
+    Massachusetts: 'MA',
+    Michigan: 'MI',
+    Minnesota: 'MN',
+    Mississippi: 'MS',
+    Missouri: 'MO',
+    Montana: 'MT',
+    Nebraska: 'NE',
+    Nevada: 'NV',
+    'New Hampshire': 'NH',
+    'New Jersey': 'NJ',
+    'New Mexico': 'NM',
+    'New York': 'NY',
+    'North Carolina': 'NC',
+    'North Dakota': 'ND',
+    Ohio: 'OH',
+    Oklahoma: 'OK',
+    Oregon: 'OR',
+    Pennsylvania: 'PA',
+    'Rhode Island': 'RI',
+    'South Carolina': 'SC',
+    'South Dakota': 'SD',
+    Tennessee: 'TN',
+    Texas: 'TX',
+    Utah: 'UT',
+    Vermont: 'VT',
+    Virginia: 'VA',
+    Washington: 'WA',
+    'West Virginia': 'WV',
+    Wisconsin: 'WI',
+    Wyoming: 'WY',
+    'Puerto Rico': 'PR'
+};
+/**
+ * Approximate state centers, used only for animation
+ * (map shapes are still the exact official outlines).
+ */ const STATE_POSITIONS = {
+    // West / AK / HI
+    WA: {
+        x: 10,
+        y: 18
+    },
+    OR: {
+        x: 13,
+        y: 25
+    },
+    CA: {
+        x: 13,
+        y: 40
+    },
+    NV: {
+        x: 21,
+        y: 35
+    },
+    AZ: {
+        x: 23,
+        y: 49
+    },
+    UT: {
+        x: 23,
+        y: 39
+    },
+    CO: {
+        x: 30,
+        y: 38
+    },
+    NM: {
+        x: 30,
+        y: 50
+    },
+    AK: {
+        x: 10,
+        y: 85
+    },
+    HI: {
+        x: 21,
+        y: 88
+    },
+    ID: {
+        x: 19,
+        y: 27
+    },
+    MT: {
+        x: 26,
+        y: 20
+    },
+    WY: {
+        x: 26,
+        y: 30
+    },
+    // Rockies / Plains / Upper Midwest
+    ND: {
+        x: 36,
+        y: 20
+    },
+    SD: {
+        x: 36,
+        y: 28
+    },
+    NE: {
+        x: 36,
+        y: 36
+    },
+    KS: {
+        x: 36,
+        y: 44
+    },
+    MN: {
+        x: 44,
+        y: 22
+    },
+    IA: {
+        x: 44,
+        y: 30
+    },
+    MO: {
+        x: 44,
+        y: 40
+    },
+    WI: {
+        x: 50,
+        y: 22
+    },
+    IL: {
+        x: 50,
+        y: 32
+    },
+    MI: {
+        x: 58,
+        y: 22
+    },
+    IN: {
+        x: 58,
+        y: 32
+    },
+    OH: {
+        x: 62,
+        y: 32
+    },
+    // South / Gulf / Lower Midwest
+    TX: {
+        x: 40,
+        y: 60
+    },
+    OK: {
+        x: 39,
+        y: 52
+    },
+    AR: {
+        x: 44,
+        y: 48
+    },
+    LA: {
+        x: 44,
+        y: 58
+    },
+    MS: {
+        x: 50,
+        y: 54
+    },
+    AL: {
+        x: 54,
+        y: 54
+    },
+    TN: {
+        x: 56,
+        y: 46
+    },
+    KY: {
+        x: 58,
+        y: 40
+    },
+    GA: {
+        x: 60,
+        y: 60
+    },
+    FL: {
+        x: 62,
+        y: 72
+    },
+    SC: {
+        x: 64,
+        y: 58
+    },
+    NC: {
+        x: 68,
+        y: 52
+    },
+    VA: {
+        x: 70,
+        y: 44
+    },
+    WV: {
+        x: 66,
+        y: 40
+    },
+    // Northeast / Mid-Atlantic
+    PA: {
+        x: 66,
+        y: 34
+    },
+    NY: {
+        x: 68,
+        y: 26
+    },
+    VT: {
+        x: 70,
+        y: 20
+    },
+    NH: {
+        x: 73,
+        y: 19
+    },
+    ME: {
+        x: 80,
+        y: 15
+    },
+    MA: {
+        x: 75,
+        y: 24
+    },
+    RI: {
+        x: 77,
+        y: 26
+    },
+    CT: {
+        x: 75,
+        y: 28
+    },
+    NJ: {
+        x: 72,
+        y: 30
+    },
+    DE: {
+        x: 73,
+        y: 34
+    },
+    MD: {
+        x: 71,
+        y: 36
+    },
+    DC: {
+        x: 70,
+        y: 38
+    },
+    PR: {
+        x: 78,
+        y: 80
+    }
+};
+// Dense cluster (New England / Mid-Atlantic)
+const DENSE_STATES = new Set([
+    'RI',
+    'CT',
+    'MA',
+    'NH',
+    'VT',
+    'NJ',
+    'DE',
+    'MD',
+    'DC',
+    'NY'
+]);
+// Tiny states that should blow up on hover
+const TINY_STATES = new Set([
+    'RI',
+    'CT',
+    'DE',
+    'NJ',
+    'MA',
+    'DC'
+]);
+// New England detached to the right
+const NEW_ENGLAND_DETACHED = new Set([
+    'ME',
+    'NH',
+    'VT',
+    'MA',
+    'RI',
+    'CT'
+]);
+// Layout offsets for detached New England — pulled in so they’re fully in-frame
+const NEW_ENGLAND_LAYOUT = {
+    ME: {
+        dx: 45,
+        dy: -60
+    },
+    NH: {
+        dx: 45,
+        dy: -25
+    },
+    VT: {
+        dx: 45,
+        dy: 10
+    },
+    MA: {
+        dx: 45,
+        dy: 45
+    },
+    RI: {
+        dx: 45,
+        dy: 80
+    },
+    CT: {
+        dx: 45,
+        dy: 115
+    }
+};
+function generateMetrics(code) {
+    const base = code.charCodeAt(0) + code.charCodeAt(1);
+    const clamp = (v, min, max)=>Math.min(max, Math.max(min, v));
+    return {
+        batchesTracked: clamp(260 + base % 320, 120, 580),
+        labsReporting: clamp(3 + base % 9, 2, 14),
+        recentRecalls: base % 6,
+        passingRate: clamp(82 + base % 11, 78, 97)
+    };
+}
+function getGeographyStyle(isSelected, transform) {
+    // Default stroke: same family of blue as hover halo so it looks cohesive even at rest
+    const baseStroke = isSelected ? '#0ea5e9' : '#38bdf8';
+    const shared = {
+        transform,
+        transformBox: 'fill-box',
+        transformOrigin: 'center',
+        shapeRendering: 'geometricPrecision',
+        vectorEffect: 'non-scaling-stroke',
+        strokeLinejoin: 'round',
+        strokeLinecap: 'round',
+        outline: 'none',
+        willChange: 'transform, filter',
+        transition: 'fill 140ms ease-out, stroke 140ms ease-out, filter 140ms ease-out, transform 120ms ease-out'
+    };
+    return {
+        default: {
+            ...shared,
+            fill: 'url(#stateGlass)',
+            stroke: baseStroke,
+            strokeWidth: 1,
+            filter: 'drop-shadow(0 4px 7px rgba(15,23,42,0.65))'
+        },
+        hover: {
+            ...shared,
+            fill: 'url(#stateGlassHover)',
+            stroke: '#e5f5ff',
+            strokeWidth: 1.15,
+            cursor: 'pointer',
+            filter: 'drop-shadow(0 9px 16px rgba(37,99,235,0.9))'
+        },
+        pressed: {
+            ...shared,
+            fill: 'url(#stateGlassActive)',
+            stroke: '#020617',
+            strokeWidth: 1.1,
+            filter: 'drop-shadow(0 11px 20px rgba(22,101,52,0.9))'
+        }
+    };
+}
+const DEFAULT_STATE = {
+    code: 'CA',
+    name: 'California'
+};
+const REGIONS = [
     {
-        region: 'west',
-        y: 30,
-        startX: 10,
-        spacing: 6.2,
-        states: [
-            {
-                code: 'WA',
-                name: 'Washington'
-            },
-            {
-                code: 'OR',
-                name: 'Oregon'
-            },
-            {
-                code: 'CA',
-                name: 'California'
-            },
-            {
-                code: 'NV',
-                name: 'Nevada'
-            },
-            {
-                code: 'ID',
-                name: 'Idaho'
-            },
-            {
-                code: 'MT',
-                name: 'Montana'
-            },
-            {
-                code: 'WY',
-                name: 'Wyoming'
-            },
-            {
-                code: 'UT',
-                name: 'Utah'
-            },
-            {
-                code: 'CO',
-                name: 'Colorado'
-            },
-            {
-                code: 'AZ',
-                name: 'Arizona'
-            },
-            {
-                code: 'NM',
-                name: 'New Mexico'
-            }
-        ]
+        id: 'us',
+        label: 'United States',
+        pill: 'US · States',
+        earthPosition: '42% 52%'
     },
     {
-        region: 'midwest',
-        y: 48,
-        startX: 18,
-        spacing: 5.7,
-        states: [
-            {
-                code: 'ND',
-                name: 'North Dakota'
-            },
-            {
-                code: 'SD',
-                name: 'South Dakota'
-            },
-            {
-                code: 'NE',
-                name: 'Nebraska'
-            },
-            {
-                code: 'KS',
-                name: 'Kansas'
-            },
-            {
-                code: 'MN',
-                name: 'Minnesota'
-            },
-            {
-                code: 'IA',
-                name: 'Iowa'
-            },
-            {
-                code: 'MO',
-                name: 'Missouri'
-            },
-            {
-                code: 'WI',
-                name: 'Wisconsin'
-            },
-            {
-                code: 'IL',
-                name: 'Illinois'
-            },
-            {
-                code: 'MI',
-                name: 'Michigan'
-            },
-            {
-                code: 'IN',
-                name: 'Indiana'
-            },
-            {
-                code: 'OH',
-                name: 'Ohio'
-            }
-        ]
-    },
-    {
-        region: 'south',
-        y: 66,
-        startX: 16,
-        spacing: 5.9,
-        states: [
-            {
-                code: 'TX',
-                name: 'Texas'
-            },
-            {
-                code: 'OK',
-                name: 'Oklahoma'
-            },
-            {
-                code: 'AR',
-                name: 'Arkansas'
-            },
-            {
-                code: 'LA',
-                name: 'Louisiana'
-            },
-            {
-                code: 'MS',
-                name: 'Mississippi'
-            },
-            {
-                code: 'AL',
-                name: 'Alabama'
-            },
-            {
-                code: 'TN',
-                name: 'Tennessee'
-            },
-            {
-                code: 'KY',
-                name: 'Kentucky'
-            },
-            {
-                code: 'GA',
-                name: 'Georgia'
-            },
-            {
-                code: 'SC',
-                name: 'South Carolina'
-            },
-            {
-                code: 'NC',
-                name: 'North Carolina'
-            },
-            {
-                code: 'VA',
-                name: 'Virginia'
-            },
-            {
-                code: 'WV',
-                name: 'West Virginia'
-            },
-            {
-                code: 'MD',
-                name: 'Maryland'
-            },
-            {
-                code: 'DC',
-                name: 'District of Columbia'
-            },
-            {
-                code: 'DE',
-                name: 'Delaware'
-            }
-        ]
-    },
-    {
-        region: 'northeast',
-        y: 34,
-        startX: 58,
-        spacing: 4.8,
-        states: [
-            {
-                code: 'PA',
-                name: 'Pennsylvania'
-            },
-            {
-                code: 'NJ',
-                name: 'New Jersey'
-            },
-            {
-                code: 'NY',
-                name: 'New York'
-            },
-            {
-                code: 'CT',
-                name: 'Connecticut'
-            },
-            {
-                code: 'RI',
-                name: 'Rhode Island'
-            },
-            {
-                code: 'MA',
-                name: 'Massachusetts'
-            },
-            {
-                code: 'VT',
-                name: 'Vermont'
-            },
-            {
-                code: 'NH',
-                name: 'New Hampshire'
-            },
-            {
-                code: 'ME',
-                name: 'Maine'
-            }
-        ]
-    },
-    {
-        region: 'pacific',
-        y: 80,
-        startX: 14,
-        spacing: 10,
-        states: [
-            {
-                code: 'AK',
-                name: 'Alaska'
-            },
-            {
-                code: 'HI',
-                name: 'Hawaii'
-            }
-        ]
+        id: 'ca',
+        label: 'Canada',
+        pill: 'Canada · Provinces',
+        earthPosition: '58% 50%'
     }
 ];
-// Tiny helper to keep classNames readable
-function cn(...classes) {
-    return classes.filter(Boolean).join(' ');
-}
-// Soft mock stats so the UI feels alive
-const DEFAULT_STATS = {
-    batches: 0,
-    activeBatches: 0,
-    labs: 0,
-    labResults: 0,
-    flaggedBatches: 0
-};
-const MOCK_STATE_STATS = {
-    ME: {
-        batches: 1,
-        activeBatches: 1,
-        labs: 1,
-        labResults: 1,
-        flaggedBatches: 0
-    }
-};
-const REGION_GRADIENT = {
-    west: 'from-cyan-300/85 via-sky-400/40 to-indigo-500/90',
-    midwest: 'from-teal-300/90 via-emerald-300/40 to-sky-500/90',
-    south: 'from-amber-300/85 via-orange-400/40 to-rose-400/85',
-    northeast: 'from-fuchsia-300/85 via-violet-400/40 to-sky-400/90',
-    pacific: 'from-cyan-200/80 via-sky-300/40 to-indigo-400/90'
-};
-const bubbleLayout = STATE_ROWS.flatMap((row, rowIndex)=>row.states.map((s, colIndex)=>({
-            code: s.code,
-            name: s.name,
-            region: row.region,
-            x: row.startX + row.spacing * colIndex,
-            y: row.y + Math.sin((colIndex + rowIndex) * 0.7) * 3,
-            rowIndex,
-            colIndex
-        })));
 function AdminStateExplorer() {
     _s();
-    const router = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$router$2e$js__$5b$client$5d$__$28$ecmascript$29$__["useRouter"])();
-    const { data: session } = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2d$auth$2f$react$2f$index$2e$js__$5b$client$5d$__$28$ecmascript$29$__["useSession"])();
-    const [selectedCode, setSelectedCode] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$index$2e$js__$5b$client$5d$__$28$ecmascript$29$__["useState"])('ME');
+    const { data: session, status } = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2d$auth$2f$react$2f$index$2e$js__$5b$client$5d$__$28$ecmascript$29$__["useSession"])();
+    const isLoggedIn = status === 'authenticated';
+    const [selectedState, setSelectedState] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$index$2e$js__$5b$client$5d$__$28$ecmascript$29$__["useState"])(DEFAULT_STATE);
     const [hoveredCode, setHoveredCode] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$index$2e$js__$5b$client$5d$__$28$ecmascript$29$__["useState"])(null);
-    const ADMIN_EMAILS = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$index$2e$js__$5b$client$5d$__$28$ecmascript$29$__["useMemo"])({
-        "AdminStateExplorer.useMemo[ADMIN_EMAILS]": ()=>(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$build$2f$polyfills$2f$process$2e$js__$5b$client$5d$__$28$ecmascript$29$__["default"].env.NEXT_PUBLIC_ADMIN_EMAILS || '').split(',').map({
-                "AdminStateExplorer.useMemo[ADMIN_EMAILS]": (s)=>s.trim().toLowerCase()
-            }["AdminStateExplorer.useMemo[ADMIN_EMAILS]"]).filter(Boolean)
-    }["AdminStateExplorer.useMemo[ADMIN_EMAILS]"], []);
-    // If no admin email list is configured, any signed-in user is treated as admin.
-    const isAdmin = !!session && (ADMIN_EMAILS.length === 0 || !!session.user?.email && ADMIN_EMAILS.includes(session.user.email.toLowerCase()));
-    const selectedBubble = bubbleLayout.find((b)=>b.code === selectedCode) ?? bubbleLayout[0];
-    const selectedStats = MOCK_STATE_STATS[selectedCode] ?? DEFAULT_STATS;
-    function handleOpenStateDataset() {
-        router.push(`/admin/states/${selectedCode}`);
-    }
-    return /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("main", {
-        className: "min-h-screen bg-[radial-gradient(circle_at_top,_rgba(56,189,248,0.16),transparent_55%),radial-gradient(circle_at_bottom,_rgba(236,72,153,0.12),transparent_60%)] bg-slate-950 text-slate-50",
-        children: [
-            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("header", {
-                className: "border-b border-slate-800/60 bg-slate-950/70 backdrop-blur-xl",
-                children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                    className: "mx-auto flex max-w-6xl items-center justify-between px-4 py-3",
+    const [pointer, setPointer] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$index$2e$js__$5b$client$5d$__$28$ecmascript$29$__["useState"])(null);
+    const [tilt, setTilt] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$index$2e$js__$5b$client$5d$__$28$ecmascript$29$__["useState"])({
+        x: 0,
+        y: 0
+    });
+    const [detailPanel, setDetailPanel] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$index$2e$js__$5b$client$5d$__$28$ecmascript$29$__["useState"])(null);
+    const [regionIndex, setRegionIndex] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$index$2e$js__$5b$client$5d$__$28$ecmascript$29$__["useState"])(0);
+    const activeRegion = REGIONS[regionIndex];
+    const metrics = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$index$2e$js__$5b$client$5d$__$28$ecmascript$29$__["useMemo"])({
+        "AdminStateExplorer.useMemo[metrics]": ()=>generateMetrics(selectedState.code)
+    }["AdminStateExplorer.useMemo[metrics]"], [
+        selectedState.code
+    ]);
+    const mapCardRef = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$index$2e$js__$5b$client$5d$__$28$ecmascript$29$__["useRef"])(null);
+    const handleMapMouseMove = (event)=>{
+        const rect = mapCardRef.current?.getBoundingClientRect();
+        if (!rect) return;
+        const x = (event.clientX - rect.left) / rect.width;
+        const y = (event.clientY - rect.top) / rect.height;
+        setPointer({
+            x,
+            y
+        });
+        const rotateX = (y - 0.5) * 5;
+        const rotateY = (0.5 - x) * 9;
+        setTilt({
+            x: rotateY,
+            y: rotateX
+        });
+    };
+    const handleMapMouseLeave = ()=>{
+        setPointer(null);
+        setTilt({
+            x: 0,
+            y: 0
+        });
+    };
+    const handleStateClick = (code, name, evt)=>{
+        const nextState = {
+            code,
+            name
+        };
+        setSelectedState(nextState);
+        if (mapCardRef.current && evt && typeof evt.clientX === 'number') {
+            const rect = mapCardRef.current.getBoundingClientRect();
+            const x = (evt.clientX - rect.left) / rect.width;
+            const y = (evt.clientY - rect.top) / rect.height;
+            const clampedX = Math.min(0.8, Math.max(0.2, x));
+            const clampedY = Math.min(0.8, Math.max(0.2, y));
+            setDetailPanel({
+                state: nextState,
+                x: clampedX,
+                y: clampedY
+            });
+        } else {
+            setDetailPanel({
+                state: nextState,
+                x: 0.5,
+                y: 0.5
+            });
+        }
+    };
+    const handleClosePanel = ()=>setDetailPanel(null);
+    const currentLabel = `${selectedState.code} · ${selectedState.name}`;
+    void pointer;
+    return /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+        className: "min-h-screen bg-[#f6f7f8] text-slate-900",
+        children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("main", {
+            className: "mx-auto flex max-w-6xl flex-col gap-4 px-4 pb-16 pt-4 md:px-8",
+            children: [
+                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("section", {
+                    className: "pt-1",
+                    children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("h1", {
+                        className: "text-balance text-2xl font-semibold tracking-tight text-slate-900 md:text-3xl lg:text-4xl",
+                        children: "Regional cannabis safety & COA explorer"
+                    }, void 0, false, {
+                        fileName: "[project]/components/AdminStateExplorer.tsx",
+                        lineNumber: 315,
+                        columnNumber: 11
+                    }, this)
+                }, void 0, false, {
+                    fileName: "[project]/components/AdminStateExplorer.tsx",
+                    lineNumber: 314,
+                    columnNumber: 9
+                }, this),
+                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("section", {
+                    className: "relative mt-1",
                     children: [
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                            className: "flex items-center gap-3",
-                            children: [
-                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                    className: "flex h-9 w-9 items-center justify-center rounded-2xl bg-gradient-to-br from-emerald-400 to-sky-500 shadow-[0_0_40px_rgba(56,189,248,0.65)]",
-                                    children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
-                                        className: "text-lg font-black tracking-tight text-slate-950",
-                                        children: "C"
-                                    }, void 0, false, {
-                                        fileName: "[project]/components/AdminStateExplorer.tsx",
-                                        lineNumber: 210,
-                                        columnNumber: 15
-                                    }, this)
-                                }, void 0, false, {
-                                    fileName: "[project]/components/AdminStateExplorer.tsx",
-                                    lineNumber: 209,
-                                    columnNumber: 13
-                                }, this),
-                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                    className: "flex flex-col leading-tight",
+                            className: "pointer-events-none absolute inset-x-6 top-[-64px] h-72 rounded-[80px] bg-[radial-gradient(circle_at_0%_0%,rgba(59,130,246,0.35),transparent_55%),radial-gradient(circle_at_100%_100%,rgba(56,189,248,0.35),transparent_55%)] blur-3xl"
+                        }, void 0, false, {
+                            fileName: "[project]/components/AdminStateExplorer.tsx",
+                            lineNumber: 323,
+                            columnNumber: 11
+                        }, this),
+                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                            ref: mapCardRef,
+                            onMouseMove: handleMapMouseMove,
+                            onMouseLeave: handleMapMouseLeave,
+                            className: "relative mx-auto max-w-6xl rounded-[48px] border border-sky-400/45 bg-gradient-to-b from-slate-200 via-slate-100 to-slate-50/0 px-[1.5px] pb-[1.5px] pt-[1.5px] shadow-[0_40px_120px_rgba(15,23,42,0.18)]",
+                            children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                className: "relative overflow-hidden rounded-[46px] bg-gradient-to-b from-slate-100 via-slate-50 to-transparent px-5 pb-6 pt-5 md:px-7 md:pb-8 md:pt-6",
+                                children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                    className: "relative z-10 mx-auto flex max-w-5xl flex-col gap-4",
                                     children: [
-                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
-                                            className: "text-sm font-semibold text-slate-50",
-                                            children: "CartFax"
-                                        }, void 0, false, {
+                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                            className: "flex flex-wrap items-center justify-between gap-3 px-1",
+                                            children: [
+                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                    className: "space-y-1",
+                                                    children: [
+                                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
+                                                            className: "text-[11px] font-semibold uppercase tracking-[0.24em] text-sky-600",
+                                                            children: activeRegion.pill
+                                                        }, void 0, false, {
+                                                            fileName: "[project]/components/AdminStateExplorer.tsx",
+                                                            lineNumber: 337,
+                                                            columnNumber: 21
+                                                        }, this),
+                                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
+                                                            className: "text-xs text-slate-600",
+                                                            children: [
+                                                                currentLabel,
+                                                                " · True state boundaries on a glass atlas. Hover to tease them apart, click to drill in."
+                                                            ]
+                                                        }, void 0, true, {
+                                                            fileName: "[project]/components/AdminStateExplorer.tsx",
+                                                            lineNumber: 340,
+                                                            columnNumber: 21
+                                                        }, this)
+                                                    ]
+                                                }, void 0, true, {
+                                                    fileName: "[project]/components/AdminStateExplorer.tsx",
+                                                    lineNumber: 336,
+                                                    columnNumber: 19
+                                                }, this),
+                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                    className: "flex items-center gap-2 text-[11px] font-medium text-slate-500",
+                                                    children: [
+                                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                                            className: "inline-flex h-2 w-2 rounded-full bg-sky-500 shadow-[0_0_0_4px_rgba(56,189,248,0.35)]"
+                                                        }, void 0, false, {
+                                                            fileName: "[project]/components/AdminStateExplorer.tsx",
+                                                            lineNumber: 346,
+                                                            columnNumber: 21
+                                                        }, this),
+                                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                                            children: "Move your mouse · Click a state"
+                                                        }, void 0, false, {
+                                                            fileName: "[project]/components/AdminStateExplorer.tsx",
+                                                            lineNumber: 347,
+                                                            columnNumber: 21
+                                                        }, this)
+                                                    ]
+                                                }, void 0, true, {
+                                                    fileName: "[project]/components/AdminStateExplorer.tsx",
+                                                    lineNumber: 345,
+                                                    columnNumber: 19
+                                                }, this)
+                                            ]
+                                        }, void 0, true, {
                                             fileName: "[project]/components/AdminStateExplorer.tsx",
-                                            lineNumber: 215,
-                                            columnNumber: 15
+                                            lineNumber: 335,
+                                            columnNumber: 17
                                         }, this),
-                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
-                                            className: "text-[11px] font-medium text-slate-400",
-                                            children: "Cannabis Retail Transparency"
+                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                            className: "flex flex-wrap items-center gap-2 px-1",
+                                            children: REGIONS.map((region, idx)=>{
+                                                const active = idx === regionIndex;
+                                                return /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
+                                                    type: "button",
+                                                    onClick: ()=>setRegionIndex(idx),
+                                                    className: 'inline-flex items-center gap-2 rounded-full border px-3 py-1 text-xs font-semibold transition-colors ' + (active ? 'border-sky-500 bg-sky-500 text-white shadow-[0_10px_30px_rgba(56,189,248,0.55)]' : 'border-slate-300 bg-white/80 text-slate-700 hover:border-sky-400 hover:text-sky-700'),
+                                                    children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                                        children: region.label
+                                                    }, void 0, false, {
+                                                        fileName: "[project]/components/AdminStateExplorer.tsx",
+                                                        lineNumber: 367,
+                                                        columnNumber: 25
+                                                    }, this)
+                                                }, region.id, false, {
+                                                    fileName: "[project]/components/AdminStateExplorer.tsx",
+                                                    lineNumber: 356,
+                                                    columnNumber: 23
+                                                }, this);
+                                            })
                                         }, void 0, false, {
                                             fileName: "[project]/components/AdminStateExplorer.tsx",
-                                            lineNumber: 218,
-                                            columnNumber: 15
+                                            lineNumber: 352,
+                                            columnNumber: 17
+                                        }, this),
+                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                            className: "relative mx-auto mt-2 aspect-[19/10] w-full",
+                                            children: [
+                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                    className: "pointer-events-none absolute inset-[14px] rounded-[999px] bg-[url('/earth-hero.jpg')] bg-cover bg-no-repeat",
+                                                    style: {
+                                                        backgroundPosition: activeRegion.earthPosition,
+                                                        transition: 'background-position 600ms ease-out'
+                                                    },
+                                                    children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                        className: "absolute inset-0 rounded-[999px] bg-[radial-gradient(circle_at_30%_18%,rgba(255,255,255,0.9),transparent_60%),radial-gradient(circle_at_70%_82%,rgba(148,163,184,0.65),transparent_60%),radial-gradient(circle_at_center,rgba(59,130,246,0.6),transparent_70%)] mix-blend-soft-light"
+                                                    }, void 0, false, {
+                                                        fileName: "[project]/components/AdminStateExplorer.tsx",
+                                                        lineNumber: 384,
+                                                        columnNumber: 21
+                                                    }, this)
+                                                }, void 0, false, {
+                                                    fileName: "[project]/components/AdminStateExplorer.tsx",
+                                                    lineNumber: 376,
+                                                    columnNumber: 19
+                                                }, this),
+                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                    className: "pointer-events-none absolute inset-x-20 bottom-4 h-24 rounded-[999px] bg-gradient-to-b from-transparent via-slate-700/35 to-black/75 blur-2xl"
+                                                }, void 0, false, {
+                                                    fileName: "[project]/components/AdminStateExplorer.tsx",
+                                                    lineNumber: 388,
+                                                    columnNumber: 19
+                                                }, this),
+                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                    className: "relative z-10 h-full w-full overflow-hidden",
+                                                    children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                        className: "flex h-full w-full transition-transform duration-500 ease-out",
+                                                        style: {
+                                                            transform: `translateX(-${regionIndex * 100}%)`
+                                                        },
+                                                        children: [
+                                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                                className: "h-full w-full flex-none",
+                                                                children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                                    style: {
+                                                                        transform: `perspective(1600px) rotateX(${tilt.y}deg) rotateY(${tilt.x}deg) rotateZ(-3deg)`
+                                                                    },
+                                                                    className: "h-full w-full transition-transform duration-150 ease-out",
+                                                                    children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2d$simple$2d$maps$2f$dist$2f$index$2e$umd$2e$js__$5b$client$5d$__$28$ecmascript$29$__["ComposableMap"], {
+                                                                        projection: "geoAlbersUsa",
+                                                                        projectionConfig: {
+                                                                            scale: 1300
+                                                                        },
+                                                                        width: 975,
+                                                                        height: 610,
+                                                                        className: "relative h-full w-full",
+                                                                        children: [
+                                                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("defs", {
+                                                                                children: [
+                                                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("radialGradient", {
+                                                                                        id: "stateGlass",
+                                                                                        cx: "30%",
+                                                                                        cy: "20%",
+                                                                                        r: "98%",
+                                                                                        children: [
+                                                                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("stop", {
+                                                                                                offset: "0%",
+                                                                                                stopColor: "#f9fafb",
+                                                                                                stopOpacity: "1"
+                                                                                            }, void 0, false, {
+                                                                                                fileName: "[project]/components/AdminStateExplorer.tsx",
+                                                                                                lineNumber: 423,
+                                                                                                columnNumber: 33
+                                                                                            }, this),
+                                                                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("stop", {
+                                                                                                offset: "24%",
+                                                                                                stopColor: "#e5e7eb",
+                                                                                                stopOpacity: "0.98"
+                                                                                            }, void 0, false, {
+                                                                                                fileName: "[project]/components/AdminStateExplorer.tsx",
+                                                                                                lineNumber: 428,
+                                                                                                columnNumber: 33
+                                                                                            }, this),
+                                                                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("stop", {
+                                                                                                offset: "50%",
+                                                                                                stopColor: "#ffffff",
+                                                                                                stopOpacity: "1"
+                                                                                            }, void 0, false, {
+                                                                                                fileName: "[project]/components/AdminStateExplorer.tsx",
+                                                                                                lineNumber: 433,
+                                                                                                columnNumber: 33
+                                                                                            }, this),
+                                                                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("stop", {
+                                                                                                offset: "70%",
+                                                                                                stopColor: "#e5e7eb",
+                                                                                                stopOpacity: "0.96"
+                                                                                            }, void 0, false, {
+                                                                                                fileName: "[project]/components/AdminStateExplorer.tsx",
+                                                                                                lineNumber: 438,
+                                                                                                columnNumber: 33
+                                                                                            }, this),
+                                                                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("stop", {
+                                                                                                offset: "82%",
+                                                                                                stopColor: "#166534",
+                                                                                                stopOpacity: "0.22"
+                                                                                            }, void 0, false, {
+                                                                                                fileName: "[project]/components/AdminStateExplorer.tsx",
+                                                                                                lineNumber: 443,
+                                                                                                columnNumber: 33
+                                                                                            }, this),
+                                                                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("stop", {
+                                                                                                offset: "100%",
+                                                                                                stopColor: "#38bdf8",
+                                                                                                stopOpacity: "0.98"
+                                                                                            }, void 0, false, {
+                                                                                                fileName: "[project]/components/AdminStateExplorer.tsx",
+                                                                                                lineNumber: 448,
+                                                                                                columnNumber: 33
+                                                                                            }, this)
+                                                                                        ]
+                                                                                    }, void 0, true, {
+                                                                                        fileName: "[project]/components/AdminStateExplorer.tsx",
+                                                                                        lineNumber: 417,
+                                                                                        columnNumber: 31
+                                                                                    }, this),
+                                                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("radialGradient", {
+                                                                                        id: "stateGlassHover",
+                                                                                        cx: "28%",
+                                                                                        cy: "18%",
+                                                                                        r: "100%",
+                                                                                        children: [
+                                                                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("stop", {
+                                                                                                offset: "0%",
+                                                                                                stopColor: "#ffffff",
+                                                                                                stopOpacity: "1"
+                                                                                            }, void 0, false, {
+                                                                                                fileName: "[project]/components/AdminStateExplorer.tsx",
+                                                                                                lineNumber: 462,
+                                                                                                columnNumber: 33
+                                                                                            }, this),
+                                                                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("stop", {
+                                                                                                offset: "30%",
+                                                                                                stopColor: "#e0f2fe",
+                                                                                                stopOpacity: "1"
+                                                                                            }, void 0, false, {
+                                                                                                fileName: "[project]/components/AdminStateExplorer.tsx",
+                                                                                                lineNumber: 467,
+                                                                                                columnNumber: 33
+                                                                                            }, this),
+                                                                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("stop", {
+                                                                                                offset: "60%",
+                                                                                                stopColor: "#60a5fa",
+                                                                                                stopOpacity: "0.99"
+                                                                                            }, void 0, false, {
+                                                                                                fileName: "[project]/components/AdminStateExplorer.tsx",
+                                                                                                lineNumber: 472,
+                                                                                                columnNumber: 33
+                                                                                            }, this),
+                                                                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("stop", {
+                                                                                                offset: "82%",
+                                                                                                stopColor: "#22c55e",
+                                                                                                stopOpacity: "0.8"
+                                                                                            }, void 0, false, {
+                                                                                                fileName: "[project]/components/AdminStateExplorer.tsx",
+                                                                                                lineNumber: 477,
+                                                                                                columnNumber: 33
+                                                                                            }, this),
+                                                                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("stop", {
+                                                                                                offset: "100%",
+                                                                                                stopColor: "#14532d",
+                                                                                                stopOpacity: "0.9"
+                                                                                            }, void 0, false, {
+                                                                                                fileName: "[project]/components/AdminStateExplorer.tsx",
+                                                                                                lineNumber: 482,
+                                                                                                columnNumber: 33
+                                                                                            }, this)
+                                                                                        ]
+                                                                                    }, void 0, true, {
+                                                                                        fileName: "[project]/components/AdminStateExplorer.tsx",
+                                                                                        lineNumber: 456,
+                                                                                        columnNumber: 31
+                                                                                    }, this),
+                                                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("radialGradient", {
+                                                                                        id: "stateGlassActive",
+                                                                                        cx: "30%",
+                                                                                        cy: "18%",
+                                                                                        r: "100%",
+                                                                                        children: [
+                                                                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("stop", {
+                                                                                                offset: "0%",
+                                                                                                stopColor: "#f0fdf4",
+                                                                                                stopOpacity: "1"
+                                                                                            }, void 0, false, {
+                                                                                                fileName: "[project]/components/AdminStateExplorer.tsx",
+                                                                                                lineNumber: 496,
+                                                                                                columnNumber: 33
+                                                                                            }, this),
+                                                                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("stop", {
+                                                                                                offset: "30%",
+                                                                                                stopColor: "#bbf7d0",
+                                                                                                stopOpacity: "1"
+                                                                                            }, void 0, false, {
+                                                                                                fileName: "[project]/components/AdminStateExplorer.tsx",
+                                                                                                lineNumber: 501,
+                                                                                                columnNumber: 33
+                                                                                            }, this),
+                                                                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("stop", {
+                                                                                                offset: "60%",
+                                                                                                stopColor: "#38bdf8",
+                                                                                                stopOpacity: "0.99"
+                                                                                            }, void 0, false, {
+                                                                                                fileName: "[project]/components/AdminStateExplorer.tsx",
+                                                                                                lineNumber: 506,
+                                                                                                columnNumber: 33
+                                                                                            }, this),
+                                                                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("stop", {
+                                                                                                offset: "86%",
+                                                                                                stopColor: "#166534",
+                                                                                                stopOpacity: "0.82"
+                                                                                            }, void 0, false, {
+                                                                                                fileName: "[project]/components/AdminStateExplorer.tsx",
+                                                                                                lineNumber: 511,
+                                                                                                columnNumber: 33
+                                                                                            }, this),
+                                                                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("stop", {
+                                                                                                offset: "100%",
+                                                                                                stopColor: "#020617",
+                                                                                                stopOpacity: "1"
+                                                                                            }, void 0, false, {
+                                                                                                fileName: "[project]/components/AdminStateExplorer.tsx",
+                                                                                                lineNumber: 516,
+                                                                                                columnNumber: 33
+                                                                                            }, this)
+                                                                                        ]
+                                                                                    }, void 0, true, {
+                                                                                        fileName: "[project]/components/AdminStateExplorer.tsx",
+                                                                                        lineNumber: 490,
+                                                                                        columnNumber: 31
+                                                                                    }, this)
+                                                                                ]
+                                                                            }, void 0, true, {
+                                                                                fileName: "[project]/components/AdminStateExplorer.tsx",
+                                                                                lineNumber: 415,
+                                                                                columnNumber: 29
+                                                                            }, this),
+                                                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2d$simple$2d$maps$2f$dist$2f$index$2e$umd$2e$js__$5b$client$5d$__$28$ecmascript$29$__["Geographies"], {
+                                                                                geography: GEO_URL,
+                                                                                children: ({ geographies })=>{
+                                                                                    const hoverPos = hoveredCode ? STATE_POSITIONS[hoveredCode] : null;
+                                                                                    const hoveredIsTiny = hoveredCode ? TINY_STATES.has(hoveredCode) : false;
+                                                                                    const hoveredIsDense = hoveredCode ? DENSE_STATES.has(hoveredCode) : false;
+                                                                                    const items = geographies.map((geo)=>{
+                                                                                        const name = geo.properties?.name;
+                                                                                        if (!name) return null;
+                                                                                        const code = NAME_TO_CODE[name] ?? name;
+                                                                                        const isSelected = code === selectedState.code;
+                                                                                        const isTiny = TINY_STATES.has(code);
+                                                                                        const isDetachedNE = NEW_ENGLAND_DETACHED.has(code);
+                                                                                        const pos = STATE_POSITIONS[code] ?? {
+                                                                                            x: 50,
+                                                                                            y: 50
+                                                                                        };
+                                                                                        const sx = pos.x / 100;
+                                                                                        const sy = pos.y / 100;
+                                                                                        // Base: pull detached New England out into a clean column on the right
+                                                                                        let baseTx = 0;
+                                                                                        let baseTy = 0;
+                                                                                        if (isDetachedNE) {
+                                                                                            const layout = NEW_ENGLAND_LAYOUT[code];
+                                                                                            if (layout) {
+                                                                                                baseTx += layout.dx;
+                                                                                                baseTy += layout.dy;
+                                                                                            }
+                                                                                        }
+                                                                                        const baseScale = isDetachedNE ? 1.3 : 1.0;
+                                                                                        let scale = baseScale;
+                                                                                        let tx = baseTx;
+                                                                                        let ty = baseTy;
+                                                                                        if (hoverPos) {
+                                                                                            const cx = hoverPos.x / 100;
+                                                                                            const cy = hoverPos.y / 100;
+                                                                                            const dx = sx - cx;
+                                                                                            const dy = sy - cy;
+                                                                                            const dist = Math.sqrt(dx * dx + dy * dy) || 0.0001;
+                                                                                            const isHover = code === hoveredCode;
+                                                                                            // Smooth radial “break apart” from hovered center
+                                                                                            const radius = 0.6;
+                                                                                            const influence = Math.max(0, 1 - dist / radius);
+                                                                                            let sepAmp = 16;
+                                                                                            if (DENSE_STATES.has(code)) sepAmp = 20;
+                                                                                            if (isTiny) sepAmp = 22;
+                                                                                            if (isDetachedNE) sepAmp *= 0.9;
+                                                                                            const separation = influence * sepAmp;
+                                                                                            const nx = dx / dist;
+                                                                                            const ny = dy / dist;
+                                                                                            if (!isHover) {
+                                                                                                tx += separation * nx;
+                                                                                                ty += separation * ny;
+                                                                                            }
+                                                                                            const neighborRadius = hoveredIsTiny ? 0.24 : 0.18;
+                                                                                            const isNeighbor = !isHover && dist < neighborRadius;
+                                                                                            if (isHover) {
+                                                                                                if (isTiny) {
+                                                                                                    // Rhode Island etc – big but still elegant
+                                                                                                    scale = baseScale * 2.4;
+                                                                                                } else if (DENSE_STATES.has(code)) {
+                                                                                                    scale = baseScale * 1.3;
+                                                                                                } else {
+                                                                                                    scale = baseScale * 1.18;
+                                                                                                }
+                                                                                            } else if (isNeighbor) {
+                                                                                                if (hoveredIsTiny || hoveredIsDense || isTiny) {
+                                                                                                    scale = baseScale * 1.16;
+                                                                                                } else {
+                                                                                                    scale = baseScale * 1.08;
+                                                                                                }
+                                                                                            }
+                                                                                        }
+                                                                                        if (isSelected) {
+                                                                                            scale *= 1.03;
+                                                                                        }
+                                                                                        const transformStr = `translate3d(${tx.toFixed(2)}px, ${ty.toFixed(2)}px, 0) scale(${scale.toFixed(3)})`;
+                                                                                        const style = getGeographyStyle(isSelected, transformStr);
+                                                                                        return {
+                                                                                            geo,
+                                                                                            name,
+                                                                                            code,
+                                                                                            style
+                                                                                        };
+                                                                                    }).filter(Boolean);
+                                                                                    const hoveredItem = hoveredCode ? items.find((i)=>i.code === hoveredCode) : null;
+                                                                                    const baseItems = hoveredCode ? items.filter((i)=>i.code !== hoveredCode) : items;
+                                                                                    const renderGeo = (item, suffix)=>/*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2d$simple$2d$maps$2f$dist$2f$index$2e$umd$2e$js__$5b$client$5d$__$28$ecmascript$29$__["Geography"], {
+                                                                                            geography: item.geo,
+                                                                                            onMouseEnter: ()=>setHoveredCode(item.code),
+                                                                                            onMouseLeave: ()=>setHoveredCode((prev)=>prev === item.code ? null : prev),
+                                                                                            onClick: (_geo, evt)=>handleStateClick(item.code, item.name, evt),
+                                                                                            style: item.style,
+                                                                                            className: "transition-transform duration-150 ease-out [transform-origin:center]"
+                                                                                        }, item.geo.rsmKey + suffix, false, {
+                                                                                            fileName: "[project]/components/AdminStateExplorer.tsx",
+                                                                                            lineNumber: 681,
+                                                                                            columnNumber: 35
+                                                                                        }, this);
+                                                                                    return /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["Fragment"], {
+                                                                                        children: [
+                                                                                            baseItems.map((item)=>renderGeo(item, '-base')),
+                                                                                            hoveredItem && renderGeo(hoveredItem, '-hovered')
+                                                                                        ]
+                                                                                    }, void 0, true);
+                                                                                }
+                                                                            }, void 0, false, {
+                                                                                fileName: "[project]/components/AdminStateExplorer.tsx",
+                                                                                lineNumber: 524,
+                                                                                columnNumber: 29
+                                                                            }, this)
+                                                                        ]
+                                                                    }, void 0, true, {
+                                                                        fileName: "[project]/components/AdminStateExplorer.tsx",
+                                                                        lineNumber: 406,
+                                                                        columnNumber: 27
+                                                                    }, this)
+                                                                }, void 0, false, {
+                                                                    fileName: "[project]/components/AdminStateExplorer.tsx",
+                                                                    lineNumber: 400,
+                                                                    columnNumber: 25
+                                                                }, this)
+                                                            }, void 0, false, {
+                                                                fileName: "[project]/components/AdminStateExplorer.tsx",
+                                                                lineNumber: 399,
+                                                                columnNumber: 23
+                                                            }, this),
+                                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                                className: "h-full w-full flex-none",
+                                                                children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                                    className: "flex h-full w-full flex-col items-center justify-center gap-4 rounded-[40px] bg-white/70 backdrop-blur-md",
+                                                                    children: [
+                                                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
+                                                                            className: "text-[11px] font-semibold uppercase tracking-[0.24em] text-slate-500",
+                                                                            children: "Canada · Provinces"
+                                                                        }, void 0, false, {
+                                                                            fileName: "[project]/components/AdminStateExplorer.tsx",
+                                                                            lineNumber: 722,
+                                                                            columnNumber: 27
+                                                                        }, this),
+                                                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("h2", {
+                                                                            className: "text-xl font-semibold text-slate-800",
+                                                                            children: "Canada coverage coming soon"
+                                                                        }, void 0, false, {
+                                                                            fileName: "[project]/components/AdminStateExplorer.tsx",
+                                                                            lineNumber: 725,
+                                                                            columnNumber: 27
+                                                                        }, this),
+                                                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
+                                                                            className: "max-w-sm text-center text-sm text-slate-500",
+                                                                            children: "This carousel is wired for additional regions. When you're ready, we'll plug in a province-level safety atlas here with the same glass-map treatment."
+                                                                        }, void 0, false, {
+                                                                            fileName: "[project]/components/AdminStateExplorer.tsx",
+                                                                            lineNumber: 728,
+                                                                            columnNumber: 27
+                                                                        }, this)
+                                                                    ]
+                                                                }, void 0, true, {
+                                                                    fileName: "[project]/components/AdminStateExplorer.tsx",
+                                                                    lineNumber: 721,
+                                                                    columnNumber: 25
+                                                                }, this)
+                                                            }, void 0, false, {
+                                                                fileName: "[project]/components/AdminStateExplorer.tsx",
+                                                                lineNumber: 720,
+                                                                columnNumber: 23
+                                                            }, this)
+                                                        ]
+                                                    }, void 0, true, {
+                                                        fileName: "[project]/components/AdminStateExplorer.tsx",
+                                                        lineNumber: 392,
+                                                        columnNumber: 21
+                                                    }, this)
+                                                }, void 0, false, {
+                                                    fileName: "[project]/components/AdminStateExplorer.tsx",
+                                                    lineNumber: 391,
+                                                    columnNumber: 19
+                                                }, this),
+                                                detailPanel && activeRegion.id === 'us' && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                    className: "pointer-events-none absolute inset-0 z-30",
+                                                    children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                        className: "pointer-events-auto max-w-sm rounded-3xl border border-slate-200/70 bg-white/95 p-5 shadow-[0_26px_80px_rgba(15,23,42,0.18)] backdrop-blur-xl",
+                                                        style: {
+                                                            position: 'absolute',
+                                                            left: `${detailPanel.x * 100}%`,
+                                                            top: `${detailPanel.y * 100}%`,
+                                                            transform: 'translate(-50%, -50%)'
+                                                        },
+                                                        children: [
+                                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                                className: "flex items-start justify-between gap-3",
+                                                                children: [
+                                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                                        children: [
+                                                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
+                                                                                className: "text-[11px] font-semibold uppercase tracking-[0.22em] text-sky-600",
+                                                                                children: [
+                                                                                    detailPanel.state.code,
+                                                                                    " ·",
+                                                                                    ' ',
+                                                                                    detailPanel.state.name
+                                                                                ]
+                                                                            }, void 0, true, {
+                                                                                fileName: "[project]/components/AdminStateExplorer.tsx",
+                                                                                lineNumber: 752,
+                                                                                columnNumber: 29
+                                                                            }, this),
+                                                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("h2", {
+                                                                                className: "mt-2 text-base font-semibold text-slate-900",
+                                                                                children: "Safety snapshot & batch activity"
+                                                                            }, void 0, false, {
+                                                                                fileName: "[project]/components/AdminStateExplorer.tsx",
+                                                                                lineNumber: 756,
+                                                                                columnNumber: 29
+                                                                            }, this)
+                                                                        ]
+                                                                    }, void 0, true, {
+                                                                        fileName: "[project]/components/AdminStateExplorer.tsx",
+                                                                        lineNumber: 751,
+                                                                        columnNumber: 27
+                                                                    }, this),
+                                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
+                                                                        type: "button",
+                                                                        onClick: handleClosePanel,
+                                                                        className: "ml-2 inline-flex h-7 w-7 items-center justify-center rounded-full bg-slate-200 text-xs text-slate-600 hover:bg-slate-300 hover:text-slate-900",
+                                                                        children: "×"
+                                                                    }, void 0, false, {
+                                                                        fileName: "[project]/components/AdminStateExplorer.tsx",
+                                                                        lineNumber: 760,
+                                                                        columnNumber: 27
+                                                                    }, this)
+                                                                ]
+                                                            }, void 0, true, {
+                                                                fileName: "[project]/components/AdminStateExplorer.tsx",
+                                                                lineNumber: 750,
+                                                                columnNumber: 25
+                                                            }, this),
+                                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                                className: "mt-4 grid gap-3 text-sm text-slate-800",
+                                                                children: [
+                                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                                        children: [
+                                                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
+                                                                                className: "text-[11px] uppercase tracking-[0.18em] text-slate-500",
+                                                                                children: "Batches tracked"
+                                                                            }, void 0, false, {
+                                                                                fileName: "[project]/components/AdminStateExplorer.tsx",
+                                                                                lineNumber: 771,
+                                                                                columnNumber: 29
+                                                                            }, this),
+                                                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
+                                                                                className: "mt-1 text-2xl font-semibold text-sky-700",
+                                                                                children: metrics.batchesTracked.toLocaleString()
+                                                                            }, void 0, false, {
+                                                                                fileName: "[project]/components/AdminStateExplorer.tsx",
+                                                                                lineNumber: 774,
+                                                                                columnNumber: 29
+                                                                            }, this)
+                                                                        ]
+                                                                    }, void 0, true, {
+                                                                        fileName: "[project]/components/AdminStateExplorer.tsx",
+                                                                        lineNumber: 770,
+                                                                        columnNumber: 27
+                                                                    }, this),
+                                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                                        className: "grid grid-cols-2 gap-3 text-xs",
+                                                                        children: [
+                                                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                                                children: [
+                                                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
+                                                                                        className: "uppercase tracking-[0.16em] text-slate-500",
+                                                                                        children: "Labs reporting"
+                                                                                    }, void 0, false, {
+                                                                                        fileName: "[project]/components/AdminStateExplorer.tsx",
+                                                                                        lineNumber: 780,
+                                                                                        columnNumber: 31
+                                                                                    }, this),
+                                                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
+                                                                                        className: "mt-1 text-lg font-semibold text-slate-800",
+                                                                                        children: metrics.labsReporting
+                                                                                    }, void 0, false, {
+                                                                                        fileName: "[project]/components/AdminStateExplorer.tsx",
+                                                                                        lineNumber: 783,
+                                                                                        columnNumber: 31
+                                                                                    }, this)
+                                                                                ]
+                                                                            }, void 0, true, {
+                                                                                fileName: "[project]/components/AdminStateExplorer.tsx",
+                                                                                lineNumber: 779,
+                                                                                columnNumber: 29
+                                                                            }, this),
+                                                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                                                children: [
+                                                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
+                                                                                        className: "uppercase tracking-[0.16em] text-slate-500",
+                                                                                        children: "Recalls watched"
+                                                                                    }, void 0, false, {
+                                                                                        fileName: "[project]/components/AdminStateExplorer.tsx",
+                                                                                        lineNumber: 788,
+                                                                                        columnNumber: 31
+                                                                                    }, this),
+                                                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
+                                                                                        className: "mt-1 text-lg font-semibold text-indigo-600",
+                                                                                        children: metrics.recentRecalls
+                                                                                    }, void 0, false, {
+                                                                                        fileName: "[project]/components/AdminStateExplorer.tsx",
+                                                                                        lineNumber: 791,
+                                                                                        columnNumber: 31
+                                                                                    }, this)
+                                                                                ]
+                                                                            }, void 0, true, {
+                                                                                fileName: "[project]/components/AdminStateExplorer.tsx",
+                                                                                lineNumber: 787,
+                                                                                columnNumber: 29
+                                                                            }, this)
+                                                                        ]
+                                                                    }, void 0, true, {
+                                                                        fileName: "[project]/components/AdminStateExplorer.tsx",
+                                                                        lineNumber: 778,
+                                                                        columnNumber: 27
+                                                                    }, this),
+                                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                                        children: [
+                                                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
+                                                                                className: "text-[11px] uppercase tracking-[0.18em] text-slate-500",
+                                                                                children: "Passing rate"
+                                                                            }, void 0, false, {
+                                                                                fileName: "[project]/components/AdminStateExplorer.tsx",
+                                                                                lineNumber: 797,
+                                                                                columnNumber: 29
+                                                                            }, this),
+                                                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
+                                                                                className: "mt-1 text-lg font-semibold text-sky-700",
+                                                                                children: [
+                                                                                    metrics.passingRate,
+                                                                                    "%",
+                                                                                    ' ',
+                                                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                                                                        className: "text-[11px] font-normal text-slate-500",
+                                                                                        children: "of COAs marked passing"
+                                                                                    }, void 0, false, {
+                                                                                        fileName: "[project]/components/AdminStateExplorer.tsx",
+                                                                                        lineNumber: 802,
+                                                                                        columnNumber: 31
+                                                                                    }, this)
+                                                                                ]
+                                                                            }, void 0, true, {
+                                                                                fileName: "[project]/components/AdminStateExplorer.tsx",
+                                                                                lineNumber: 800,
+                                                                                columnNumber: 29
+                                                                            }, this)
+                                                                        ]
+                                                                    }, void 0, true, {
+                                                                        fileName: "[project]/components/AdminStateExplorer.tsx",
+                                                                        lineNumber: 796,
+                                                                        columnNumber: 27
+                                                                    }, this)
+                                                                ]
+                                                            }, void 0, true, {
+                                                                fileName: "[project]/components/AdminStateExplorer.tsx",
+                                                                lineNumber: 769,
+                                                                columnNumber: 25
+                                                            }, this),
+                                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                                className: "mt-4 flex items-center justify-between gap-3",
+                                                                children: [
+                                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
+                                                                        className: "max-w-[60%] text-[11px] text-slate-500",
+                                                                        children: "These are illustrative numbers for now. Wire them to your real CartFax batch & recall APIs when you're ready."
+                                                                    }, void 0, false, {
+                                                                        fileName: "[project]/components/AdminStateExplorer.tsx",
+                                                                        lineNumber: 810,
+                                                                        columnNumber: 27
+                                                                    }, this),
+                                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$link$2e$js__$5b$client$5d$__$28$ecmascript$29$__["default"], {
+                                                                        href: "/admin",
+                                                                        className: "inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-sky-500 to-slate-100 px-3.5 py-1.5 text-[11px] font-semibold text-slate-950 shadow-[0_14px_40px_rgba(148,163,184,0.6)] hover:from-sky-400 hover:to-white",
+                                                                        children: [
+                                                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                                                                children: "Open admin backend"
+                                                                            }, void 0, false, {
+                                                                                fileName: "[project]/components/AdminStateExplorer.tsx",
+                                                                                lineNumber: 819,
+                                                                                columnNumber: 29
+                                                                            }, this),
+                                                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                                                                className: "text-[14px]",
+                                                                                children: "↗"
+                                                                            }, void 0, false, {
+                                                                                fileName: "[project]/components/AdminStateExplorer.tsx",
+                                                                                lineNumber: 820,
+                                                                                columnNumber: 29
+                                                                            }, this)
+                                                                        ]
+                                                                    }, void 0, true, {
+                                                                        fileName: "[project]/components/AdminStateExplorer.tsx",
+                                                                        lineNumber: 815,
+                                                                        columnNumber: 27
+                                                                    }, this)
+                                                                ]
+                                                            }, void 0, true, {
+                                                                fileName: "[project]/components/AdminStateExplorer.tsx",
+                                                                lineNumber: 809,
+                                                                columnNumber: 25
+                                                            }, this)
+                                                        ]
+                                                    }, void 0, true, {
+                                                        fileName: "[project]/components/AdminStateExplorer.tsx",
+                                                        lineNumber: 741,
+                                                        columnNumber: 23
+                                                    }, this)
+                                                }, void 0, false, {
+                                                    fileName: "[project]/components/AdminStateExplorer.tsx",
+                                                    lineNumber: 740,
+                                                    columnNumber: 21
+                                                }, this)
+                                            ]
+                                        }, void 0, true, {
+                                            fileName: "[project]/components/AdminStateExplorer.tsx",
+                                            lineNumber: 374,
+                                            columnNumber: 17
                                         }, this)
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/components/AdminStateExplorer.tsx",
-                                    lineNumber: 214,
-                                    columnNumber: 13
-                                }, this)
-                            ]
-                        }, void 0, true, {
-                            fileName: "[project]/components/AdminStateExplorer.tsx",
-                            lineNumber: 208,
-                            columnNumber: 11
-                        }, this),
-                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                            className: "flex items-center gap-2 text-[11px]",
-                            children: [
-                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
-                                    className: "rounded-full bg-slate-900/80 px-3 py-1 text-slate-300",
-                                    children: "Atlas"
-                                }, void 0, false, {
-                                    fileName: "[project]/components/AdminStateExplorer.tsx",
-                                    lineNumber: 225,
-                                    columnNumber: 13
-                                }, this),
-                                isAdmin && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$link$2e$js__$5b$client$5d$__$28$ecmascript$29$__["default"], {
-                                    href: "/admin/batches",
-                                    className: "rounded-full bg-sky-500/10 px-3 py-1 font-medium text-sky-300 ring-1 ring-sky-500/40 hover:bg-sky-500/20",
-                                    children: "Admin data tools"
-                                }, void 0, false, {
-                                    fileName: "[project]/components/AdminStateExplorer.tsx",
-                                    lineNumber: 229,
+                                    lineNumber: 333,
                                     columnNumber: 15
                                 }, this)
-                            ]
-                        }, void 0, true, {
+                            }, void 0, false, {
+                                fileName: "[project]/components/AdminStateExplorer.tsx",
+                                lineNumber: 332,
+                                columnNumber: 13
+                            }, this)
+                        }, void 0, false, {
                             fileName: "[project]/components/AdminStateExplorer.tsx",
-                            lineNumber: 224,
+                            lineNumber: 326,
                             columnNumber: 11
                         }, this)
                     ]
                 }, void 0, true, {
                     fileName: "[project]/components/AdminStateExplorer.tsx",
-                    lineNumber: 207,
+                    lineNumber: 321,
                     columnNumber: 9
-                }, this)
-            }, void 0, false, {
-                fileName: "[project]/components/AdminStateExplorer.tsx",
-                lineNumber: 206,
-                columnNumber: 7
-            }, this),
-            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("section", {
-                className: "mx-auto flex max-w-6xl flex-col gap-8 px-4 pb-10 pt-8 lg:flex-row",
-                children: [
-                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                        className: "relative flex-1 rounded-[40px] border border-slate-800/80 bg-[radial-gradient(circle_at_top,_rgba(56,189,248,0.18),transparent_55%),radial-gradient(circle_at_bottom,_rgba(129,140,248,0.14),transparent_60%)] bg-slate-950/80 p-5 shadow-[0_40px_120px_rgba(15,23,42,0.9)]",
+                }, this),
+                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("section", {
+                    className: "mt-6",
+                    children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                        className: "rounded-3xl border border-slate-200 bg-white p-6 shadow-[0_24px_60px_rgba(15,23,42,0.12)]",
                         children: [
-                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                className: "mb-4 flex items-center justify-between gap-4",
-                                children: [
-                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                        children: [
-                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                                className: "inline-flex items-center gap-2 rounded-full bg-slate-900/80 px-3 py-1 text-[11px] font-medium text-slate-300",
-                                                children: [
-                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
-                                                        className: "inline-block h-1.5 w-1.5 rounded-full bg-emerald-400 shadow-[0_0_12px_rgba(74,222,128,0.8)]"
-                                                    }, void 0, false, {
-                                                        fileName: "[project]/components/AdminStateExplorer.tsx",
-                                                        lineNumber: 246,
-                                                        columnNumber: 17
-                                                    }, this),
-                                                    "CartFax • Atlas"
-                                                ]
-                                            }, void 0, true, {
-                                                fileName: "[project]/components/AdminStateExplorer.tsx",
-                                                lineNumber: 245,
-                                                columnNumber: 15
-                                            }, this),
-                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("h1", {
-                                                className: "mt-3 text-2xl font-semibold text-slate-50",
-                                                children: "United States Cannabis Safety Atlas"
-                                            }, void 0, false, {
-                                                fileName: "[project]/components/AdminStateExplorer.tsx",
-                                                lineNumber: 249,
-                                                columnNumber: 15
-                                            }, this),
-                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
-                                                className: "mt-1 max-w-xl text-sm text-slate-400",
-                                                children: "A soft, breathing field of state bubbles. Hover to bring a state forward. Click to lock focus and open its dataset."
-                                            }, void 0, false, {
-                                                fileName: "[project]/components/AdminStateExplorer.tsx",
-                                                lineNumber: 252,
-                                                columnNumber: 15
-                                            }, this)
-                                        ]
-                                    }, void 0, true, {
-                                        fileName: "[project]/components/AdminStateExplorer.tsx",
-                                        lineNumber: 244,
-                                        columnNumber: 13
-                                    }, this),
-                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                        className: "hidden flex-col items-end gap-2 text-[11px] text-slate-400 sm:flex",
-                                        children: [
-                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                                className: "flex items-center gap-2",
-                                                children: [
-                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
-                                                        className: "inline-flex h-2 w-2 rounded-full bg-emerald-400 shadow-[0_0_8px_rgba(74,222,128,0.9)]"
-                                                    }, void 0, false, {
-                                                        fileName: "[project]/components/AdminStateExplorer.tsx",
-                                                        lineNumber: 260,
-                                                        columnNumber: 17
-                                                    }, this),
-                                                    "Active batches"
-                                                ]
-                                            }, void 0, true, {
-                                                fileName: "[project]/components/AdminStateExplorer.tsx",
-                                                lineNumber: 259,
-                                                columnNumber: 15
-                                            }, this),
-                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                                className: "flex items-center gap-2",
-                                                children: [
-                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
-                                                        className: "inline-flex h-2 w-2 rounded-full bg-rose-400 shadow-[0_0_8px_rgba(248,113,113,0.9)]"
-                                                    }, void 0, false, {
-                                                        fileName: "[project]/components/AdminStateExplorer.tsx",
-                                                        lineNumber: 264,
-                                                        columnNumber: 17
-                                                    }, this),
-                                                    "Flagged lots"
-                                                ]
-                                            }, void 0, true, {
-                                                fileName: "[project]/components/AdminStateExplorer.tsx",
-                                                lineNumber: 263,
-                                                columnNumber: 15
-                                            }, this)
-                                        ]
-                                    }, void 0, true, {
-                                        fileName: "[project]/components/AdminStateExplorer.tsx",
-                                        lineNumber: 258,
-                                        columnNumber: 13
-                                    }, this)
-                                ]
-                            }, void 0, true, {
+                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
+                                className: "mb-2 text-[11px] font-semibold uppercase tracking-[0.24em] text-sky-700",
+                                children: "Admin data tools"
+                            }, void 0, false, {
                                 fileName: "[project]/components/AdminStateExplorer.tsx",
-                                lineNumber: 243,
-                                columnNumber: 11
+                                lineNumber: 835,
+                                columnNumber: 13
+                            }, this),
+                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("h2", {
+                                className: "text-lg font-semibold text-slate-900",
+                                children: "Admin hub"
+                            }, void 0, false, {
+                                fileName: "[project]/components/AdminStateExplorer.tsx",
+                                lineNumber: 838,
+                                columnNumber: 13
+                            }, this),
+                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
+                                className: "mt-2 text-sm text-slate-600",
+                                children: "When you're signed in as an admin, the hub opens the full CartFax backend: batches, COAs, brands, locations, and more."
+                            }, void 0, false, {
+                                fileName: "[project]/components/AdminStateExplorer.tsx",
+                                lineNumber: 839,
+                                columnNumber: 13
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                className: "relative mt-4 h-[420px] overflow-visible",
+                                className: "mt-4 flex flex-wrap items-center justify-between gap-3",
                                 children: [
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                        className: "pointer-events-none absolute inset-[10%] rounded-[50px] bg-[radial-gradient(circle_at_center,_rgba(56,189,248,0.08),transparent_65%)] blur-3xl"
-                                    }, void 0, false, {
-                                        fileName: "[project]/components/AdminStateExplorer.tsx",
-                                        lineNumber: 272,
-                                        columnNumber: 13
-                                    }, this),
-                                    bubbleLayout.map((bubble)=>{
-                                        const isSelected = bubble.code === selectedCode;
-                                        const isHovered = bubble.code === hoveredCode;
-                                        const stats = MOCK_STATE_STATS[bubble.code] ?? DEFAULT_STATS;
-                                        const baseZ = 10 + bubble.rowIndex * 2 + bubble.colIndex * 0.2;
-                                        const zIndex = isHovered ? 60 : isSelected ? 50 : baseZ;
-                                        const scale = isHovered || isSelected ? 1.08 : 1;
-                                        const glowOpacity = stats.flaggedBatches > 0 ? 0.9 : stats.activeBatches > 0 ? 0.7 : 0.25;
-                                        const regionGradient = REGION_GRADIENT[bubble.region];
-                                        return /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
-                                            type: "button",
-                                            onClick: ()=>setSelectedCode(bubble.code),
-                                            onMouseEnter: ()=>setHoveredCode(bubble.code),
-                                            onMouseLeave: ()=>setHoveredCode(null),
-                                            className: "group absolute",
-                                            style: {
-                                                left: `${bubble.x}%`,
-                                                top: `${bubble.y}%`,
-                                                transform: `translate(-50%, -50%) scale(${scale})`,
-                                                zIndex,
-                                                transition: 'transform 160ms ease-out, box-shadow 160ms ease-out'
-                                            },
-                                            children: [
-                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                                    className: "pointer-events-none absolute inset-0 rounded-[999px] blur-xl",
-                                                    style: {
-                                                        opacity: glowOpacity,
-                                                        background: 'radial-gradient(circle at center, rgba(56,189,248,0.35), transparent 60%)'
-                                                    }
-                                                }, void 0, false, {
-                                                    fileName: "[project]/components/AdminStateExplorer.tsx",
-                                                    lineNumber: 307,
-                                                    columnNumber: 19
-                                                }, this),
-                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                                    className: cn('relative flex min-w-[3.1rem] items-center justify-center rounded-[999px] border border-white/16 px-4 py-2.5 text-xs font-semibold tracking-[0.24em] uppercase text-slate-50 backdrop-blur-xl shadow-[0_20px_50px_rgba(15,23,42,0.9)]', 'bg-gradient-to-br', regionGradient, isSelected && 'ring-2 ring-sky-300/80 shadow-[0_0_48px_rgba(56,189,248,0.9)]', isHovered && !isSelected && 'ring-1 ring-sky-200/60'),
-                                                    children: [
-                                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
-                                                            className: "drop-shadow-[0_0_8px_rgba(15,23,42,0.8)]",
-                                                            children: bubble.code
-                                                        }, void 0, false, {
-                                                            fileName: "[project]/components/AdminStateExplorer.tsx",
-                                                            lineNumber: 327,
-                                                            columnNumber: 21
-                                                        }, this),
-                                                        stats.flaggedBatches > 0 && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
-                                                            className: "ml-2 inline-flex h-1.5 w-1.5 rounded-full bg-rose-400 shadow-[0_0_10px_rgba(248,113,113,0.9)]"
-                                                        }, void 0, false, {
-                                                            fileName: "[project]/components/AdminStateExplorer.tsx",
-                                                            lineNumber: 331,
-                                                            columnNumber: 23
-                                                        }, this),
-                                                        stats.activeBatches > 0 && stats.flaggedBatches === 0 && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
-                                                            className: "ml-2 inline-flex h-1.5 w-1.5 rounded-full bg-emerald-400 shadow-[0_0_10px_rgba(74,222,128,0.9)]"
-                                                        }, void 0, false, {
-                                                            fileName: "[project]/components/AdminStateExplorer.tsx",
-                                                            lineNumber: 334,
-                                                            columnNumber: 23
-                                                        }, this)
-                                                    ]
-                                                }, void 0, true, {
-                                                    fileName: "[project]/components/AdminStateExplorer.tsx",
-                                                    lineNumber: 317,
-                                                    columnNumber: 19
-                                                }, this)
-                                            ]
-                                        }, bubble.code, true, {
-                                            fileName: "[project]/components/AdminStateExplorer.tsx",
-                                            lineNumber: 290,
-                                            columnNumber: 17
-                                        }, this);
-                                    })
-                                ]
-                            }, void 0, true, {
-                                fileName: "[project]/components/AdminStateExplorer.tsx",
-                                lineNumber: 270,
-                                columnNumber: 11
-                            }, this)
-                        ]
-                    }, void 0, true, {
-                        fileName: "[project]/components/AdminStateExplorer.tsx",
-                        lineNumber: 242,
-                        columnNumber: 9
-                    }, this),
-                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("aside", {
-                        className: "flex w-full max-w-md flex-col gap-4 lg:w-[360px]",
-                        children: [
-                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                className: "rounded-[32px] border border-slate-800/80 bg-slate-950/80 p-5 shadow-[0_30px_80px_rgba(15,23,42,0.9)]",
-                                children: [
-                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                        className: "mb-4 flex items-center justify-between gap-3",
+                                        className: "flex items-center gap-2 text-xs text-slate-500",
                                         children: [
-                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                                className: "flex items-center gap-2",
-                                                children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
-                                                    className: "rounded-full bg-slate-900/80 px-2.5 py-1 text-[11px] font-medium text-slate-300",
-                                                    children: "Selected state"
-                                                }, void 0, false, {
-                                                    fileName: "[project]/components/AdminStateExplorer.tsx",
-                                                    lineNumber: 349,
-                                                    columnNumber: 17
-                                                }, this)
+                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                                className: 'inline-flex h-2 w-2 rounded-full shadow-[0_0_0_4px_rgba(56,189,248,0.25)] ' + (isLoggedIn ? 'bg-sky-500' : 'bg-slate-400')
                                             }, void 0, false, {
                                                 fileName: "[project]/components/AdminStateExplorer.tsx",
-                                                lineNumber: 348,
-                                                columnNumber: 15
+                                                lineNumber: 846,
+                                                columnNumber: 17
                                             }, this),
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
-                                                className: "rounded-full bg-slate-900/80 px-2.5 py-1 text-[11px] font-semibold text-sky-200",
-                                                children: selectedBubble.code
+                                                children: isLoggedIn ? 'Admin mode unlocked. Data editing enabled.' : 'Sign in with your admin account to unlock editing.'
                                             }, void 0, false, {
                                                 fileName: "[project]/components/AdminStateExplorer.tsx",
-                                                lineNumber: 353,
-                                                columnNumber: 15
+                                                lineNumber: 852,
+                                                columnNumber: 17
                                             }, this)
                                         ]
                                     }, void 0, true, {
                                         fileName: "[project]/components/AdminStateExplorer.tsx",
-                                        lineNumber: 347,
-                                        columnNumber: 13
+                                        lineNumber: 845,
+                                        columnNumber: 15
                                     }, this),
-                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("h2", {
-                                        className: "text-lg font-semibold text-slate-50",
-                                        children: selectedBubble.name
-                                    }, void 0, false, {
-                                        fileName: "[project]/components/AdminStateExplorer.tsx",
-                                        lineNumber: 358,
-                                        columnNumber: 13
-                                    }, this),
-                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
-                                        className: "mt-1 text-sm text-slate-400",
+                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$link$2e$js__$5b$client$5d$__$28$ecmascript$29$__["default"], {
+                                        href: "/admin",
+                                        className: "inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-sky-500 to-slate-100 px-4 py-2 text-xs font-semibold text-slate-950 shadow-[0_12px_35px_rgba(148,163,184,0.5)] hover:from-sky-400 hover:to-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-400 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-50",
                                         children: [
-                                            "Exploring all batches CartFax currently has mapped into",
-                                            ' ',
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
-                                                className: "font-medium text-sky-200",
-                                                children: selectedBubble.code
+                                                children: "Open admin hub"
                                             }, void 0, false, {
                                                 fileName: "[project]/components/AdminStateExplorer.tsx",
-                                                lineNumber: 363,
-                                                columnNumber: 15
+                                                lineNumber: 863,
+                                                columnNumber: 17
                                             }, this),
-                                            ". Use this as a jumping-off point into messy datasets."
-                                        ]
-                                    }, void 0, true, {
-                                        fileName: "[project]/components/AdminStateExplorer.tsx",
-                                        lineNumber: 361,
-                                        columnNumber: 13
-                                    }, this),
-                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                        className: "mt-4 grid grid-cols-2 gap-3 text-xs",
-                                        children: [
-                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                                className: "rounded-2xl bg-slate-900/80 p-3",
-                                                children: [
-                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                                        className: "text-[11px] text-slate-400",
-                                                        children: "Active batches"
-                                                    }, void 0, false, {
-                                                        fileName: "[project]/components/AdminStateExplorer.tsx",
-                                                        lineNumber: 371,
-                                                        columnNumber: 17
-                                                    }, this),
-                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                                        className: "mt-1 text-lg font-semibold text-emerald-300",
-                                                        children: selectedStats.activeBatches
-                                                    }, void 0, false, {
-                                                        fileName: "[project]/components/AdminStateExplorer.tsx",
-                                                        lineNumber: 372,
-                                                        columnNumber: 17
-                                                    }, this)
-                                                ]
-                                            }, void 0, true, {
-                                                fileName: "[project]/components/AdminStateExplorer.tsx",
-                                                lineNumber: 370,
-                                                columnNumber: 15
-                                            }, this),
-                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                                className: "rounded-2xl bg-slate-900/80 p-3",
-                                                children: [
-                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                                        className: "text-[11px] text-slate-400",
-                                                        children: "Lab results linked"
-                                                    }, void 0, false, {
-                                                        fileName: "[project]/components/AdminStateExplorer.tsx",
-                                                        lineNumber: 377,
-                                                        columnNumber: 17
-                                                    }, this),
-                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                                        className: "mt-1 text-lg font-semibold text-sky-300",
-                                                        children: selectedStats.labResults
-                                                    }, void 0, false, {
-                                                        fileName: "[project]/components/AdminStateExplorer.tsx",
-                                                        lineNumber: 380,
-                                                        columnNumber: 17
-                                                    }, this)
-                                                ]
-                                            }, void 0, true, {
-                                                fileName: "[project]/components/AdminStateExplorer.tsx",
-                                                lineNumber: 376,
-                                                columnNumber: 15
-                                            }, this),
-                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                                className: "rounded-2xl bg-slate-900/80 p-3",
-                                                children: [
-                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                                        className: "text-[11px] text-slate-400",
-                                                        children: "Labs in atlas"
-                                                    }, void 0, false, {
-                                                        fileName: "[project]/components/AdminStateExplorer.tsx",
-                                                        lineNumber: 385,
-                                                        columnNumber: 17
-                                                    }, this),
-                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                                        className: "mt-1 text-lg font-semibold text-fuchsia-300",
-                                                        children: selectedStats.labs
-                                                    }, void 0, false, {
-                                                        fileName: "[project]/components/AdminStateExplorer.tsx",
-                                                        lineNumber: 386,
-                                                        columnNumber: 17
-                                                    }, this)
-                                                ]
-                                            }, void 0, true, {
-                                                fileName: "[project]/components/AdminStateExplorer.tsx",
-                                                lineNumber: 384,
-                                                columnNumber: 15
-                                            }, this),
-                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                                className: "rounded-2xl bg-slate-900/80 p-3",
-                                                children: [
-                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                                        className: "text-[11px] text-slate-400",
-                                                        children: "Flagged batches"
-                                                    }, void 0, false, {
-                                                        fileName: "[project]/components/AdminStateExplorer.tsx",
-                                                        lineNumber: 391,
-                                                        columnNumber: 17
-                                                    }, this),
-                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                                        className: "mt-1 text-lg font-semibold text-rose-300",
-                                                        children: selectedStats.flaggedBatches
-                                                    }, void 0, false, {
-                                                        fileName: "[project]/components/AdminStateExplorer.tsx",
-                                                        lineNumber: 394,
-                                                        columnNumber: 17
-                                                    }, this)
-                                                ]
-                                            }, void 0, true, {
-                                                fileName: "[project]/components/AdminStateExplorer.tsx",
-                                                lineNumber: 390,
-                                                columnNumber: 15
-                                            }, this)
-                                        ]
-                                    }, void 0, true, {
-                                        fileName: "[project]/components/AdminStateExplorer.tsx",
-                                        lineNumber: 369,
-                                        columnNumber: 13
-                                    }, this),
-                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
-                                        type: "button",
-                                        onClick: handleOpenStateDataset,
-                                        className: "mt-5 inline-flex w-full items-center justify-center gap-2 rounded-full bg-gradient-to-r from-sky-400 to-emerald-400 px-4 py-2.5 text-sm font-semibold text-slate-950 shadow-[0_15px_45px_rgba(56,189,248,0.85)] hover:brightness-110 focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-300",
-                                        children: [
-                                            "Open ",
-                                            selectedBubble.code,
-                                            " dataset",
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
-                                                className: "text-xs",
-                                                "aria-hidden": true,
+                                                className: "text-[15px]",
                                                 children: "↗"
                                             }, void 0, false, {
                                                 fileName: "[project]/components/AdminStateExplorer.tsx",
-                                                lineNumber: 406,
-                                                columnNumber: 15
-                                            }, this)
-                                        ]
-                                    }, void 0, true, {
-                                        fileName: "[project]/components/AdminStateExplorer.tsx",
-                                        lineNumber: 400,
-                                        columnNumber: 13
-                                    }, this)
-                                ]
-                            }, void 0, true, {
-                                fileName: "[project]/components/AdminStateExplorer.tsx",
-                                lineNumber: 346,
-                                columnNumber: 11
-                            }, this),
-                            isAdmin && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                className: "rounded-[28px] border border-slate-800/80 bg-slate-950/85 p-4 text-xs shadow-[0_24px_70px_rgba(15,23,42,0.9)]",
-                                children: [
-                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                        className: "mb-3 flex items-center justify-between gap-2",
-                                        children: [
-                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("h3", {
-                                                className: "text-[13px] font-semibold text-slate-100",
-                                                children: "Atlas data tools"
-                                            }, void 0, false, {
-                                                fileName: "[project]/components/AdminStateExplorer.tsx",
-                                                lineNumber: 416,
-                                                columnNumber: 17
-                                            }, this),
-                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
-                                                className: "rounded-full bg-emerald-500/15 px-2 py-0.5 text-[10px] font-medium text-emerald-300 ring-1 ring-emerald-400/40",
-                                                children: "Admin"
-                                            }, void 0, false, {
-                                                fileName: "[project]/components/AdminStateExplorer.tsx",
-                                                lineNumber: 419,
+                                                lineNumber: 864,
                                                 columnNumber: 17
                                             }, this)
                                         ]
                                     }, void 0, true, {
                                         fileName: "[project]/components/AdminStateExplorer.tsx",
-                                        lineNumber: 415,
-                                        columnNumber: 15
-                                    }, this),
-                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
-                                        className: "mb-3 text-[11px] leading-relaxed text-slate-400",
-                                        children: "Shortcuts into the messy bits: COAs, batches, and state-level rollups. These will grow as we wire in more scrapers and parsers."
-                                    }, void 0, false, {
-                                        fileName: "[project]/components/AdminStateExplorer.tsx",
-                                        lineNumber: 424,
-                                        columnNumber: 15
-                                    }, this),
-                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                        className: "space-y-2",
-                                        children: [
-                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
-                                                type: "button",
-                                                onClick: handleOpenStateDataset,
-                                                className: "flex w-full items-center justify-between rounded-2xl bg-slate-900/90 px-3 py-2.5 text-left text-[11px] text-slate-200 hover:bg-slate-800/80",
-                                                children: [
-                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
-                                                        children: [
-                                                            "Open",
-                                                            ' ',
-                                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
-                                                                className: "font-semibold",
-                                                                children: selectedBubble.code
-                                                            }, void 0, false, {
-                                                                fileName: "[project]/components/AdminStateExplorer.tsx",
-                                                                lineNumber: 438,
-                                                                columnNumber: 21
-                                                            }, this),
-                                                            ' ',
-                                                            "batches & lab results"
-                                                        ]
-                                                    }, void 0, true, {
-                                                        fileName: "[project]/components/AdminStateExplorer.tsx",
-                                                        lineNumber: 436,
-                                                        columnNumber: 19
-                                                    }, this),
-                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
-                                                        className: "text-xs text-sky-300",
-                                                        children: "↗"
-                                                    }, void 0, false, {
-                                                        fileName: "[project]/components/AdminStateExplorer.tsx",
-                                                        lineNumber: 441,
-                                                        columnNumber: 19
-                                                    }, this)
-                                                ]
-                                            }, void 0, true, {
-                                                fileName: "[project]/components/AdminStateExplorer.tsx",
-                                                lineNumber: 431,
-                                                columnNumber: 17
-                                            }, this),
-                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$link$2e$js__$5b$client$5d$__$28$ecmascript$29$__["default"], {
-                                                href: "/admin/uploads",
-                                                className: "flex w-full items-center justify-between rounded-2xl bg-slate-900/90 px-3 py-2.5 text-[11px] text-slate-200 hover:bg-slate-800/80",
-                                                children: [
-                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
-                                                        children: "COA uploads & parsing"
-                                                    }, void 0, false, {
-                                                        fileName: "[project]/components/AdminStateExplorer.tsx",
-                                                        lineNumber: 448,
-                                                        columnNumber: 19
-                                                    }, this),
-                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
-                                                        className: "text-xs text-sky-300",
-                                                        children: "↗"
-                                                    }, void 0, false, {
-                                                        fileName: "[project]/components/AdminStateExplorer.tsx",
-                                                        lineNumber: 449,
-                                                        columnNumber: 19
-                                                    }, this)
-                                                ]
-                                            }, void 0, true, {
-                                                fileName: "[project]/components/AdminStateExplorer.tsx",
-                                                lineNumber: 444,
-                                                columnNumber: 17
-                                            }, this),
-                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$link$2e$js__$5b$client$5d$__$28$ecmascript$29$__["default"], {
-                                                href: "/admin/batches",
-                                                className: "flex w-full items-center justify-between rounded-2xl bg-slate-900/90 px-3 py-2.5 text-[11px] text-slate-200 hover:bg-slate-800/80",
-                                                children: [
-                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
-                                                        children: "Global batch catalog"
-                                                    }, void 0, false, {
-                                                        fileName: "[project]/components/AdminStateExplorer.tsx",
-                                                        lineNumber: 456,
-                                                        columnNumber: 19
-                                                    }, this),
-                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
-                                                        className: "text-xs text-sky-300",
-                                                        children: "↗"
-                                                    }, void 0, false, {
-                                                        fileName: "[project]/components/AdminStateExplorer.tsx",
-                                                        lineNumber: 457,
-                                                        columnNumber: 19
-                                                    }, this)
-                                                ]
-                                            }, void 0, true, {
-                                                fileName: "[project]/components/AdminStateExplorer.tsx",
-                                                lineNumber: 452,
-                                                columnNumber: 17
-                                            }, this)
-                                        ]
-                                    }, void 0, true, {
-                                        fileName: "[project]/components/AdminStateExplorer.tsx",
-                                        lineNumber: 430,
+                                        lineNumber: 859,
                                         columnNumber: 15
                                     }, this)
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/components/AdminStateExplorer.tsx",
-                                lineNumber: 414,
+                                lineNumber: 844,
                                 columnNumber: 13
                             }, this)
                         ]
                     }, void 0, true, {
                         fileName: "[project]/components/AdminStateExplorer.tsx",
-                        lineNumber: 344,
-                        columnNumber: 9
+                        lineNumber: 834,
+                        columnNumber: 11
                     }, this)
-                ]
-            }, void 0, true, {
-                fileName: "[project]/components/AdminStateExplorer.tsx",
-                lineNumber: 240,
-                columnNumber: 7
-            }, this)
-        ]
-    }, void 0, true, {
+                }, void 0, false, {
+                    fileName: "[project]/components/AdminStateExplorer.tsx",
+                    lineNumber: 833,
+                    columnNumber: 9
+                }, this)
+            ]
+        }, void 0, true, {
+            fileName: "[project]/components/AdminStateExplorer.tsx",
+            lineNumber: 312,
+            columnNumber: 7
+        }, this)
+    }, void 0, false, {
         fileName: "[project]/components/AdminStateExplorer.tsx",
-        lineNumber: 204,
+        lineNumber: 311,
         columnNumber: 5
     }, this);
 }
-_s(AdminStateExplorer, "+LAWyiE+5q2Kwv4L60ygZtMhn6w=", false, function() {
+_s(AdminStateExplorer, "flvN86dZiubxGmYGMmQFxPD/VIk=", false, function() {
     return [
-        __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$router$2e$js__$5b$client$5d$__$28$ecmascript$29$__["useRouter"],
         __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2d$auth$2f$react$2f$index$2e$js__$5b$client$5d$__$28$ecmascript$29$__["useSession"]
     ];
 });

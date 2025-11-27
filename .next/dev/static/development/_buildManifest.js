@@ -2,17 +2,8 @@ self.__BUILD_MANIFEST = {
   "/": [
     "static/chunks/pages/index.js"
   ],
-  "/admin": [
-    "static/chunks/pages/admin.js"
-  ],
-  "/admin/batches": [
-    "static/chunks/pages/admin/batches.js"
-  ],
-  "/admin/states/[stateCode]": [
-    "static/chunks/pages/admin/states/[stateCode].js"
-  ],
-  "/admin/uploads": [
-    "static/chunks/pages/admin/uploads.js"
+  "/_error": [
+    "static/chunks/pages/_error.js"
   ],
   "__rewrites": {
     "afterFiles": [],
