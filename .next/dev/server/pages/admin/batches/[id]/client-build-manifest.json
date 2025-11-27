@@ -1,3 +1,5 @@
 {
-  "/admin/batches/[id]": ["static/chunks/pages/admin/batches/[id].js"]
+  "/admin/batches/[id]": [
+    "static/chunks/pages/admin/batches/[id].js"
+  ]
 }

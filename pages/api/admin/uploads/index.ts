@@ -1,5 +1,4 @@
 // pages/api/admin/uploads/index.ts
-
 import type { NextApiRequest, NextApiResponse } from 'next';
 import { getServerSession } from 'next-auth/next';
 import { authOptions } from '../../auth/[...nextauth]';
@@ -10,300 +9,447 @@ import fs from 'fs/promises';
 import path from 'path';
 import crypto from 'crypto';
 
-import { parseCoa, ParsedCoa } from '../../../../lib/coaParsers/registry';
-
 const prisma = new PrismaClient();
 
-// Multer: keep file in memory; we decide where/how to write it.
+// Use memory storage; we handle writing to disk ourselves
 const upload = multer({ storage: multer.memoryStorage() });
+
+// Needed so Next.js doesn’t try to body-parse the multipart request
+export const config = {
+  api: {
+    bodyParser: false,
+  },
+};
 
 function runMiddleware(
   req: NextApiRequest,
   res: NextApiResponse,
-  fn: Function
-): Promise<void> {
-  return new Promise((resolve, reject) => {
-    fn(req, res, (result: any) => {
-      if (result instanceof Error) return reject(result);
-      return resolve(result);
+  fn: (...args: any[]) => void
+) {
+  return new Promise<void>((resolve, reject) => {
+    fn(req, res, (result: unknown) => {
+      if (result instanceof Error) {
+        return reject(result);
+      }
+      return resolve();
     });
   });
 }
 
-export const config = {
-  api: {
-    bodyParser: false, // required for multer
-  },
+type ParsedMeta = {
+  labName: string | null;
+  batchCode: string | null;
+  sampleId: string | null;
+  sampleType: string | null;
+  thcPercent: number | null;
+  cbdPercent: number | null;
+  totalCannabinoidsPercent: number | null;
+  passed: boolean | null;
+  stateCode: string | null;
+  jurisdiction: string | null;
 };
+
+function normalizeText(text: string | null | undefined): string {
+  if (!text) return '';
+  return text.replace(/\r\n/g, '\n').replace(/\u0000/g, '').trim();
+}
+
+function isBadBatchCode(code: string | null | undefined): boolean {
+  if (!code) return true;
+  const trimmed = code.trim();
+  if (!trimmed) return true;
+  // Avoid "PASS", "PASSED", "FAIL", "FAILED" as batch codes
+  return /^(PASS(ED)?|FAIL(ED)?)$/i.test(trimmed);
+}
+
+function slugifyLabName(name: string): string {
+  const base = name
+    .toLowerCase()
+    .replace(/labs?$/i, '') // strip trailing "Lab" / "Labs"
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '');
+  return base || 'lab-' + crypto.randomBytes(4).toString('hex');
+}
+
+/**
+ * Heuristic parser specifically for Nova Analytic Labs (TagLeaf COAs)
+ */
+function parseNovaAnalyticLabs(text: string): ParsedMeta | null {
+  const normalized = normalizeText(text);
+  if (!/nova analytic labs/i.test(normalized)) {
+    return null;
+  }
+
+  let labName = 'Nova Analytic Labs';
+
+  let batchCode: string | null = null;
+  let sampleId: string | null = null;
+  let sampleType: string | null = null;
+  let thcPercent: number | null = null;
+  let cbdPercent: number | null = null;
+  let totalCannabinoidsPercent: number | null = null;
+  let passed: boolean | null = null;
+
+  // SAMPLE ID
+  const sampleMatch =
+    normalized.match(/SAMPLE\s+ID\s*:\s*([A-Z0-9-]+)/i) ||
+    normalized.match(/SAMPLE\s+ID:\s*([A-Z0-9-]+)/i);
+  if (sampleMatch) {
+    sampleId = sampleMatch[1].trim();
+  }
+
+  // MATRIX (sample type)
+  const matrixMatch = normalized.match(/MATRIX\s*:\s*([A-Z ]+)/i);
+  if (matrixMatch) {
+    sampleType = matrixMatch[1].trim();
+  }
+
+  // BATCH RESULT PASS / FAIL
+  const resultMatch = normalized.match(
+    /BATCH\s+RESULT\s*:\s*(PASS(?:ED)?|FAIL(?:ED)?)/i
+  );
+  if (resultMatch) {
+    passed = /^PASS/i.test(resultMatch[1]);
+  }
+
+  // BATCH CODE – avoid PASS/FAIL
+  const batchMatch =
+    normalized.match(/BATCH\s+NO\.\s*:\s*([A-Z0-9-]+)/i) ||
+    normalized.match(/BATCH\s*:\s*([A-Z0-9-]+)/i);
+  if (batchMatch) {
+    const candidate = batchMatch[1].trim();
+    if (!isBadBatchCode(candidate)) {
+      batchCode = candidate;
+    }
+  }
+
+  // Older Nova flower COAs: "Δ-THC:28.5 %" and "TOTAL CANNABINOIDS:29.1 %"
+  const thcMatch = normalized.match(/Δ-THC\s*:?\s*([0-9.]+)\s*%/i);
+  if (thcMatch) {
+    thcPercent = parseFloat(thcMatch[1]);
+  }
+
+  const cbdMatch = normalized.match(/\bCBD\s*:?\s*([0-9.]+)\s*%/i);
+  if (cbdMatch) {
+    cbdPercent = parseFloat(cbdMatch[1]);
+  }
+
+  const totalMatch = normalized.match(
+    /TOTAL\s+CANNABINOIDS\s*:?\s*([0-9.]+)\s*%/i
+  );
+  if (totalMatch) {
+    totalCannabinoidsPercent = parseFloat(totalMatch[1]);
+  }
+
+  // Nova is Maine in our dataset
+  const stateCode = 'ME';
+  const jurisdiction = 'ME';
+
+  return {
+    labName,
+    batchCode,
+    sampleId,
+    sampleType,
+    thcPercent,
+    cbdPercent,
+    totalCannabinoidsPercent,
+    passed,
+    stateCode,
+    jurisdiction,
+  };
+}
+
+/**
+ * Generic fallback parser for arbitrary labs.
+ */
+function basicHeuristicParse(text: string): ParsedMeta {
+  const normalized = normalizeText(text);
+
+  let labName: string | null = null;
+  let batchCode: string | null = null;
+  let sampleId: string | null = null;
+  let sampleType: string | null = null;
+  let thcPercent: number | null = null;
+  let cbdPercent: number | null = null;
+  let totalCannabinoidsPercent: number | null = null;
+  let passed: boolean | null = null;
+  let stateCode: string | null = null;
+  let jurisdiction: string | null = null;
+
+  // Generic lab name heuristic
+  const labMatch = normalized.match(/([A-Z][A-Za-z0-9 &]+Labs?)/);
+  if (labMatch) {
+    labName = labMatch[1].trim();
+  }
+
+  // Generic batch code
+  const batchMatch =
+    normalized.match(/BATCH\s+NO\.\s*:\s*([A-Z0-9-]+)/i) ||
+    normalized.match(/BATCH\s*:\s*([A-Z0-9-]+)/i);
+  if (batchMatch) {
+    const candidate = batchMatch[1].trim();
+    if (!isBadBatchCode(candidate)) {
+      batchCode = candidate;
+    }
+  }
+
+  // Sample id
+  const sampleMatch = normalized.match(/SAMPLE\s+ID\s*:\s*([A-Z0-9-]+)/i);
+  if (sampleMatch) {
+    sampleId = sampleMatch[1].trim();
+  }
+
+  // Matrix / sample type
+  const matrixMatch = normalized.match(/MATRIX\s*:\s*([A-Z ]+)/i);
+  if (matrixMatch) {
+    sampleType = matrixMatch[1].trim();
+  }
+
+  // Pass/fail
+  const resultMatch = normalized.match(
+    /BATCH\s+RESULT\s*:\s*(PASS(?:ED)?|FAIL(?:ED)?)/i
+  );
+  if (resultMatch) {
+    passed = /^PASS/i.test(resultMatch[1]);
+  }
+
+  // Potency (generic)
+  const thcMatch = normalized.match(/THC\s*:?\s*([0-9.]+)\s*%/i);
+  if (thcMatch) {
+    thcPercent = parseFloat(thcMatch[1]);
+  }
+
+  const cbdMatch = normalized.match(/\bCBD\s*:?\s*([0-9.]+)\s*%/i);
+  if (cbdMatch) {
+    cbdPercent = parseFloat(cbdMatch[1]);
+  }
+
+  const totalMatch = normalized.match(
+    /TOTAL\s+CANNABINOIDS\s*:?\s*([0-9.]+)\s*%/i
+  );
+  if (totalMatch) {
+    totalCannabinoidsPercent = parseFloat(totalMatch[1]);
+  }
+
+  // Naive state inference
+  if (/\bME\s+\d{5}\b/i.test(normalized)) {
+    stateCode = 'ME';
+    jurisdiction = 'ME';
+  }
+
+  return {
+    labName,
+    batchCode,
+    sampleId,
+    sampleType,
+    thcPercent,
+    cbdPercent,
+    totalCannabinoidsPercent,
+    passed,
+    stateCode,
+    jurisdiction,
+  };
+}
 
 export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse
 ) {
-  const session = await getServerSession(req, res, authOptions);
+  const session = await getServerSession(req, res, authOptions as any);
 
-  if (!session || !session.user?.email) {
-    res.status(401).json({ error: 'Unauthorized' });
-    return;
+  if (!session || !session.user || (session.user as any).role !== 'admin') {
+    return res.status(401).json({ error: 'Unauthorized' });
   }
 
+  // -------- GET: list uploaded COAs --------
   if (req.method === 'GET') {
-    await handleGet(req, res);
-    return;
-  }
-
-  if (req.method === 'POST') {
-    await handlePost(req, res, session.user.email);
-    return;
-  }
-
-  res.setHeader('Allow', ['GET', 'POST']);
-  res.status(405).end('Method Not Allowed');
-}
-
-// ---------- GET: list uploaded documents ----------
-
-async function handleGet(req: NextApiRequest, res: NextApiResponse) {
-  try {
     const docs = await prisma.uploadedDocument.findMany({
       orderBy: { createdAt: 'desc' },
-      select: {
-        id: true,
-        fileName: true,
-        mimeType: true,
-        size: true,
-        sha256: true,
-        batchCode: true,
-        labName: true,
-        createdAt: true,
-        verified: true,
-        extractedText: true,
-        labResult: {
-          select: { id: true },
-        },
-      },
-    });
-
-    res.json(docs);
-  } catch (e: any) {
-    console.error('Failed to list uploads', e);
-    res.status(500).json({ error: e?.message || 'Failed to list uploads' });
-  }
-}
-
-// ---------- POST: upload + parse + wire up lab/batch/labResult ----------
-
-async function handlePost(
-  req: NextApiRequest,
-  res: NextApiResponse,
-  uploaderEmail: string
-) {
-  try {
-    // 1) Parse multipart form and grab the PDF
-    await runMiddleware(req, res, upload.single('file'));
-
-    const file = (req as any).file as Express.Multer.File | undefined;
-    if (!file) {
-      res.status(400).json({ error: 'Missing PDF file field "file"' });
-      return;
-    }
-
-    if (file.mimetype !== 'application/pdf') {
-      res.status(400).json({ error: 'Only PDF files are allowed.' });
-      return;
-    }
-
-    // 2) Hash for dedupe
-    const sha256 = crypto
-      .createHash('sha256')
-      .update(file.buffer)
-      .digest('hex');
-
-    const existing = await prisma.uploadedDocument.findUnique({
-      where: { sha256 },
       include: {
         labResult: true,
       },
     });
-
-    if (existing) {
-      // Already ingested – return the existing doc + labResult reference
-      res.json({ reused: true, document: existing, labResult: existing.labResult });
-      return;
-    }
-
-    // 3) Persist PDF to disk under uploads/coas/<sha>.pdf
-    const uploadDir = path.join(process.cwd(), 'uploads', 'coas');
-    await fs.mkdir(uploadDir, { recursive: true });
-
-    const diskFileName = `${sha256}.pdf`;
-    const absoluteFilePath = path.join(uploadDir, diskFileName);
-    const relativeFilePath = path.join('uploads', 'coas', diskFileName);
-
-    await fs.writeFile(absoluteFilePath, file.buffer);
-
-    // 4) Extract text with pdf-parse
-    const parsedPdf = await pdfParse(file.buffer);
-    const extractedText = parsedPdf.text || '';
-
-    // 5) Try to parse via lab-specific registry (Nova, etc.)
-    const parsed: ParsedCoa | null = parseCoa(extractedText, file.originalname);
-
-    // 6) Store UploadedDocument row
-    const uploadedDoc = await prisma.uploadedDocument.create({
-      data: {
-        filePath: relativeFilePath,
-        fileName: file.originalname,
-        mimeType: file.mimetype,
-        size: file.size,
-        sha256,
-        extractedText,
-        labName: parsed?.labName || null,
-        batchCode: parsed?.batchCode || null,
-        uploader: uploaderEmail,
-        verified: false,
-      },
-    });
-
-    // 7) If we didn't recognize the lab / batch, we stop here.
-    if (!parsed || !parsed.batchCode) {
-      res.json({
-        reused: false,
-        document: uploadedDoc,
-        labResult: null,
-        parsed: null,
-      });
-      return;
-    }
-
-    // ---------- Upsert Lab (Nova) ----------
-    let labRecord = null;
-    if (parsed.labSlug) {
-      labRecord = await prisma.lab.upsert({
-        where: { slug: parsed.labSlug },
-        update: {
-          name: parsed.labName,
-          website: parsed.labWebsite || undefined,
-          city: parsed.labCity || undefined,
-          stateCode: parsed.labStateCode || undefined,
-        },
-        create: {
-          slug: parsed.labSlug,
-          name: parsed.labName,
-          website: parsed.labWebsite || undefined,
-          city: parsed.labCity || undefined,
-          stateCode: parsed.labStateCode || undefined,
-        },
-      });
-    }
-
-    // ---------- Find or create Batch ----------
-    const batchStateCode =
-      parsed.batchStateCode || parsed.jurisdiction || parsed.labStateCode || null;
-
-    let batchRecord = await prisma.batch.findFirst({
-      where: {
-        batchCode: parsed.batchCode,
-        ...(batchStateCode ? { stateCode: batchStateCode } : {}),
-      },
-    });
-
-    if (batchRecord) {
-      batchRecord = await prisma.batch.update({
-        where: { id: batchRecord.id },
-        data: {
-          productName: parsed.productName ?? batchRecord.productName,
-          primaryCategory: parsed.sampleType ?? batchRecord.primaryCategory,
-          jurisdiction: parsed.jurisdiction ?? batchRecord.jurisdiction,
-          stateCode: batchStateCode ?? batchRecord.stateCode,
-        },
-      });
-    } else {
-      batchRecord = await prisma.batch.create({
-        data: {
-          batchCode: parsed.batchCode,
-          productName: parsed.productName ?? null,
-          primaryCategory: parsed.sampleType ?? null,
-          jurisdiction: parsed.jurisdiction ?? batchStateCode ?? null,
-          stateCode: batchStateCode,
-          isActive: true,
-        },
-      });
-    }
-
-    // ---------- Create LabResult linked to Batch + Lab + UploadedDocument ----------
-    const labResult = await prisma.labResult.create({
-      data: {
-        batch: {
-          connect: { id: batchRecord.id },
-        },
-        lab: labRecord
-          ? {
-              connect: { id: labRecord.id },
-            }
-          : undefined,
-        uploadedDocument: {
-          connect: { id: uploadedDoc.id },
-        },
-
-        testedAt: parsed.testedAt ? new Date(parsed.testedAt) : undefined,
-        reportedAt: parsed.reportedAt ? new Date(parsed.reportedAt) : undefined,
-
-        thcPercent:
-          typeof parsed.thcPercent === 'number' ? parsed.thcPercent : null,
-        cbdPercent:
-          typeof parsed.cbdPercent === 'number' ? parsed.cbdPercent : null,
-        totalCannabinoidsPercent:
-          typeof parsed.totalCannabinoidsPercent === 'number'
-            ? parsed.totalCannabinoidsPercent
-            : null,
-        totalTerpenesPercent:
-          typeof parsed.totalTerpenesPercent === 'number'
-            ? parsed.totalTerpenesPercent
-            : null,
-
-        pesticidesPass:
-          typeof parsed.pesticidesPass === 'boolean'
-            ? parsed.pesticidesPass
-            : null,
-        solventsPass:
-          typeof parsed.solventsPass === 'boolean'
-            ? parsed.solventsPass
-            : null,
-        heavyMetalsPass:
-          typeof parsed.heavyMetalsPass === 'boolean'
-            ? parsed.heavyMetalsPass
-            : null,
-        microbialsPass:
-          typeof parsed.microbialsPass === 'boolean'
-            ? parsed.microbialsPass
-            : null,
-
-        moisturePercent:
-          typeof parsed.moisturePercent === 'number'
-            ? parsed.moisturePercent
-            : null,
-        waterActivity:
-          typeof parsed.waterActivity === 'number'
-            ? parsed.waterActivity
-            : null,
-
-        analyteSummary: parsed.analyteSummary ?? null,
-        rawJson: null,
-        sourcePdfUrl: parsed.sourceUrl ?? null,
-      },
-    });
-
-    res.json({
-      reused: false,
-      document: uploadedDoc,
-      labResult,
-      parsed,
-    });
-  } catch (e: any) {
-    console.error('Error handling upload', e);
-    res
-      .status(500)
-      .json({ error: e?.message || 'Failed to handle COA upload' });
+    return res.status(200).json(docs);
   }
+
+  // -------- POST: upload + parse COA --------
+  if (req.method === 'POST') {
+    try {
+      await runMiddleware(req, res, upload.single('file'));
+
+      const anyReq = req as any;
+      const file = anyReq.file as
+        | {
+            buffer: Buffer;
+            mimetype: string;
+            originalname: string;
+            size: number;
+          }
+        | undefined;
+
+      if (!file) {
+        return res.status(400).json({ error: 'No file uploaded' });
+      }
+
+      if (file.mimetype !== 'application/pdf') {
+        return res
+          .status(400)
+          .json({ error: 'Only application/pdf files are supported' });
+      }
+
+      // Hash and dedupe
+      const sha256 = crypto
+        .createHash('sha256')
+        .update(file.buffer)
+        .digest('hex');
+
+      const existing = await prisma.uploadedDocument.findUnique({
+        where: { sha256 },
+        include: { labResult: true },
+      });
+
+      if (existing) {
+        return res.status(200).json({
+          reused: true,
+          document: existing,
+          labResult: existing.labResult,
+        });
+      }
+
+      // Persist to disk
+      const uploadsDir = path.join(process.cwd(), 'uploads', 'coas');
+      await fs.mkdir(uploadsDir, { recursive: true });
+
+      const filePath = path.join(uploadsDir, `${sha256}.pdf`);
+      await fs.writeFile(filePath, file.buffer);
+
+      // Extract text via pdf-parse
+      let extractedText = '';
+      try {
+        const parsed = await pdfParse(file.buffer);
+        extractedText = normalizeText(parsed.text);
+      } catch (err) {
+        console.error('pdf-parse failed, continuing with empty text', err);
+        extractedText = '';
+      }
+
+      // --- Parse metadata (Nova first, then generic fallback) ---
+      let meta: ParsedMeta = {
+        labName: null,
+        batchCode: null,
+        sampleId: null,
+        sampleType: null,
+        thcPercent: null,
+        cbdPercent: null,
+        totalCannabinoidsPercent: null,
+        passed: null,
+        stateCode: null,
+        jurisdiction: null,
+      };
+
+      const nova = parseNovaAnalyticLabs(extractedText);
+      if (nova) {
+        meta = nova;
+      } else {
+        meta = basicHeuristicParse(extractedText);
+      }
+
+      // --- Create UploadedDocument row ---
+      const document = await prisma.uploadedDocument.create({
+        data: {
+          filePath,
+          fileName: file.originalname,
+          mimeType: file.mimetype,
+          size: file.size,
+          sha256,
+          extractedText: extractedText || null,
+          labName: meta.labName,
+          batchCode: meta.batchCode,
+          uploader:
+            (session.user as any).email ||
+            (session.user as any).name ||
+            'unknown',
+          // verified stays default false
+        },
+      });
+
+      // --- Upsert Lab (if we have a lab name) ---
+      let labRecord: any = null;
+      if (meta.labName) {
+        const slug = slugifyLabName(meta.labName);
+
+        labRecord = await prisma.lab.upsert({
+          where: { slug },
+          update: {
+            name: meta.labName,
+            stateCode: meta.stateCode ?? undefined,
+            city: meta.stateCode === 'ME' ? 'Portland' : undefined,
+          },
+          create: {
+            name: meta.labName,
+            slug,
+            stateCode: meta.stateCode ?? undefined,
+            city: meta.stateCode === 'ME' ? 'Portland' : undefined,
+          },
+        });
+      }
+
+      // --- Create/find Batch (if we have a batch code) ---
+      let batchRecord: any = null;
+      if (meta.batchCode) {
+        batchRecord = await prisma.batch.findFirst({
+          where: { batchCode: meta.batchCode },
+        });
+
+        if (!batchRecord) {
+          batchRecord = await prisma.batch.create({
+            data: {
+              batchCode: meta.batchCode,
+              jurisdiction: meta.jurisdiction,
+              stateCode: meta.stateCode ?? meta.jurisdiction,
+              isActive: true,
+            },
+          });
+        }
+      }
+
+      // --- Create LabResult ONLY if we have a Batch ---
+      let labResult: any = null;
+      if (batchRecord) {
+        const labConnect =
+          labRecord != null ? { lab: { connect: { id: labRecord.id } } } : {};
+
+        labResult = await prisma.labResult.create({
+          data: {
+            batch: { connect: { id: batchRecord.id } }, // <-- REQUIRED RELATION
+            ...labConnect,
+            uploadedDocument: { connect: { id: document.id } },
+            sampleId: meta.sampleId,
+            sampleType: meta.sampleType,
+            thcPercent: meta.thcPercent,
+            cbdPercent: meta.cbdPercent,
+            totalCannabinoidsPercent: meta.totalCannabinoidsPercent,
+            passed: meta.passed,
+          },
+        });
+      }
+
+      return res.status(200).json({
+        reused: false,
+        document: {
+          ...document,
+          labResult,
+        },
+        labResult,
+      });
+    } catch (err: any) {
+      console.error('Error handling upload', err);
+      return res
+        .status(500)
+        .json({ error: err?.message || 'Failed to handle upload' });
+    }
+  }
+
+  // Unsupported method
+  return res.status(405).end();
 }

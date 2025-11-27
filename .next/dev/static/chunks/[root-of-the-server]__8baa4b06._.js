@@ -465,110 +465,101 @@ function triggerUpdate(msg) {
 "[project]/pages/admin/index.tsx [client] (ecmascript)", ((__turbopack_context__) => {
 "use strict";
 
+// pages/admin/index.tsx
 __turbopack_context__.s([
     "default",
-    ()=>AdminStatesPage
+    ()=>AdminHome
 ]);
 var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/node_modules/react/jsx-dev-runtime.js [client] (ecmascript)");
-var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dynamic$2e$js__$5b$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/node_modules/next/dynamic.js [client] (ecmascript)");
+var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2d$auth$2f$react$2f$index$2e$js__$5b$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/node_modules/next-auth/react/index.js [client] (ecmascript)");
+(()=>{
+    const e = new Error("Cannot find module '../../components/AdminStateExplorer'");
+    e.code = 'MODULE_NOT_FOUND';
+    throw e;
+})();
+;
+var _s = __turbopack_context__.k.signature();
 ;
 ;
-;
-// --- CRITICAL FIX: Dynamic Import with ssr: false ---
-// This tells Next.js to only load the Map component in the browser environment,
-// bypassing the server's inability to handle Leaflet's dependencies (like 'window').
-const DynamicMap = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dynamic$2e$js__$5b$client$5d$__$28$ecmascript$29$__["default"])(()=>__turbopack_context__.A("[project]/components/Map.tsx [client] (ecmascript, next/dynamic entry, async loader)"), {
-    loadableGenerated: {
-        modules: [
-            "[project]/components/Map.tsx [client] (ecmascript, next/dynamic entry)"
-        ]
-    },
-    ssr: false,
-    loading: ()=>/*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-            className: "flex justify-center items-center h-96 w-full bg-gray-50 rounded-lg",
-            children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
-                className: "text-lg text-gray-500 animate-pulse",
-                children: "🛰️ Loading Interactive Map..."
+function AdminHome() {
+    _s();
+    const { data: session, status } = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2d$auth$2f$react$2f$index$2e$js__$5b$client$5d$__$28$ecmascript$29$__["useSession"])();
+    if (status === 'loading') {
+        return /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+            className: "flex min-h-screen items-center justify-center bg-slate-950 text-slate-200",
+            children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                className: "rounded-2xl border border-slate-800 bg-slate-900/70 px-4 py-3 text-sm",
+                children: "Checking your session…"
             }, void 0, false, {
                 fileName: "[project]/pages/admin/index.tsx",
-                lineNumber: 12,
+                lineNumber: 11,
                 columnNumber: 9
-            }, ("TURBOPACK compile-time value", void 0))
+            }, this)
         }, void 0, false, {
             fileName: "[project]/pages/admin/index.tsx",
-            lineNumber: 11,
+            lineNumber: 10,
             columnNumber: 7
-        }, ("TURBOPACK compile-time value", void 0))
-});
-_c = DynamicMap;
-function AdminStatesPage() {
-    return /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-        className: "min-h-screen p-6 bg-gray-50",
-        children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-            className: "max-w-7xl mx-auto",
-            children: [
-                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("h1", {
-                    className: "text-3xl font-bold text-gray-900 mb-2",
-                    children: "Administrative State Overview"
-                }, void 0, false, {
-                    fileName: "[project]/pages/admin/index.tsx",
-                    lineNumber: 27,
-                    columnNumber: 9
-                }, this),
-                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
-                    className: "text-gray-500 mb-8",
-                    children: "Interactive map for visualizing and managing state-level data."
-                }, void 0, false, {
-                    fileName: "[project]/pages/admin/index.tsx",
-                    lineNumber: 30,
-                    columnNumber: 9
-                }, this),
-                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])(DynamicMap, {}, void 0, false, {
-                    fileName: "[project]/pages/admin/index.tsx",
-                    lineNumber: 35,
-                    columnNumber: 9
-                }, this),
-                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                    className: "mt-8 bg-white p-6 rounded-lg shadow",
-                    children: [
-                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("h2", {
-                            className: "text-xl font-semibold mb-4",
-                            children: "State Data Table (Placeholder)"
-                        }, void 0, false, {
-                            fileName: "[project]/pages/admin/index.tsx",
-                            lineNumber: 38,
-                            columnNumber: 13
-                        }, this),
-                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
-                            className: "text-gray-600",
-                            children: "Data tables or other administrative controls for the states will appear here. This area confirms the rest of your page is loading correctly below the map."
-                        }, void 0, false, {
-                            fileName: "[project]/pages/admin/index.tsx",
-                            lineNumber: 39,
-                            columnNumber: 13
-                        }, this)
-                    ]
-                }, void 0, true, {
-                    fileName: "[project]/pages/admin/index.tsx",
-                    lineNumber: 37,
-                    columnNumber: 9
-                }, this)
-            ]
-        }, void 0, true, {
+        }, this);
+    }
+    if (!session) {
+        return /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+            className: "flex min-h-screen items-center justify-center bg-slate-950 text-slate-200",
+            children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                className: "flex flex-col gap-3 rounded-2xl border border-slate-800 bg-slate-900/80 px-6 py-5 text-sm shadow-2xl",
+                children: [
+                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("h1", {
+                        className: "text-lg font-semibold",
+                        children: "Sign in to access CartFax Atlas"
+                    }, void 0, false, {
+                        fileName: "[project]/pages/admin/index.tsx",
+                        lineNumber: 22,
+                        columnNumber: 11
+                    }, this),
+                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
+                        className: "text-slate-400 text-xs",
+                        children: "You'll need an authorized account to access admin tools, COA uploads, and batch explorer. Guests can still view the public atlas at the main homepage."
+                    }, void 0, false, {
+                        fileName: "[project]/pages/admin/index.tsx",
+                        lineNumber: 23,
+                        columnNumber: 11
+                    }, this),
+                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
+                        onClick: ()=>(0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2d$auth$2f$react$2f$index$2e$js__$5b$client$5d$__$28$ecmascript$29$__["signIn"])(),
+                        className: "mt-1 inline-flex items-center justify-center rounded-lg bg-sky-500 px-4 py-2 text-[13px] font-semibold text-slate-950 shadow-lg hover:bg-sky-400",
+                        children: "Sign in"
+                    }, void 0, false, {
+                        fileName: "[project]/pages/admin/index.tsx",
+                        lineNumber: 27,
+                        columnNumber: 11
+                    }, this)
+                ]
+            }, void 0, true, {
+                fileName: "[project]/pages/admin/index.tsx",
+                lineNumber: 21,
+                columnNumber: 9
+            }, this)
+        }, void 0, false, {
             fileName: "[project]/pages/admin/index.tsx",
-            lineNumber: 26,
+            lineNumber: 20,
             columnNumber: 7
-        }, this)
+        }, this);
+    }
+    return /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])(AdminStateExplorer, {
+        session: session
     }, void 0, false, {
         fileName: "[project]/pages/admin/index.tsx",
-        lineNumber: 25,
-        columnNumber: 5
+        lineNumber: 38,
+        columnNumber: 10
     }, this);
 }
-_c1 = AdminStatesPage;
-var _c, _c1;
-__turbopack_context__.k.register(_c, "DynamicMap");
-__turbopack_context__.k.register(_c1, "AdminStatesPage");
+_s(AdminHome, "ujwIunAD3hlHFoJLG3BNiDLiMqM=", false, function() {
+    return [
+        __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2d$auth$2f$react$2f$index$2e$js__$5b$client$5d$__$28$ecmascript$29$__["useSession"]
+    ];
+});
+_c = AdminHome;
+var _c;
+__turbopack_context__.k.register(_c, "AdminHome");
 if (typeof globalThis.$RefreshHelpers$ === 'object' && globalThis.$RefreshHelpers !== null) {
     __turbopack_context__.k.registerExports(__turbopack_context__.m, globalThis.$RefreshHelpers$);
 }

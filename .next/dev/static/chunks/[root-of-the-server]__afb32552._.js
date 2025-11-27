@@ -465,622 +465,1017 @@ function triggerUpdate(msg) {
 "[project]/pages/admin/uploads/[id].tsx [client] (ecmascript)", ((__turbopack_context__) => {
 "use strict";
 
+// pages/admin/uploads/[id].tsx
 __turbopack_context__.s([
     "default",
-    ()=>AdminUploadFullDebug
+    ()=>AdminUploadDetailPage
 ]);
 var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/node_modules/react/jsx-dev-runtime.js [client] (ecmascript)");
 var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$router$2e$js__$5b$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/node_modules/next/router.js [client] (ecmascript)");
-var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2d$auth$2f$react$2f$index$2e$js__$5b$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/node_modules/next-auth/react/index.js [client] (ecmascript)");
+var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$link$2e$js__$5b$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/node_modules/next/link.js [client] (ecmascript)");
 var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$index$2e$js__$5b$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/node_modules/react/index.js [client] (ecmascript)");
 ;
 var _s = __turbopack_context__.k.signature();
 ;
 ;
 ;
-function AdminUploadFullDebug() {
+function formatDate(value) {
+    if (!value) return "—";
+    const d = typeof value === "string" ? new Date(value) : value;
+    if (Number.isNaN(d.getTime())) return "—";
+    return d.toLocaleString();
+}
+function formatSize(size) {
+    if (!size || size <= 0) return "—";
+    const kb = size / 1024;
+    if (kb < 1024) return `${kb.toFixed(1)} KB`;
+    const mb = kb / 1024;
+    return `${mb.toFixed(1)} MB`;
+}
+function numberOrDash(n) {
+    if (n === null || n === undefined || Number.isNaN(n)) return "—";
+    return `${n.toFixed(2)} %`;
+}
+function deriveNovaFromText(text) {
+    if (!text) return null;
+    const raw = text.replace(/\r\n/g, "\n");
+    const lower = raw.toLowerCase();
+    if (!lower.includes("nova analytic labs")) {
+        return null;
+    }
+    const safeNumber = (re)=>{
+        const m = raw.match(re);
+        if (!m || !m[1]) return null;
+        const value = parseFloat(m[1].replace(",", ""));
+        return Number.isNaN(value) ? null : value;
+    };
+    const clientMatch = raw.match(/CLIENT:\s*([^/\n]+?)(?:\/\/|BATCH|$)/i);
+    const clientName = clientMatch?.[1]?.trim() || null;
+    const batchResultMatch = raw.match(/BATCH RESULT:\s*(PASS|PASSED|FAIL|FAILED)/i);
+    const batchResult = batchResultMatch?.[1]?.toUpperCase() || null;
+    const batchNoMatch = raw.match(/BATCH\s+NO\.?\s*[:#]\s*([A-Za-z0-9\-_.]+)/i);
+    const batchCodeMatch = raw.match(/BATCH(?!\s*RESULT)\s*[:#]\s*([A-Za-z0-9\-_.]+)/i);
+    let batchCode = null;
+    if (batchNoMatch && batchNoMatch[1]) {
+        batchCode = batchNoMatch[1].trim();
+    } else if (batchCodeMatch && batchCodeMatch[1]) {
+        batchCode = batchCodeMatch[1].trim();
+    }
+    if (batchCode && /^(pass|passed|fail|failed)$/i.test(batchCode)) {
+        batchCode = null;
+    }
+    const sampleIdMatch = raw.match(/SAMPLE ID:\s*([A-Z0-9\-]+)/i);
+    const sampleId = sampleIdMatch?.[1] || null;
+    // Fallback: if no explicit batch code but we have a Sample ID, use that
+    if (!batchCode && sampleId) {
+        batchCode = sampleId;
+    }
+    const matrixMatch = raw.match(/MATRIX:\s*([A-Za-z ]+)/i);
+    const matrix = matrixMatch?.[1]?.trim() || null;
+    const producedMatch = raw.match(/PRODUCED:\s*([A-Z]{3}\s+\d{1,2},\s+\d{4})/i);
+    const producedRaw = producedMatch?.[1]?.trim() || null;
+    // Potency extraction:
+    //  - First look for explicit "TOTAL THC nn.nn %"
+    //  - fall back to "Δ-THC nn.nn %"
+    const thcPercent = safeNumber(/TOTAL THC[^\d]*(\d+(?:\.\d+)?)\s*%/i) || safeNumber(/Δ-THC\s*[: ]\s*(\d+(?:\.\d+)?)\s*%/i) || null;
+    // CBD is often "CBD 2.93 %" or "TOTAL CBD 0.902 %"
+    const cbdPercent = safeNumber(/CBD\s+(\d+(?:\.\d+)?)\s*%/i) || safeNumber(/TOTAL CBD[^\d]*(\d+(?:\.\d+)?)\s*%/i) || null;
+    const totalCannabinoidsPercent = safeNumber(/TOTAL CANNABINOIDS\s+(\d+(?:\.\d+)?)\s*%/i) || null;
+    const pesticidesPass = /PESTICIDES[\s\S]{0,60}PASS/i.test(raw) || /PESTICIDES, INSECTICIDES[\s\S]{0,200}NDN\/A/i.test(raw) || null;
+    let passed = null;
+    if (batchResult === "PASS" || batchResult === "PASSED") passed = true;
+    if (batchResult === "FAIL" || batchResult === "FAILED") passed = false;
+    return {
+        labName: "Nova Analytic Labs",
+        clientName,
+        batchResult,
+        batchCode,
+        sampleId,
+        matrix,
+        producedRaw,
+        thcPercent,
+        cbdPercent,
+        totalCannabinoidsPercent,
+        pesticidesPass,
+        passed
+    };
+}
+function AdminUploadDetailPage() {
     _s();
     const router = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$router$2e$js__$5b$client$5d$__$28$ecmascript$29$__["useRouter"])();
     const { id } = router.query;
-    const { data: session } = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2d$auth$2f$react$2f$index$2e$js__$5b$client$5d$__$28$ecmascript$29$__["useSession"])();
     const [doc, setDoc] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$index$2e$js__$5b$client$5d$__$28$ecmascript$29$__["useState"])(null);
-    const [loading, setLoading] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$index$2e$js__$5b$client$5d$__$28$ecmascript$29$__["useState"])(false);
-    const [error, setError] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$index$2e$js__$5b$client$5d$__$28$ecmascript$29$__["useState"])(null);
+    const [loading, setLoading] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$index$2e$js__$5b$client$5d$__$28$ecmascript$29$__["useState"])(true);
+    const [errorText, setErrorText] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$index$2e$js__$5b$client$5d$__$28$ecmascript$29$__["useState"])(null);
     (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$index$2e$js__$5b$client$5d$__$28$ecmascript$29$__["useEffect"])({
-        "AdminUploadFullDebug.useEffect": ()=>{
-            if (!id || !session) return;
-            const idStr = Array.isArray(id) ? id[0] : id;
-            void fetchDoc(idStr);
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-        }
-    }["AdminUploadFullDebug.useEffect"], [
-        id,
-        session
-    ]);
-    async function fetchDoc(idStr) {
-        try {
-            setLoading(true);
-            setError(null);
-            const res = await fetch(`/api/admin/uploads/${idStr}`);
-            if (!res.ok) {
-                const txt = await res.text();
-                throw new Error(txt || 'Failed to load document');
+        "AdminUploadDetailPage.useEffect": ()=>{
+            if (!id) return;
+            let cancelled = false;
+            async function fetchDetail() {
+                setLoading(true);
+                setErrorText(null);
+                try {
+                    const res = await fetch(`/api/admin/uploads/${id}`);
+                    const txt = await res.text();
+                    if (!res.ok) {
+                        if (!cancelled) {
+                            setErrorText(txt || "Failed to load COA detail");
+                            setLoading(false);
+                        }
+                        return;
+                    }
+                    const data = JSON.parse(txt);
+                    if (!cancelled) {
+                        setDoc(data);
+                        setLoading(false);
+                    }
+                } catch (err) {
+                    if (!cancelled) {
+                        setErrorText(err?.message || "Failed to load COA detail");
+                        setLoading(false);
+                    }
+                }
             }
-            const data = await res.json();
-            setDoc(data);
-        } catch (e) {
-            console.error('Failed to load upload detail', e);
-            setError(e.message || 'Failed to load document');
-        } finally{
-            setLoading(false);
+            fetchDetail();
+            return ({
+                "AdminUploadDetailPage.useEffect": ()=>{
+                    cancelled = true;
+                }
+            })["AdminUploadDetailPage.useEffect"];
         }
-    }
-    if (!session) {
+    }["AdminUploadDetailPage.useEffect"], [
+        id
+    ]);
+    const derivedNova = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$index$2e$js__$5b$client$5d$__$28$ecmascript$29$__["useMemo"])({
+        "AdminUploadDetailPage.useMemo[derivedNova]": ()=>deriveNovaFromText(doc?.extractedText)
+    }["AdminUploadDetailPage.useMemo[derivedNova]"], [
+        doc?.extractedText
+    ]);
+    const labResult = doc?.labResult;
+    const displayThc = labResult?.thcPercent ?? derivedNova?.thcPercent ?? null;
+    const displayCbd = labResult?.cbdPercent ?? derivedNova?.cbdPercent ?? null;
+    const displayTotalCannabinoids = labResult?.totalCannabinoidsPercent ?? derivedNova?.totalCannabinoidsPercent ?? null;
+    const displayBatchCode = derivedNova?.batchCode ?? doc?.batchCode ?? labResult?.batch?.batchCode ?? null;
+    if (loading) {
         return /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-            className: "p-6",
+            className: "min-h-screen bg-slate-950 text-slate-100 flex items-center justify-center",
             children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
                 className: "text-sm text-slate-300",
-                children: "Sign in as an admin to view COA debug details."
+                children: "Loading COA detail…"
             }, void 0, false, {
                 fileName: "[project]/pages/admin/uploads/[id].tsx",
-                lineNumber: 68,
+                lineNumber: 263,
                 columnNumber: 9
             }, this)
         }, void 0, false, {
             fileName: "[project]/pages/admin/uploads/[id].tsx",
-            lineNumber: 67,
+            lineNumber: 262,
             columnNumber: 7
         }, this);
     }
-    if (loading && !doc) {
+    if (errorText) {
         return /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-            className: "p-6",
-            children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
-                className: "text-sm text-slate-300",
-                children: "Loading COA…"
-            }, void 0, false, {
-                fileName: "[project]/pages/admin/uploads/[id].tsx",
-                lineNumber: 78,
-                columnNumber: 9
-            }, this)
-        }, void 0, false, {
-            fileName: "[project]/pages/admin/uploads/[id].tsx",
-            lineNumber: 77,
-            columnNumber: 7
-        }, this);
-    }
-    if (error && !doc) {
-        return /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-            className: "p-6",
-            children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
-                className: "text-sm text-red-400",
+            className: "min-h-screen bg-slate-950 text-slate-100 flex items-center justify-center",
+            children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                className: "max-w-lg rounded-xl border border-red-500/40 bg-red-950/30 p-4",
                 children: [
-                    "Error: ",
-                    error
+                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
+                        className: "text-sm font-semibold text-red-200 mb-2",
+                        children: "Error loading COA"
+                    }, void 0, false, {
+                        fileName: "[project]/pages/admin/uploads/[id].tsx",
+                        lineNumber: 272,
+                        columnNumber: 11
+                    }, this),
+                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("pre", {
+                        className: "text-xs text-red-100 whitespace-pre-wrap",
+                        children: errorText
+                    }, void 0, false, {
+                        fileName: "[project]/pages/admin/uploads/[id].tsx",
+                        lineNumber: 275,
+                        columnNumber: 11
+                    }, this),
+                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                        className: "mt-3",
+                        children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$link$2e$js__$5b$client$5d$__$28$ecmascript$29$__["default"], {
+                            href: "/admin/uploads",
+                            className: "text-xs text-sky-300 hover:underline",
+                            children: "← Back to COA uploads"
+                        }, void 0, false, {
+                            fileName: "[project]/pages/admin/uploads/[id].tsx",
+                            lineNumber: 279,
+                            columnNumber: 13
+                        }, this)
+                    }, void 0, false, {
+                        fileName: "[project]/pages/admin/uploads/[id].tsx",
+                        lineNumber: 278,
+                        columnNumber: 11
+                    }, this)
                 ]
             }, void 0, true, {
                 fileName: "[project]/pages/admin/uploads/[id].tsx",
-                lineNumber: 86,
+                lineNumber: 271,
                 columnNumber: 9
             }, this)
         }, void 0, false, {
             fileName: "[project]/pages/admin/uploads/[id].tsx",
-            lineNumber: 85,
+            lineNumber: 270,
             columnNumber: 7
         }, this);
     }
     if (!doc) {
         return /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-            className: "p-6",
+            className: "min-h-screen bg-slate-950 text-slate-100 flex items-center justify-center",
+            children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                className: "text-center space-y-2",
+                children: [
+                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
+                        className: "text-sm text-slate-300",
+                        children: "COA not found or has been deleted."
+                    }, void 0, false, {
+                        fileName: "[project]/pages/admin/uploads/[id].tsx",
+                        lineNumber: 295,
+                        columnNumber: 11
+                    }, this),
+                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$link$2e$js__$5b$client$5d$__$28$ecmascript$29$__["default"], {
+                        href: "/admin/uploads",
+                        className: "text-xs text-sky-300 hover:underline",
+                        children: "← Back to COA uploads"
+                    }, void 0, false, {
+                        fileName: "[project]/pages/admin/uploads/[id].tsx",
+                        lineNumber: 298,
+                        columnNumber: 11
+                    }, this)
+                ]
+            }, void 0, true, {
+                fileName: "[project]/pages/admin/uploads/[id].tsx",
+                lineNumber: 294,
+                columnNumber: 9
+            }, this)
+        }, void 0, false, {
+            fileName: "[project]/pages/admin/uploads/[id].tsx",
+            lineNumber: 293,
+            columnNumber: 7
+        }, this);
+    }
+    return /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+        className: "min-h-screen bg-slate-950 text-slate-100",
+        children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("main", {
+            className: "max-w-6xl mx-auto py-8 px-4",
             children: [
-                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
-                    onClick: ()=>router.push('/admin/uploads'),
-                    className: "text-xs text-slate-400 hover:text-emerald-400 mb-2",
+                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$link$2e$js__$5b$client$5d$__$28$ecmascript$29$__["default"], {
+                    href: "/admin/uploads",
+                    className: "inline-flex items-center text-xs font-medium text-sky-400 hover:text-sky-300",
                     children: "← Back to COA uploads"
                 }, void 0, false, {
                     fileName: "[project]/pages/admin/uploads/[id].tsx",
-                    lineNumber: 94,
+                    lineNumber: 312,
                     columnNumber: 9
                 }, this),
-                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
-                    className: "text-sm text-slate-300",
-                    children: "Document not found."
-                }, void 0, false, {
+                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                    className: "mt-4 flex flex-col gap-1 sm:flex-row sm:items-baseline sm:justify-between",
+                    children: [
+                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                            children: [
+                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("h1", {
+                                    className: "text-2xl font-semibold tracking-tight",
+                                    children: [
+                                        "COA #",
+                                        doc.id
+                                    ]
+                                }, void 0, true, {
+                                    fileName: "[project]/pages/admin/uploads/[id].tsx",
+                                    lineNumber: 321,
+                                    columnNumber: 13
+                                }, this),
+                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
+                                    className: "text-xs text-slate-400 mt-1 break-all",
+                                    children: doc.fileName
+                                }, void 0, false, {
+                                    fileName: "[project]/pages/admin/uploads/[id].tsx",
+                                    lineNumber: 324,
+                                    columnNumber: 13
+                                }, this)
+                            ]
+                        }, void 0, true, {
+                            fileName: "[project]/pages/admin/uploads/[id].tsx",
+                            lineNumber: 320,
+                            columnNumber: 11
+                        }, this),
+                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                            className: "text-right text-xs text-slate-400 space-y-1",
+                            children: [
+                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
+                                    children: [
+                                        "Uploaded: ",
+                                        formatDate(doc.createdAt)
+                                    ]
+                                }, void 0, true, {
+                                    fileName: "[project]/pages/admin/uploads/[id].tsx",
+                                    lineNumber: 329,
+                                    columnNumber: 13
+                                }, this),
+                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
+                                    children: [
+                                        "SHA256: ",
+                                        doc.sha256
+                                    ]
+                                }, void 0, true, {
+                                    fileName: "[project]/pages/admin/uploads/[id].tsx",
+                                    lineNumber: 330,
+                                    columnNumber: 13
+                                }, this)
+                            ]
+                        }, void 0, true, {
+                            fileName: "[project]/pages/admin/uploads/[id].tsx",
+                            lineNumber: 328,
+                            columnNumber: 11
+                        }, this)
+                    ]
+                }, void 0, true, {
                     fileName: "[project]/pages/admin/uploads/[id].tsx",
-                    lineNumber: 100,
+                    lineNumber: 319,
+                    columnNumber: 9
+                }, this),
+                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                    className: "mt-6 grid gap-6 lg:grid-cols-[minmax(0,2.2fr)_minmax(0,1.8fr)]",
+                    children: [
+                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("section", {
+                            className: "space-y-4",
+                            children: [
+                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                    className: "rounded-xl border border-slate-800 bg-slate-900/60 p-4",
+                                    children: [
+                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("h2", {
+                                            className: "text-xs font-semibold uppercase tracking-wide text-slate-400",
+                                            children: "Parsed metadata"
+                                        }, void 0, false, {
+                                            fileName: "[project]/pages/admin/uploads/[id].tsx",
+                                            lineNumber: 338,
+                                            columnNumber: 15
+                                        }, this),
+                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("dl", {
+                                            className: "mt-3 grid gap-x-6 gap-y-2 text-xs sm:grid-cols-2",
+                                            children: [
+                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                    children: [
+                                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("dt", {
+                                                            className: "text-slate-500",
+                                                            children: "Batch code"
+                                                        }, void 0, false, {
+                                                            fileName: "[project]/pages/admin/uploads/[id].tsx",
+                                                            lineNumber: 343,
+                                                            columnNumber: 19
+                                                        }, this),
+                                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("dd", {
+                                                            className: "font-mono text-slate-100",
+                                                            children: displayBatchCode || "—"
+                                                        }, void 0, false, {
+                                                            fileName: "[project]/pages/admin/uploads/[id].tsx",
+                                                            lineNumber: 344,
+                                                            columnNumber: 19
+                                                        }, this)
+                                                    ]
+                                                }, void 0, true, {
+                                                    fileName: "[project]/pages/admin/uploads/[id].tsx",
+                                                    lineNumber: 342,
+                                                    columnNumber: 17
+                                                }, this),
+                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                    children: [
+                                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("dt", {
+                                                            className: "text-slate-500",
+                                                            children: "Batch result"
+                                                        }, void 0, false, {
+                                                            fileName: "[project]/pages/admin/uploads/[id].tsx",
+                                                            lineNumber: 349,
+                                                            columnNumber: 19
+                                                        }, this),
+                                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("dd", {
+                                                            className: "font-mono text-slate-100",
+                                                            children: derivedNova?.batchResult || (labResult?.passed === true ? "PASS" : labResult?.passed === false ? "FAIL" : "Unknown")
+                                                        }, void 0, false, {
+                                                            fileName: "[project]/pages/admin/uploads/[id].tsx",
+                                                            lineNumber: 350,
+                                                            columnNumber: 19
+                                                        }, this)
+                                                    ]
+                                                }, void 0, true, {
+                                                    fileName: "[project]/pages/admin/uploads/[id].tsx",
+                                                    lineNumber: 348,
+                                                    columnNumber: 17
+                                                }, this),
+                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                    children: [
+                                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("dt", {
+                                                            className: "text-slate-500",
+                                                            children: "Lab name"
+                                                        }, void 0, false, {
+                                                            fileName: "[project]/pages/admin/uploads/[id].tsx",
+                                                            lineNumber: 360,
+                                                            columnNumber: 19
+                                                        }, this),
+                                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("dd", {
+                                                            className: "font-medium",
+                                                            children: doc.labName || labResult?.lab?.name || (derivedNova ? derivedNova.labName : "Unknown")
+                                                        }, void 0, false, {
+                                                            fileName: "[project]/pages/admin/uploads/[id].tsx",
+                                                            lineNumber: 361,
+                                                            columnNumber: 19
+                                                        }, this)
+                                                    ]
+                                                }, void 0, true, {
+                                                    fileName: "[project]/pages/admin/uploads/[id].tsx",
+                                                    lineNumber: 359,
+                                                    columnNumber: 17
+                                                }, this),
+                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                    children: [
+                                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("dt", {
+                                                            className: "text-slate-500",
+                                                            children: "Client / Producer"
+                                                        }, void 0, false, {
+                                                            fileName: "[project]/pages/admin/uploads/[id].tsx",
+                                                            lineNumber: 368,
+                                                            columnNumber: 19
+                                                        }, this),
+                                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("dd", {
+                                                            className: "font-medium",
+                                                            children: derivedNova?.clientName || "—"
+                                                        }, void 0, false, {
+                                                            fileName: "[project]/pages/admin/uploads/[id].tsx",
+                                                            lineNumber: 369,
+                                                            columnNumber: 19
+                                                        }, this)
+                                                    ]
+                                                }, void 0, true, {
+                                                    fileName: "[project]/pages/admin/uploads/[id].tsx",
+                                                    lineNumber: 367,
+                                                    columnNumber: 17
+                                                }, this),
+                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                    children: [
+                                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("dt", {
+                                                            className: "text-slate-500",
+                                                            children: "Sample ID"
+                                                        }, void 0, false, {
+                                                            fileName: "[project]/pages/admin/uploads/[id].tsx",
+                                                            lineNumber: 374,
+                                                            columnNumber: 19
+                                                        }, this),
+                                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("dd", {
+                                                            className: "font-mono",
+                                                            children: derivedNova?.sampleId || "—"
+                                                        }, void 0, false, {
+                                                            fileName: "[project]/pages/admin/uploads/[id].tsx",
+                                                            lineNumber: 375,
+                                                            columnNumber: 19
+                                                        }, this)
+                                                    ]
+                                                }, void 0, true, {
+                                                    fileName: "[project]/pages/admin/uploads/[id].tsx",
+                                                    lineNumber: 373,
+                                                    columnNumber: 17
+                                                }, this),
+                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                    children: [
+                                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("dt", {
+                                                            className: "text-slate-500",
+                                                            children: "Matrix / Sample type"
+                                                        }, void 0, false, {
+                                                            fileName: "[project]/pages/admin/uploads/[id].tsx",
+                                                            lineNumber: 380,
+                                                            columnNumber: 19
+                                                        }, this),
+                                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("dd", {
+                                                            children: derivedNova?.matrix || labResult?.batch?.productName || "—"
+                                                        }, void 0, false, {
+                                                            fileName: "[project]/pages/admin/uploads/[id].tsx",
+                                                            lineNumber: 381,
+                                                            columnNumber: 19
+                                                        }, this)
+                                                    ]
+                                                }, void 0, true, {
+                                                    fileName: "[project]/pages/admin/uploads/[id].tsx",
+                                                    lineNumber: 379,
+                                                    columnNumber: 17
+                                                }, this),
+                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                    children: [
+                                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("dt", {
+                                                            className: "text-slate-500",
+                                                            children: "Produced"
+                                                        }, void 0, false, {
+                                                            fileName: "[project]/pages/admin/uploads/[id].tsx",
+                                                            lineNumber: 384,
+                                                            columnNumber: 19
+                                                        }, this),
+                                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("dd", {
+                                                            children: derivedNova?.producedRaw || "—"
+                                                        }, void 0, false, {
+                                                            fileName: "[project]/pages/admin/uploads/[id].tsx",
+                                                            lineNumber: 385,
+                                                            columnNumber: 19
+                                                        }, this)
+                                                    ]
+                                                }, void 0, true, {
+                                                    fileName: "[project]/pages/admin/uploads/[id].tsx",
+                                                    lineNumber: 383,
+                                                    columnNumber: 17
+                                                }, this),
+                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                    children: [
+                                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("dt", {
+                                                            className: "text-slate-500",
+                                                            children: "Backend path"
+                                                        }, void 0, false, {
+                                                            fileName: "[project]/pages/admin/uploads/[id].tsx",
+                                                            lineNumber: 388,
+                                                            columnNumber: 19
+                                                        }, this),
+                                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("dd", {
+                                                            className: "font-mono break-all",
+                                                            children: doc.filePath
+                                                        }, void 0, false, {
+                                                            fileName: "[project]/pages/admin/uploads/[id].tsx",
+                                                            lineNumber: 389,
+                                                            columnNumber: 19
+                                                        }, this)
+                                                    ]
+                                                }, void 0, true, {
+                                                    fileName: "[project]/pages/admin/uploads/[id].tsx",
+                                                    lineNumber: 387,
+                                                    columnNumber: 17
+                                                }, this),
+                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                    children: [
+                                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("dt", {
+                                                            className: "text-slate-500",
+                                                            children: "File type"
+                                                        }, void 0, false, {
+                                                            fileName: "[project]/pages/admin/uploads/[id].tsx",
+                                                            lineNumber: 392,
+                                                            columnNumber: 19
+                                                        }, this),
+                                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("dd", {
+                                                            children: [
+                                                                doc.mimeType,
+                                                                " · ",
+                                                                formatSize(doc.size)
+                                                            ]
+                                                        }, void 0, true, {
+                                                            fileName: "[project]/pages/admin/uploads/[id].tsx",
+                                                            lineNumber: 393,
+                                                            columnNumber: 19
+                                                        }, this)
+                                                    ]
+                                                }, void 0, true, {
+                                                    fileName: "[project]/pages/admin/uploads/[id].tsx",
+                                                    lineNumber: 391,
+                                                    columnNumber: 17
+                                                }, this),
+                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                    children: [
+                                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("dt", {
+                                                            className: "text-slate-500",
+                                                            children: "Verification"
+                                                        }, void 0, false, {
+                                                            fileName: "[project]/pages/admin/uploads/[id].tsx",
+                                                            lineNumber: 398,
+                                                            columnNumber: 19
+                                                        }, this),
+                                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("dd", {
+                                                            children: doc.verified ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                                                className: "text-emerald-300",
+                                                                children: "Verified"
+                                                            }, void 0, false, {
+                                                                fileName: "[project]/pages/admin/uploads/[id].tsx",
+                                                                lineNumber: 401,
+                                                                columnNumber: 23
+                                                            }, this) : /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                                                className: "text-amber-300",
+                                                                children: "Unverified"
+                                                            }, void 0, false, {
+                                                                fileName: "[project]/pages/admin/uploads/[id].tsx",
+                                                                lineNumber: 403,
+                                                                columnNumber: 23
+                                                            }, this)
+                                                        }, void 0, false, {
+                                                            fileName: "[project]/pages/admin/uploads/[id].tsx",
+                                                            lineNumber: 399,
+                                                            columnNumber: 19
+                                                        }, this)
+                                                    ]
+                                                }, void 0, true, {
+                                                    fileName: "[project]/pages/admin/uploads/[id].tsx",
+                                                    lineNumber: 397,
+                                                    columnNumber: 17
+                                                }, this)
+                                            ]
+                                        }, void 0, true, {
+                                            fileName: "[project]/pages/admin/uploads/[id].tsx",
+                                            lineNumber: 341,
+                                            columnNumber: 15
+                                        }, this)
+                                    ]
+                                }, void 0, true, {
+                                    fileName: "[project]/pages/admin/uploads/[id].tsx",
+                                    lineNumber: 337,
+                                    columnNumber: 13
+                                }, this),
+                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                    className: "rounded-xl border border-slate-800 bg-slate-900/60 p-4",
+                                    children: [
+                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("h2", {
+                                            className: "text-xs font-semibold uppercase tracking-wide text-slate-400",
+                                            children: "Potency & safety summary"
+                                        }, void 0, false, {
+                                            fileName: "[project]/pages/admin/uploads/[id].tsx",
+                                            lineNumber: 411,
+                                            columnNumber: 15
+                                        }, this),
+                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("dl", {
+                                            className: "mt-3 grid gap-x-6 gap-y-2 text-xs sm:grid-cols-3",
+                                            children: [
+                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                    children: [
+                                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("dt", {
+                                                            className: "text-slate-500",
+                                                            children: "THC %"
+                                                        }, void 0, false, {
+                                                            fileName: "[project]/pages/admin/uploads/[id].tsx",
+                                                            lineNumber: 416,
+                                                            columnNumber: 19
+                                                        }, this),
+                                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("dd", {
+                                                            className: "font-mono",
+                                                            children: numberOrDash(displayThc)
+                                                        }, void 0, false, {
+                                                            fileName: "[project]/pages/admin/uploads/[id].tsx",
+                                                            lineNumber: 417,
+                                                            columnNumber: 19
+                                                        }, this)
+                                                    ]
+                                                }, void 0, true, {
+                                                    fileName: "[project]/pages/admin/uploads/[id].tsx",
+                                                    lineNumber: 415,
+                                                    columnNumber: 17
+                                                }, this),
+                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                    children: [
+                                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("dt", {
+                                                            className: "text-slate-500",
+                                                            children: "CBD %"
+                                                        }, void 0, false, {
+                                                            fileName: "[project]/pages/admin/uploads/[id].tsx",
+                                                            lineNumber: 422,
+                                                            columnNumber: 19
+                                                        }, this),
+                                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("dd", {
+                                                            className: "font-mono",
+                                                            children: numberOrDash(displayCbd)
+                                                        }, void 0, false, {
+                                                            fileName: "[project]/pages/admin/uploads/[id].tsx",
+                                                            lineNumber: 423,
+                                                            columnNumber: 19
+                                                        }, this)
+                                                    ]
+                                                }, void 0, true, {
+                                                    fileName: "[project]/pages/admin/uploads/[id].tsx",
+                                                    lineNumber: 421,
+                                                    columnNumber: 17
+                                                }, this),
+                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                    children: [
+                                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("dt", {
+                                                            className: "text-slate-500",
+                                                            children: "Total cannabinoids %"
+                                                        }, void 0, false, {
+                                                            fileName: "[project]/pages/admin/uploads/[id].tsx",
+                                                            lineNumber: 428,
+                                                            columnNumber: 19
+                                                        }, this),
+                                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("dd", {
+                                                            className: "font-mono",
+                                                            children: numberOrDash(displayTotalCannabinoids)
+                                                        }, void 0, false, {
+                                                            fileName: "[project]/pages/admin/uploads/[id].tsx",
+                                                            lineNumber: 429,
+                                                            columnNumber: 19
+                                                        }, this)
+                                                    ]
+                                                }, void 0, true, {
+                                                    fileName: "[project]/pages/admin/uploads/[id].tsx",
+                                                    lineNumber: 427,
+                                                    columnNumber: 17
+                                                }, this)
+                                            ]
+                                        }, void 0, true, {
+                                            fileName: "[project]/pages/admin/uploads/[id].tsx",
+                                            lineNumber: 414,
+                                            columnNumber: 15
+                                        }, this),
+                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("dl", {
+                                            className: "mt-4 grid gap-x-6 gap-y-2 text-xs sm:grid-cols-2",
+                                            children: [
+                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                    children: [
+                                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("dt", {
+                                                            className: "text-slate-500",
+                                                            children: "Pesticides"
+                                                        }, void 0, false, {
+                                                            fileName: "[project]/pages/admin/uploads/[id].tsx",
+                                                            lineNumber: 437,
+                                                            columnNumber: 19
+                                                        }, this),
+                                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("dd", {
+                                                            children: labResult?.pesticidesPass ?? derivedNova?.pesticidesPass ?? null ? "Pass" : labResult?.pesticidesPass === false ? "Fail" : "Unknown"
+                                                        }, void 0, false, {
+                                                            fileName: "[project]/pages/admin/uploads/[id].tsx",
+                                                            lineNumber: 438,
+                                                            columnNumber: 19
+                                                        }, this)
+                                                    ]
+                                                }, void 0, true, {
+                                                    fileName: "[project]/pages/admin/uploads/[id].tsx",
+                                                    lineNumber: 436,
+                                                    columnNumber: 17
+                                                }, this),
+                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                    children: [
+                                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("dt", {
+                                                            className: "text-slate-500",
+                                                            children: "Microbials"
+                                                        }, void 0, false, {
+                                                            fileName: "[project]/pages/admin/uploads/[id].tsx",
+                                                            lineNumber: 449,
+                                                            columnNumber: 19
+                                                        }, this),
+                                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("dd", {
+                                                            children: labResult?.microbialsPass === true ? "Pass" : labResult?.microbialsPass === false ? "Fail" : "Unknown"
+                                                        }, void 0, false, {
+                                                            fileName: "[project]/pages/admin/uploads/[id].tsx",
+                                                            lineNumber: 450,
+                                                            columnNumber: 19
+                                                        }, this)
+                                                    ]
+                                                }, void 0, true, {
+                                                    fileName: "[project]/pages/admin/uploads/[id].tsx",
+                                                    lineNumber: 448,
+                                                    columnNumber: 17
+                                                }, this),
+                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                    children: [
+                                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("dt", {
+                                                            className: "text-slate-500",
+                                                            children: "Solvents"
+                                                        }, void 0, false, {
+                                                            fileName: "[project]/pages/admin/uploads/[id].tsx",
+                                                            lineNumber: 459,
+                                                            columnNumber: 19
+                                                        }, this),
+                                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("dd", {
+                                                            children: labResult?.solventsPass === true ? "Pass" : labResult?.solventsPass === false ? "Fail" : "Unknown"
+                                                        }, void 0, false, {
+                                                            fileName: "[project]/pages/admin/uploads/[id].tsx",
+                                                            lineNumber: 460,
+                                                            columnNumber: 19
+                                                        }, this)
+                                                    ]
+                                                }, void 0, true, {
+                                                    fileName: "[project]/pages/admin/uploads/[id].tsx",
+                                                    lineNumber: 458,
+                                                    columnNumber: 17
+                                                }, this),
+                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                    children: [
+                                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("dt", {
+                                                            className: "text-slate-500",
+                                                            children: "Heavy metals"
+                                                        }, void 0, false, {
+                                                            fileName: "[project]/pages/admin/uploads/[id].tsx",
+                                                            lineNumber: 469,
+                                                            columnNumber: 19
+                                                        }, this),
+                                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("dd", {
+                                                            children: labResult?.heavyMetalsPass === true ? "Pass" : labResult?.heavyMetalsPass === false ? "Fail" : "Unknown"
+                                                        }, void 0, false, {
+                                                            fileName: "[project]/pages/admin/uploads/[id].tsx",
+                                                            lineNumber: 470,
+                                                            columnNumber: 19
+                                                        }, this)
+                                                    ]
+                                                }, void 0, true, {
+                                                    fileName: "[project]/pages/admin/uploads/[id].tsx",
+                                                    lineNumber: 468,
+                                                    columnNumber: 17
+                                                }, this)
+                                            ]
+                                        }, void 0, true, {
+                                            fileName: "[project]/pages/admin/uploads/[id].tsx",
+                                            lineNumber: 435,
+                                            columnNumber: 15
+                                        }, this)
+                                    ]
+                                }, void 0, true, {
+                                    fileName: "[project]/pages/admin/uploads/[id].tsx",
+                                    lineNumber: 410,
+                                    columnNumber: 13
+                                }, this),
+                                labResult?.batch && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                    className: "rounded-xl border border-slate-800 bg-slate-900/60 p-4",
+                                    children: [
+                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("h2", {
+                                            className: "text-xs font-semibold uppercase tracking-wide text-slate-400",
+                                            children: "Linked batch"
+                                        }, void 0, false, {
+                                            fileName: "[project]/pages/admin/uploads/[id].tsx",
+                                            lineNumber: 483,
+                                            columnNumber: 17
+                                        }, this),
+                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("dl", {
+                                            className: "mt-3 grid gap-x-6 gap-y-1 text-xs sm:grid-cols-2",
+                                            children: [
+                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                    children: [
+                                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("dt", {
+                                                            className: "text-slate-500",
+                                                            children: "Batch link"
+                                                        }, void 0, false, {
+                                                            fileName: "[project]/pages/admin/uploads/[id].tsx",
+                                                            lineNumber: 488,
+                                                            columnNumber: 21
+                                                        }, this),
+                                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("dd", {
+                                                            children: [
+                                                                "Batch #",
+                                                                labResult.batch.id
+                                                            ]
+                                                        }, void 0, true, {
+                                                            fileName: "[project]/pages/admin/uploads/[id].tsx",
+                                                            lineNumber: 489,
+                                                            columnNumber: 21
+                                                        }, this)
+                                                    ]
+                                                }, void 0, true, {
+                                                    fileName: "[project]/pages/admin/uploads/[id].tsx",
+                                                    lineNumber: 487,
+                                                    columnNumber: 19
+                                                }, this),
+                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                    children: [
+                                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("dt", {
+                                                            className: "text-slate-500",
+                                                            children: "Jurisdiction"
+                                                        }, void 0, false, {
+                                                            fileName: "[project]/pages/admin/uploads/[id].tsx",
+                                                            lineNumber: 492,
+                                                            columnNumber: 21
+                                                        }, this),
+                                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("dd", {
+                                                            children: labResult.batch.jurisdiction || labResult.batch.stateCode || "—"
+                                                        }, void 0, false, {
+                                                            fileName: "[project]/pages/admin/uploads/[id].tsx",
+                                                            lineNumber: 493,
+                                                            columnNumber: 21
+                                                        }, this)
+                                                    ]
+                                                }, void 0, true, {
+                                                    fileName: "[project]/pages/admin/uploads/[id].tsx",
+                                                    lineNumber: 491,
+                                                    columnNumber: 19
+                                                }, this),
+                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                    children: [
+                                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("dt", {
+                                                            className: "text-slate-500",
+                                                            children: "Product name"
+                                                        }, void 0, false, {
+                                                            fileName: "[project]/pages/admin/uploads/[id].tsx",
+                                                            lineNumber: 500,
+                                                            columnNumber: 21
+                                                        }, this),
+                                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("dd", {
+                                                            children: labResult.batch.productName || "—"
+                                                        }, void 0, false, {
+                                                            fileName: "[project]/pages/admin/uploads/[id].tsx",
+                                                            lineNumber: 501,
+                                                            columnNumber: 21
+                                                        }, this)
+                                                    ]
+                                                }, void 0, true, {
+                                                    fileName: "[project]/pages/admin/uploads/[id].tsx",
+                                                    lineNumber: 499,
+                                                    columnNumber: 19
+                                                }, this),
+                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                    children: [
+                                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("dt", {
+                                                            className: "text-slate-500",
+                                                            children: "Stored batch code"
+                                                        }, void 0, false, {
+                                                            fileName: "[project]/pages/admin/uploads/[id].tsx",
+                                                            lineNumber: 504,
+                                                            columnNumber: 21
+                                                        }, this),
+                                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("dd", {
+                                                            className: "font-mono",
+                                                            children: labResult.batch.batchCode || "—"
+                                                        }, void 0, false, {
+                                                            fileName: "[project]/pages/admin/uploads/[id].tsx",
+                                                            lineNumber: 505,
+                                                            columnNumber: 21
+                                                        }, this)
+                                                    ]
+                                                }, void 0, true, {
+                                                    fileName: "[project]/pages/admin/uploads/[id].tsx",
+                                                    lineNumber: 503,
+                                                    columnNumber: 19
+                                                }, this)
+                                            ]
+                                        }, void 0, true, {
+                                            fileName: "[project]/pages/admin/uploads/[id].tsx",
+                                            lineNumber: 486,
+                                            columnNumber: 17
+                                        }, this)
+                                    ]
+                                }, void 0, true, {
+                                    fileName: "[project]/pages/admin/uploads/[id].tsx",
+                                    lineNumber: 482,
+                                    columnNumber: 15
+                                }, this)
+                            ]
+                        }, void 0, true, {
+                            fileName: "[project]/pages/admin/uploads/[id].tsx",
+                            lineNumber: 336,
+                            columnNumber: 11
+                        }, this),
+                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("section", {
+                            className: "rounded-xl border border-slate-800 bg-slate-900/60 p-4 flex flex-col",
+                            children: [
+                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("h2", {
+                                    className: "text-xs font-semibold uppercase tracking-wide text-slate-400",
+                                    children: "Raw extracted text"
+                                }, void 0, false, {
+                                    fileName: "[project]/pages/admin/uploads/[id].tsx",
+                                    lineNumber: 516,
+                                    columnNumber: 13
+                                }, this),
+                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
+                                    className: "mt-1 mb-3 text-[11px] text-slate-500",
+                                    children: "Use this to refine per-lab parsing rules. This view also includes Nova-specific parsing for batch result, potency, and sample metadata."
+                                }, void 0, false, {
+                                    fileName: "[project]/pages/admin/uploads/[id].tsx",
+                                    lineNumber: 519,
+                                    columnNumber: 13
+                                }, this),
+                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                    className: "relative flex-1 min-h-[200px]",
+                                    children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("pre", {
+                                        className: "absolute inset-0 overflow-auto text-[11px] leading-snug bg-slate-950/60 border border-slate-800 rounded-lg p-3 font-mono text-slate-100 whitespace-pre-wrap",
+                                        children: doc.extractedText || "No extracted text available."
+                                    }, void 0, false, {
+                                        fileName: "[project]/pages/admin/uploads/[id].tsx",
+                                        lineNumber: 525,
+                                        columnNumber: 15
+                                    }, this)
+                                }, void 0, false, {
+                                    fileName: "[project]/pages/admin/uploads/[id].tsx",
+                                    lineNumber: 524,
+                                    columnNumber: 13
+                                }, this)
+                            ]
+                        }, void 0, true, {
+                            fileName: "[project]/pages/admin/uploads/[id].tsx",
+                            lineNumber: 515,
+                            columnNumber: 11
+                        }, this)
+                    ]
+                }, void 0, true, {
+                    fileName: "[project]/pages/admin/uploads/[id].tsx",
+                    lineNumber: 334,
                     columnNumber: 9
                 }, this)
             ]
         }, void 0, true, {
             fileName: "[project]/pages/admin/uploads/[id].tsx",
-            lineNumber: 93,
+            lineNumber: 311,
             columnNumber: 7
-        }, this);
-    }
-    const sizeKb = (doc.size / 1024).toFixed(1);
-    return /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-        className: "p-6 max-w-6xl mx-auto space-y-4",
-        children: [
-            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                className: "flex items-center justify-between gap-3",
-                children: [
-                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                        children: [
-                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
-                                onClick: ()=>router.push('/admin/uploads'),
-                                className: "text-xs text-slate-400 hover:text-emerald-400 mb-1",
-                                children: "← Back to COA uploads"
-                            }, void 0, false, {
-                                fileName: "[project]/pages/admin/uploads/[id].tsx",
-                                lineNumber: 112,
-                                columnNumber: 11
-                            }, this),
-                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("h1", {
-                                className: "text-2xl font-semibold text-slate-100",
-                                children: [
-                                    "COA #",
-                                    doc.id
-                                ]
-                            }, void 0, true, {
-                                fileName: "[project]/pages/admin/uploads/[id].tsx",
-                                lineNumber: 118,
-                                columnNumber: 11
-                            }, this),
-                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
-                                className: "text-sm text-slate-400",
-                                children: [
-                                    doc.fileName,
-                                    ' ',
-                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
-                                        className: "text-slate-600",
-                                        children: [
-                                            "(",
-                                            sizeKb,
-                                            " KB · ",
-                                            doc.mimeType,
-                                            ")"
-                                        ]
-                                    }, void 0, true, {
-                                        fileName: "[project]/pages/admin/uploads/[id].tsx",
-                                        lineNumber: 123,
-                                        columnNumber: 13
-                                    }, this)
-                                ]
-                            }, void 0, true, {
-                                fileName: "[project]/pages/admin/uploads/[id].tsx",
-                                lineNumber: 121,
-                                columnNumber: 11
-                            }, this)
-                        ]
-                    }, void 0, true, {
-                        fileName: "[project]/pages/admin/uploads/[id].tsx",
-                        lineNumber: 111,
-                        columnNumber: 9
-                    }, this),
-                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                        className: "flex flex-col items-end gap-1",
-                        children: [
-                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
-                                className: "text-[11px] text-slate-500 font-mono break-all",
-                                children: [
-                                    "SHA256: ",
-                                    doc.sha256
-                                ]
-                            }, void 0, true, {
-                                fileName: "[project]/pages/admin/uploads/[id].tsx",
-                                lineNumber: 129,
-                                columnNumber: 11
-                            }, this),
-                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
-                                className: `px-2 py-1 rounded-full text-[11px] border ${doc.verified ? 'border-emerald-500 text-emerald-300' : 'border-slate-600 text-slate-300'}`,
-                                children: doc.verified ? 'Verified' : 'Unverified'
-                            }, void 0, false, {
-                                fileName: "[project]/pages/admin/uploads/[id].tsx",
-                                lineNumber: 132,
-                                columnNumber: 11
-                            }, this)
-                        ]
-                    }, void 0, true, {
-                        fileName: "[project]/pages/admin/uploads/[id].tsx",
-                        lineNumber: 128,
-                        columnNumber: 9
-                    }, this)
-                ]
-            }, void 0, true, {
-                fileName: "[project]/pages/admin/uploads/[id].tsx",
-                lineNumber: 110,
-                columnNumber: 7
-            }, this),
-            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                className: "grid gap-4 md:grid-cols-[minmax(0,1.1fr)_minmax(0,1.7fr)]",
-                children: [
-                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                        className: "space-y-4",
-                        children: [
-                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                className: "rounded-xl border border-slate-800 bg-slate-900/70 p-4 text-sm",
-                                children: [
-                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("h2", {
-                                        className: "text-sm font-semibold text-slate-200 mb-2",
-                                        children: "Parsed metadata"
-                                    }, void 0, false, {
-                                        fileName: "[project]/pages/admin/uploads/[id].tsx",
-                                        lineNumber: 149,
-                                        columnNumber: 13
-                                    }, this),
-                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                        className: "grid gap-2 text-xs",
-                                        children: [
-                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                                children: [
-                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                                        className: "text-slate-400",
-                                                        children: "Batch code"
-                                                    }, void 0, false, {
-                                                        fileName: "[project]/pages/admin/uploads/[id].tsx",
-                                                        lineNumber: 154,
-                                                        columnNumber: 17
-                                                    }, this),
-                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                                        className: "text-slate-100",
-                                                        children: doc.batchCode || /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
-                                                            className: "text-slate-500",
-                                                            children: "Not detected"
-                                                        }, void 0, false, {
-                                                            fileName: "[project]/pages/admin/uploads/[id].tsx",
-                                                            lineNumber: 157,
-                                                            columnNumber: 21
-                                                        }, this)
-                                                    }, void 0, false, {
-                                                        fileName: "[project]/pages/admin/uploads/[id].tsx",
-                                                        lineNumber: 155,
-                                                        columnNumber: 17
-                                                    }, this)
-                                                ]
-                                            }, void 0, true, {
-                                                fileName: "[project]/pages/admin/uploads/[id].tsx",
-                                                lineNumber: 153,
-                                                columnNumber: 15
-                                            }, this),
-                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                                children: [
-                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                                        className: "text-slate-400",
-                                                        children: "Lab name"
-                                                    }, void 0, false, {
-                                                        fileName: "[project]/pages/admin/uploads/[id].tsx",
-                                                        lineNumber: 162,
-                                                        columnNumber: 17
-                                                    }, this),
-                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                                        className: "text-slate-100",
-                                                        children: doc.labName || /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
-                                                            className: "text-slate-500",
-                                                            children: "Not detected"
-                                                        }, void 0, false, {
-                                                            fileName: "[project]/pages/admin/uploads/[id].tsx",
-                                                            lineNumber: 165,
-                                                            columnNumber: 21
-                                                        }, this)
-                                                    }, void 0, false, {
-                                                        fileName: "[project]/pages/admin/uploads/[id].tsx",
-                                                        lineNumber: 163,
-                                                        columnNumber: 17
-                                                    }, this)
-                                                ]
-                                            }, void 0, true, {
-                                                fileName: "[project]/pages/admin/uploads/[id].tsx",
-                                                lineNumber: 161,
-                                                columnNumber: 15
-                                            }, this),
-                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                                children: [
-                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                                        className: "text-slate-400",
-                                                        children: "Uploaded"
-                                                    }, void 0, false, {
-                                                        fileName: "[project]/pages/admin/uploads/[id].tsx",
-                                                        lineNumber: 170,
-                                                        columnNumber: 17
-                                                    }, this),
-                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                                        className: "text-slate-100",
-                                                        children: new Date(doc.createdAt).toLocaleString()
-                                                    }, void 0, false, {
-                                                        fileName: "[project]/pages/admin/uploads/[id].tsx",
-                                                        lineNumber: 171,
-                                                        columnNumber: 17
-                                                    }, this)
-                                                ]
-                                            }, void 0, true, {
-                                                fileName: "[project]/pages/admin/uploads/[id].tsx",
-                                                lineNumber: 169,
-                                                columnNumber: 15
-                                            }, this),
-                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                                children: [
-                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                                        className: "text-slate-400",
-                                                        children: "File path (backend)"
-                                                    }, void 0, false, {
-                                                        fileName: "[project]/pages/admin/uploads/[id].tsx",
-                                                        lineNumber: 176,
-                                                        columnNumber: 17
-                                                    }, this),
-                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                                        className: "text-[11px] text-slate-500 break-all",
-                                                        children: doc.filePath || 'Not stored on disk (in-memory upload)'
-                                                    }, void 0, false, {
-                                                        fileName: "[project]/pages/admin/uploads/[id].tsx",
-                                                        lineNumber: 177,
-                                                        columnNumber: 17
-                                                    }, this)
-                                                ]
-                                            }, void 0, true, {
-                                                fileName: "[project]/pages/admin/uploads/[id].tsx",
-                                                lineNumber: 175,
-                                                columnNumber: 15
-                                            }, this)
-                                        ]
-                                    }, void 0, true, {
-                                        fileName: "[project]/pages/admin/uploads/[id].tsx",
-                                        lineNumber: 152,
-                                        columnNumber: 13
-                                    }, this)
-                                ]
-                            }, void 0, true, {
-                                fileName: "[project]/pages/admin/uploads/[id].tsx",
-                                lineNumber: 148,
-                                columnNumber: 11
-                            }, this),
-                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                className: "rounded-xl border border-slate-800 bg-slate-900/70 p-4 text-sm",
-                                children: [
-                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("h2", {
-                                        className: "text-sm font-semibold text-slate-200 mb-2",
-                                        children: "Linked lab result"
-                                    }, void 0, false, {
-                                        fileName: "[project]/pages/admin/uploads/[id].tsx",
-                                        lineNumber: 186,
-                                        columnNumber: 13
-                                    }, this),
-                                    !doc.labResult ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                        className: "text-xs text-slate-500",
-                                        children: "No LabResult record linked to this COA yet."
-                                    }, void 0, false, {
-                                        fileName: "[project]/pages/admin/uploads/[id].tsx",
-                                        lineNumber: 190,
-                                        columnNumber: 15
-                                    }, this) : /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                        className: "space-y-2 text-xs",
-                                        children: [
-                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                                className: "flex items-center justify-between",
-                                                children: [
-                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                                        className: "text-slate-200",
-                                                        children: [
-                                                            "LabResult #",
-                                                            doc.labResult.id
-                                                        ]
-                                                    }, void 0, true, {
-                                                        fileName: "[project]/pages/admin/uploads/[id].tsx",
-                                                        lineNumber: 196,
-                                                        columnNumber: 19
-                                                    }, this),
-                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                                        className: "text-slate-500",
-                                                        children: new Date(doc.labResult.createdAt).toLocaleString()
-                                                    }, void 0, false, {
-                                                        fileName: "[project]/pages/admin/uploads/[id].tsx",
-                                                        lineNumber: 199,
-                                                        columnNumber: 19
-                                                    }, this)
-                                                ]
-                                            }, void 0, true, {
-                                                fileName: "[project]/pages/admin/uploads/[id].tsx",
-                                                lineNumber: 195,
-                                                columnNumber: 17
-                                            }, this),
-                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                                className: "grid gap-2 grid-cols-2",
-                                                children: [
-                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                                        children: [
-                                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                                                className: "text-slate-400",
-                                                                children: "THC %"
-                                                            }, void 0, false, {
-                                                                fileName: "[project]/pages/admin/uploads/[id].tsx",
-                                                                lineNumber: 205,
-                                                                columnNumber: 21
-                                                            }, this),
-                                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                                                className: "text-slate-100",
-                                                                children: doc.labResult.thcPercent != null ? `${doc.labResult.thcPercent.toFixed(2)}%` : '—'
-                                                            }, void 0, false, {
-                                                                fileName: "[project]/pages/admin/uploads/[id].tsx",
-                                                                lineNumber: 206,
-                                                                columnNumber: 21
-                                                            }, this)
-                                                        ]
-                                                    }, void 0, true, {
-                                                        fileName: "[project]/pages/admin/uploads/[id].tsx",
-                                                        lineNumber: 204,
-                                                        columnNumber: 19
-                                                    }, this),
-                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                                        children: [
-                                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                                                className: "text-slate-400",
-                                                                children: "CBD %"
-                                                            }, void 0, false, {
-                                                                fileName: "[project]/pages/admin/uploads/[id].tsx",
-                                                                lineNumber: 213,
-                                                                columnNumber: 21
-                                                            }, this),
-                                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                                                className: "text-slate-100",
-                                                                children: doc.labResult.cbdPercent != null ? `${doc.labResult.cbdPercent.toFixed(2)}%` : '—'
-                                                            }, void 0, false, {
-                                                                fileName: "[project]/pages/admin/uploads/[id].tsx",
-                                                                lineNumber: 214,
-                                                                columnNumber: 21
-                                                            }, this)
-                                                        ]
-                                                    }, void 0, true, {
-                                                        fileName: "[project]/pages/admin/uploads/[id].tsx",
-                                                        lineNumber: 212,
-                                                        columnNumber: 19
-                                                    }, this),
-                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                                        children: [
-                                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                                                className: "text-slate-400",
-                                                                children: "Total cannabinoids %"
-                                                            }, void 0, false, {
-                                                                fileName: "[project]/pages/admin/uploads/[id].tsx",
-                                                                lineNumber: 221,
-                                                                columnNumber: 21
-                                                            }, this),
-                                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                                                className: "text-slate-100",
-                                                                children: doc.labResult.totalCannabinoidsPercent != null ? `${doc.labResult.totalCannabinoidsPercent.toFixed(2)}%` : '—'
-                                                            }, void 0, false, {
-                                                                fileName: "[project]/pages/admin/uploads/[id].tsx",
-                                                                lineNumber: 222,
-                                                                columnNumber: 21
-                                                            }, this)
-                                                        ]
-                                                    }, void 0, true, {
-                                                        fileName: "[project]/pages/admin/uploads/[id].tsx",
-                                                        lineNumber: 220,
-                                                        columnNumber: 19
-                                                    }, this),
-                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                                        children: [
-                                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                                                className: "text-slate-400",
-                                                                children: "Overall result"
-                                                            }, void 0, false, {
-                                                                fileName: "[project]/pages/admin/uploads/[id].tsx",
-                                                                lineNumber: 229,
-                                                                columnNumber: 21
-                                                            }, this),
-                                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                                                className: "text-slate-100",
-                                                                children: doc.labResult.passed == null ? 'Unknown' : doc.labResult.passed ? 'Pass' : 'Fail'
-                                                            }, void 0, false, {
-                                                                fileName: "[project]/pages/admin/uploads/[id].tsx",
-                                                                lineNumber: 230,
-                                                                columnNumber: 21
-                                                            }, this)
-                                                        ]
-                                                    }, void 0, true, {
-                                                        fileName: "[project]/pages/admin/uploads/[id].tsx",
-                                                        lineNumber: 228,
-                                                        columnNumber: 19
-                                                    }, this)
-                                                ]
-                                            }, void 0, true, {
-                                                fileName: "[project]/pages/admin/uploads/[id].tsx",
-                                                lineNumber: 203,
-                                                columnNumber: 17
-                                            }, this),
-                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                                className: "text-[11px] text-slate-500",
-                                                children: [
-                                                    "Batch link:",
-                                                    ' ',
-                                                    doc.labResult.batchId ? `Batch #${doc.labResult.batchId}` : 'not linked'
-                                                ]
-                                            }, void 0, true, {
-                                                fileName: "[project]/pages/admin/uploads/[id].tsx",
-                                                lineNumber: 239,
-                                                columnNumber: 17
-                                            }, this)
-                                        ]
-                                    }, void 0, true, {
-                                        fileName: "[project]/pages/admin/uploads/[id].tsx",
-                                        lineNumber: 194,
-                                        columnNumber: 15
-                                    }, this)
-                                ]
-                            }, void 0, true, {
-                                fileName: "[project]/pages/admin/uploads/[id].tsx",
-                                lineNumber: 185,
-                                columnNumber: 11
-                            }, this)
-                        ]
-                    }, void 0, true, {
-                        fileName: "[project]/pages/admin/uploads/[id].tsx",
-                        lineNumber: 147,
-                        columnNumber: 9
-                    }, this),
-                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                        className: "rounded-xl border border-slate-800 bg-slate-900/70 p-4 flex flex-col",
-                        children: [
-                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                className: "flex items-center justify-between mb-2",
-                                children: [
-                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("h2", {
-                                        className: "text-sm font-semibold text-slate-200",
-                                        children: "Raw extracted text"
-                                    }, void 0, false, {
-                                        fileName: "[project]/pages/admin/uploads/[id].tsx",
-                                        lineNumber: 253,
-                                        columnNumber: 13
-                                    }, this),
-                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
-                                        className: "text-[11px] text-slate-500",
-                                        children: "Use this to refine per-lab parsing rules."
-                                    }, void 0, false, {
-                                        fileName: "[project]/pages/admin/uploads/[id].tsx",
-                                        lineNumber: 256,
-                                        columnNumber: 13
-                                    }, this)
-                                ]
-                            }, void 0, true, {
-                                fileName: "[project]/pages/admin/uploads/[id].tsx",
-                                lineNumber: 252,
-                                columnNumber: 11
-                            }, this),
-                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                className: "flex-1 rounded-md border border-slate-800 bg-slate-950 text-[11px] text-slate-200 p-3 overflow-auto whitespace-pre-wrap",
-                                children: doc.extractedText ? doc.extractedText : 'No extracted text stored for this COA.'
-                            }, void 0, false, {
-                                fileName: "[project]/pages/admin/uploads/[id].tsx",
-                                lineNumber: 260,
-                                columnNumber: 11
-                            }, this)
-                        ]
-                    }, void 0, true, {
-                        fileName: "[project]/pages/admin/uploads/[id].tsx",
-                        lineNumber: 251,
-                        columnNumber: 9
-                    }, this)
-                ]
-            }, void 0, true, {
-                fileName: "[project]/pages/admin/uploads/[id].tsx",
-                lineNumber: 145,
-                columnNumber: 7
-            }, this)
-        ]
-    }, void 0, true, {
+        }, this)
+    }, void 0, false, {
         fileName: "[project]/pages/admin/uploads/[id].tsx",
-        lineNumber: 108,
+        lineNumber: 310,
         columnNumber: 5
     }, this);
 }
-_s(AdminUploadFullDebug, "bmo7B+UqaK9wgEeDlsjhKtfcvE8=", false, function() {
+_s(AdminUploadDetailPage, "ExvMhFmkJReApwxfbFRGBT2R7fk=", false, function() {
     return [
-        __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$router$2e$js__$5b$client$5d$__$28$ecmascript$29$__["useRouter"],
-        __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2d$auth$2f$react$2f$index$2e$js__$5b$client$5d$__$28$ecmascript$29$__["useSession"]
+        __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$router$2e$js__$5b$client$5d$__$28$ecmascript$29$__["useRouter"]
     ];
 });
-_c = AdminUploadFullDebug;
+_c = AdminUploadDetailPage;
 var _c;
-__turbopack_context__.k.register(_c, "AdminUploadFullDebug");
+__turbopack_context__.k.register(_c, "AdminUploadDetailPage");
 if (typeof globalThis.$RefreshHelpers$ === 'object' && globalThis.$RefreshHelpers !== null) {
     __turbopack_context__.k.registerExports(__turbopack_context__.m, globalThis.$RefreshHelpers$);
 }

@@ -1,47 +1,39 @@
-import dynamic from 'next/dynamic';
+// pages/admin/index.tsx
+import { useSession, signIn } from 'next-auth/react';
+import AdminStateExplorer from '../../components/AdminStateExplorer';
 
-// --- CRITICAL FIX: Dynamic Import with ssr: false ---
-// This tells Next.js to only load the Map component in the browser environment,
-// bypassing the server's inability to handle Leaflet's dependencies (like 'window').
-const DynamicMap = dynamic(
-  () => import('../../components/Map'), 
-  {
-    ssr: false, 
-    loading: () => (
-      <div className="flex justify-center items-center h-96 w-full bg-gray-50 rounded-lg">
-        <p className="text-lg text-gray-500 animate-pulse">
-          🛰️ Loading Interactive Map...
-        </p>
-      </div>
-    ), 
-  }
-);
+export default function AdminHome() {
+  const { data: session, status } = useSession();
 
-// We will assume you have a standard layout for admin pages, 
-// but since you didn't provide AdminLayout, we'll just use the main content.
-
-export default function AdminStatesPage() {
-  return (
-    <div className="min-h-screen p-6 bg-gray-50">
-      <div className="max-w-7xl mx-auto">
-        <h1 className="text-3xl font-bold text-gray-900 mb-2">
-          Administrative State Overview
-        </h1>
-        <p className="text-gray-500 mb-8">
-          Interactive map for visualizing and managing state-level data.
-        </p>
-        
-        {/* Render the dynamically imported map */}
-        <DynamicMap />
-
-        <div className="mt-8 bg-white p-6 rounded-lg shadow">
-            <h2 className="text-xl font-semibold mb-4">State Data Table (Placeholder)</h2>
-            <p className="text-gray-600">
-                Data tables or other administrative controls for the states will appear here.
-                This area confirms the rest of your page is loading correctly below the map.
-            </p>
+  if (status === 'loading') {
+    return (
+      <div className="flex min-h-screen items-center justify-center bg-slate-950 text-slate-100">
+        <div className="rounded-2xl border border-slate-800 bg-slate-900/70 px-4 py-3 text-sm">
+          Checking your session…
         </div>
       </div>
-    </div>
-  );
+    );
+  }
+
+  if (!session) {
+    return (
+      <div className="flex min-h-screen items-center justify-center bg-slate-950 text-slate-100">
+        <div className="flex flex-col gap-3 rounded-2xl border border-slate-800 bg-slate-900/70 px-5 py-4 text-sm max-w-sm">
+          <h1 className="text-lg font-semibold">Sign in to access CartFax Atlas</h1>
+          <p className="text-slate-400 text-xs">
+            You&apos;ll need an authorized account to access admin tools, COA uploads, and
+            the full batch explorer. Guests can still view the public atlas at the main homepage.
+          </p>
+          <button
+            onClick={() => signIn()}
+            className="mt-1 inline-flex items-center justify-center rounded-lg bg-sky-500 px-3 py-1.5 text-xs font-medium text-white hover:bg-sky-400"
+          >
+            Sign in
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  return <AdminStateExplorer session={session} />;
 }
