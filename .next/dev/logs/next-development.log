@@ -1,8 +1,8 @@
-[00:00:00.694] Server  LOG      ✓ Ready in 446ms
-[00:00:04.924] Browser WARN    THREE.Material: parameter 'map' has value of undefined.
-[00:00:04.924] Browser WARN    THREE.Material: parameter 'map' has value of undefined.
-[00:00:04.924] Browser WARN    THREE.Material: parameter 'map' has value of undefined.
-[00:00:04.924] Browser ERROR   Warning: Failed %s type: %s%s prop Invalid prop `globeMaterial` of type `function` supplied to `Globe`, expected `object`. 
+[00:00:00.847] Server  LOG      ✓ Ready in 549ms
+[00:00:07.818] Browser WARN    THREE.Material: parameter 'map' has value of undefined.
+[00:00:07.818] Browser WARN    THREE.Material: parameter 'map' has value of undefined.
+[00:00:07.818] Browser WARN    THREE.Material: parameter 'map' has value of undefined.
+[00:00:07.818] Browser ERROR   Warning: Failed %s type: %s%s prop Invalid prop `globeMaterial` of type `function` supplied to `Globe`, expected `object`. 
     at http://localhost:3000/_next/static/chunks/node_modules_c0b16311._.js:183:158
     at GlobeStates (http://localhost:3000/_next/static/chunks/components_GlobeStates_tsx_af8e3cfd._.js:52:24)
     at LoadableComponent (http://localhost:3000/_next/static/chunks/node_modules_next_dist_shared_lib_32e1cc00._.js:5501:9)
@@ -25,3 +25,37 @@
     at Container (http://localhost:3000/_next/static/chunks/node_modules_next_dist_client_3ede7da4._.js:3041:1)
     at AppContainer (http://localhost:3000/_next/static/chunks/node_modules_next_dist_client_3ede7da4._.js:3140:25)
     at Root (http://localhost:3000/_next/static/chunks/node_modules_next_dist_client_3ede7da4._.js:3348:17)
+[00:05:37.845] Server  LOG      ✓ Compiled in 45ms
+[00:05:39.289] Browser WARN    THREE.Material: parameter 'map' has value of undefined.
+[00:05:39.289] Browser WARN    THREE.Material: parameter 'map' has value of undefined.
+[00:05:39.289] Browser WARN    THREE.Material: parameter 'map' has value of undefined.
+[00:05:49.612] Browser WARN    THREE.Material: parameter 'map' has value of undefined.
+[00:05:49.612] Browser WARN    THREE.Material: parameter 'map' has value of undefined.
+[00:05:49.612] Browser WARN    THREE.Material: parameter 'map' has value of undefined.
+[00:05:49.612] Browser ERROR   Warning: Failed %s type: %s%s prop Invalid prop `globeMaterial` of type `function` supplied to `Globe`, expected `object`. 
+    at http://localhost:3000/_next/static/chunks/node_modules_c0b16311._.js:183:158
+    at GlobeStates (http://localhost:3000/_next/static/chunks/components_GlobeStates_tsx_af8e3cfd._.js:52:24)
+    at LoadableComponent (http://localhost:3000/_next/static/chunks/node_modules_next_dist_shared_lib_32e1cc00._.js:5501:9)
+    at div
+    at div
+    at div
+    at div
+    at div
+    at main
+    at AdminStateExplorer (http://localhost:3000/_next/static/chunks/%5Broot-of-the-server%5D__8bee4b01._.js:849:172)
+    at Home (http://localhost:3000/_next/static/chunks/%5Broot-of-the-server%5D__8bee4b01._.js:1465:188)
+    at div
+    at main
+    at div
+    at Layout (http://localhost:3000/_next/static/chunks/%5Broot-of-the-server%5D__4dd6c99b._.js:480:19)
+    at SessionProvider (http://localhost:3000/_next/static/chunks/node_modules_364a06ad._.js:2126:26)
+    at App (http://localhost:3000/_next/static/chunks/%5Broot-of-the-server%5D__4dd6c99b._.js:687:16)
+    at PathnameContextProviderAdapter (http://localhost:3000/_next/static/chunks/node_modules_next_dist_shared_lib_4025f6b7._.js:5052:43)
+    at PagesDevOverlayErrorBoundary (http://localhost:3000/_next/static/chunks/node_modules_next_dist_6024eba3._.js:1142:9)
+    at PagesDevOverlayBridge (http://localhost:3000/_next/static/chunks/node_modules_next_dist_6024eba3._.js:1919:34)
+    at Container (http://localhost:3000/_next/static/chunks/node_modules_next_dist_client_3ede7da4._.js:3041:1)
+    at AppContainer (http://localhost:3000/_next/static/chunks/node_modules_next_dist_client_3ede7da4._.js:3140:25)
+    at Root (http://localhost:3000/_next/static/chunks/node_modules_next_dist_client_3ede7da4._.js:3348:17)
+[00:20:52.886] Browser WARN    THREE.Material: parameter 'map' has value of undefined.
+[00:20:52.886] Browser WARN    THREE.Material: parameter 'map' has value of undefined.
+[00:20:52.886] Browser WARN    THREE.Material: parameter 'map' has value of undefined.

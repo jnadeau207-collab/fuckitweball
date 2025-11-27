@@ -2,6 +2,9 @@ self.__BUILD_MANIFEST = {
   "/": [
     "static/chunks/pages/index.js"
   ],
+  "/admin": [
+    "static/chunks/pages/admin.js"
+  ],
   "__rewrites": {
     "afterFiles": [],
     "beforeFiles": [],
@@ -32,8 +35,7 @@ self.__BUILD_MANIFEST = {
     "/api/admin/lab-results/[id]",
     "/api/admin/register-upload",
     "/api/admin/state-summary",
-    "/api/admin/states/[code].ts",
-    "/api/admin/states/[stateCode]",
+    "/api/admin/states/[code]",
     "/api/admin/uploads",
     "/api/admin/uploads/[id]",
     "/api/algolia/reindex",
