@@ -2,7 +2,19 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Custom global styling */
+/* Global background + text color overrides so the whole app sits on white */
+
+html,
 body {
-  @apply bg-slate-950 text-slate-50;
+  min-height: 100%;
+  background-color: #ffffff !important;
+  color: #020617;
+}
+
+/* If any component still uses dark Tailwind backgrounds, force them to white */
+
+.bg-slate-950,
+.bg-slate-900 {
+  background-color: #ffffff !important;
+  color: #020617 !important;
 }

@@ -25,10 +25,12 @@
     "pdf-parse": "^1.1.4",
     "react": "18.2.0",
     "react-dom": "18.2.0",
+    "react-globe.gl": "^2.37.0",
     "react-leaflet": "^4.2.1",
-    "react-simple-maps": "^3.0.0",
+    "react-simple-maps": "^1.0.0",
     "swr": "^2.1.0",
-    "three": "^0.181.2"
+    "three": "^0.181.2",
+    "topojson-client": "^3.1.0"
   },
   "devDependencies": {
     "@types/bcrypt": "^6.0.0",

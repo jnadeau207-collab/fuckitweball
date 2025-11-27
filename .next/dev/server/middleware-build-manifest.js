@@ -1,19 +1,19 @@
 globalThis.__BUILD_MANIFEST = {
   "pages": {
     "/": [
-      "static/chunks/[root-of-the-server]__8fc30a21._.js",
+      "static/chunks/components_GlobeStates_tsx_299a9509._.js",
       "static/chunks/node_modules_next_dist_compiled_8ca6b690._.js",
-      "static/chunks/node_modules_next_dist_shared_lib_4025f6b7._.js",
-      "static/chunks/node_modules_next_dist_client_3ede7da4._.js",
-      "static/chunks/node_modules_next_dist_7fdbac9b._.js",
-      "static/chunks/node_modules_next_link_207af988.js",
+      "static/chunks/node_modules_next_dist_shared_lib_7dd99361._.js",
+      "static/chunks/node_modules_next_dist_client_d0aa886c._.js",
+      "static/chunks/node_modules_next_dist_6024eba3._.js",
+      "static/chunks/node_modules_next_dynamic_d0f0e623.js",
       "static/chunks/node_modules_react_e3593a73._.js",
       "static/chunks/node_modules_react-dom_cjs_react-dom_development_2b5e0eb3.js",
       "static/chunks/node_modules_react-dom_8a8085df._.js",
-      "static/chunks/node_modules_d3-geo_src_0d53da9f._.js",
-      "static/chunks/node_modules_805480d0._.js",
+      "static/chunks/node_modules_364a06ad._.js",
+      "static/chunks/[root-of-the-server]__8fc30a21._.js",
       "static/chunks/pages_index_2da965e7._.js",
-      "static/chunks/turbopack-pages_index_aa61057b._.js"
+      "static/chunks/turbopack-pages_index_d8761cfe._.js"
     ],
     "/_app": [
       "static/chunks/node_modules_next_dist_compiled_8ca6b690._.js",
