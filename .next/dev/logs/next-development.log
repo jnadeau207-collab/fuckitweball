@@ -1,4 +1,3 @@
-[00:00:00.732] Server  LOG      ✓ Ready in 466ms
-[00:00:03.208] Browser WARN    THREE.Material: parameter 'map' has value of undefined.
-[00:01:34.780] Browser WARN    THREE.Material: parameter 'map' has value of undefined.
-[00:01:51.355] Browser WARN    THREE.Material: parameter 'map' has value of undefined.
+[00:00:00.686] Server  LOG      ✓ Ready in 438ms
+[00:00:04.235] Browser WARN    THREE.Color: Alpha component of rgba(56,189,248,0.85) will be ignored.
+[00:00:05.987] Browser WARN    THREE.Color: Alpha component of rgba(56,189,248,0.85) will be ignored.

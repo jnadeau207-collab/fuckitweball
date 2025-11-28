@@ -12,7 +12,7 @@
   "static/chunks/node_modules_three-globe_dist_three-globe_mjs_fd92cf78._.js",
   "static/chunks/node_modules_polished_dist_polished_esm_15caa0c0.js",
   "static/chunks/node_modules_c0b16311._.js",
-  "static/chunks/components_GlobeStates_tsx_af8e3cfd._.js"
+  "static/chunks/_fe4e737b._.js"
 ],
     source: "dynamic"
 });

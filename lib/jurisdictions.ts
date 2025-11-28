@@ -1,180 +1,67 @@
 // lib/jurisdictions.ts
-// Central place for "what jurisdiction are we in" + cannabis legal status
-// + high-level access rules. Backend will enforce the same rules server-side.
 
-export type RegionId =
+export type JurisdictionId =
   | 'unitedStates'
   | 'canada'
   | 'mexico'
-  | 'netherlands'
-  | 'uruguay'
-  | 'germany'
-  | 'southAfrica'
-  | 'luxembourg'
-  | 'malta'
-  | 'georgia';
+  | 'netherlands';
 
-export type LegalStatus =
-  | 'recreational'
-  | 'medical'
-  | 'mixed' // patchwork / partial
-  | 'tolerated'
-  | 'illegal';
-
-export type UserRole = 'guest' | 'consumer' | 'operator' | 'gov';
-
-export interface Jurisdiction {
-  id: RegionId;
-  name: string;
-  legalStatus: LegalStatus;
-  // This is the jurisdiction-level dataset you'll plug into your real backend.
-  apiNamespace: string; // e.g. 'us', 'ca', 'mx', 'de', etc.
-  defaultLandingAdminPath: string; // where admin "Open data tools" goes
-  notes?: string;
+export interface JurisdictionSpec {
+  id: JurisdictionId;
+  label: string;
+  code: string;
+  description: string;
+  region: string; // Added for filtering
+  focus: { lat: number; lng: number; altitude: number };
+  topoJsonUrl: string;
+  featureIdProp: string;
 }
 
-export const JURISDICTIONS: Record<RegionId, Jurisdiction> = {
-  unitedStates: {
+export const JURISDICTIONS: JurisdictionSpec[] = [
+  {
     id: 'unitedStates',
-    name: 'United States',
-    legalStatus: 'mixed', // state-by-state
-    apiNamespace: 'us',
-    defaultLandingAdminPath: '/admin/us',
-    notes: 'Patchwork of state-level laws; federal prohibition still in play.',
+    label: 'United States',
+    code: 'us',
+    description: 'Patchwork of state-level laws.',
+    region: 'north_america',
+    focus: { lat: 39, lng: -98, altitude: 1.7 },
+    topoJsonUrl: 'https://cdn.jsdelivr.net/npm/us-atlas@3/states-10m.json',
+    featureIdProp: 'name', 
   },
-  canada: {
+  {
     id: 'canada',
-    name: 'Canada',
-    legalStatus: 'recreational',
-    apiNamespace: 'ca',
-    defaultLandingAdminPath: '/admin/ca',
-    notes: 'National recreational and medical framework.',
+    label: 'Canada',
+    code: 'ca',
+    description: 'National recreational + medical framework.',
+    region: 'north_america',
+    focus: { lat: 56, lng: -106, altitude: 2.0 },
+    topoJsonUrl: 'https://raw.githubusercontent.com/deldersveld/topojson/master/countries/canada/canada-provinces.json',
+    featureIdProp: 'NAME_1', 
   },
-  mexico: {
+  {
     id: 'mexico',
-    name: 'Mexico',
-    legalStatus: 'mixed',
-    apiNamespace: 'mx',
-    defaultLandingAdminPath: '/admin/mx',
-    notes:
-      'Supreme Court rulings enabling personal use; implementation is evolving.',
+    label: 'Mexico',
+    code: 'mx',
+    description: 'Federal reforms in motion.',
+    region: 'north_america',
+    focus: { lat: 23, lng: -102, altitude: 1.9 },
+    topoJsonUrl: 'https://raw.githubusercontent.com/deldersveld/topojson/master/countries/mexico/mexico-states.json',
+    featureIdProp: 'NAME_1',
   },
-  netherlands: {
+  {
     id: 'netherlands',
-    name: 'Netherlands',
-    legalStatus: 'tolerated',
-    apiNamespace: 'nl',
-    defaultLandingAdminPath: '/admin/nl',
-    notes:
-      'Famous for tolerance and coffeeshops, but technically a controlled substance.',
+    label: 'Netherlands',
+    code: 'nl',
+    description: 'Tolerated retail model with pilots.',
+    region: 'europe',
+    focus: { lat: 52.3, lng: 5.3, altitude: 4.0 },
+    topoJsonUrl: 'https://raw.githubusercontent.com/deldersveld/topojson/master/countries/netherlands/nl-provinces.json',
+    featureIdProp: 'NAME_1',
   },
-  uruguay: {
-    id: 'uruguay',
-    name: 'Uruguay',
-    legalStatus: 'recreational',
-    apiNamespace: 'uy',
-    defaultLandingAdminPath: '/admin/uy',
-    notes: 'First country to fully legalize recreational cannabis.',
-  },
-  germany: {
-    id: 'germany',
-    name: 'Germany',
-    legalStatus: 'recreational',
-    apiNamespace: 'de',
-    defaultLandingAdminPath: '/admin/de',
-    notes:
-      'Personal use and home grow legalized with non-profit social clubs; commercial retail still restricted.',
-  },
-  southAfrica: {
-    id: 'southAfrica',
-    name: 'South Africa',
-    legalStatus: 'recreational',
-    apiNamespace: 'za',
-    defaultLandingAdminPath: '/admin/za',
-    notes:
-      'Private use and cultivation legalized; commercial sale is still prohibited.',
-  },
-  luxembourg: {
-    id: 'luxembourg',
-    name: 'Luxembourg',
-    legalStatus: 'recreational',
-    apiNamespace: 'lu',
-    defaultLandingAdminPath: '/admin/lu',
-    notes: 'Private home grow and use legalized; public use and sales limited.',
-  },
-  malta: {
-    id: 'malta',
-    name: 'Malta',
-    legalStatus: 'recreational',
-    apiNamespace: 'mt',
-    defaultLandingAdminPath: '/admin/mt',
-    notes:
-      'First EU country to legalize recreational use; non-profit clubs allowed.',
-  },
-  georgia: {
-    id: 'georgia',
-    name: 'Georgia',
-    legalStatus: 'recreational',
-    apiNamespace: 'ge',
-    defaultLandingAdminPath: '/admin/ge',
-    notes: 'Private consumption legal; supply side remains restricted.',
-  },
-};
+];
 
-// Simple access model. Backend must enforce the same rules on every request.
-export interface AccessProfile {
-  canSeePII: boolean;
-  canSeeGovDashboards: boolean;
-  canSeeOperatorDashboards: boolean;
-  canSeeAggregatedAnalytics: boolean;
-}
+export const jurisdictionById: Record<JurisdictionId, JurisdictionSpec> =
+  Object.fromEntries(JURISDICTIONS.map((j) => [j.id, j]));
 
-// Baseline policy: you can tighten per-jurisdiction if needed.
-const BASE_ACCESS_BY_ROLE: Record<UserRole, AccessProfile> = {
-  guest: {
-    canSeePII: false,
-    canSeeGovDashboards: false,
-    canSeeOperatorDashboards: false,
-    canSeeAggregatedAnalytics: true,
-  },
-  consumer: {
-    canSeePII: false,
-    canSeeGovDashboards: false,
-    canSeeOperatorDashboards: false,
-    canSeeAggregatedAnalytics: true,
-  },
-  operator: {
-    canSeePII: true,
-    canSeeGovDashboards: false,
-    canSeeOperatorDashboards: true,
-    canSeeAggregatedAnalytics: true,
-  },
-  gov: {
-    canSeePII: true,
-    canSeeGovDashboards: true,
-    canSeeOperatorDashboards: true,
-    canSeeAggregatedAnalytics: true,
-  },
-};
-
-// Per-jurisdiction overrides (e.g. US gov users can’t see Canada gov).
-// Backend should enforce the same constraints.
-export function getAccessProfile(
-  jurisdiction: RegionId,
-  role: UserRole,
-): AccessProfile {
-  const base = BASE_ACCESS_BY_ROLE[role];
-
-  // Example of “US gov cannot see Canadian deep data” – tune as needed.
-  if (jurisdiction === 'canada' && role === 'gov') {
-    return {
-      ...base,
-      canSeeGovDashboards: false,
-      canSeeAggregatedAnalytics: true,
-      // canSeePII stays true or false depending on your privacy stance
-    };
-  }
-
-  // You can branch on other jurisdictions here as your rules harden.
-  return base;
-}
+// FIX: Export this so AdminStateExplorer can use it
+export const DEFAULT_JURISDICTION = JURISDICTIONS[0];
