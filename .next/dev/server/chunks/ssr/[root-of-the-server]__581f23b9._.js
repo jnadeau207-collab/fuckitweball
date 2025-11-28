@@ -86,9 +86,10 @@ const GlobeStates = ({ region, onStateSelect, onViewChange, onRegionChange })=>{
     const [worldPolygons, setWorldPolygons] = (0, __TURBOPACK__imported__module__$5b$externals$5d2f$react__$5b$external$5d$__$28$react$2c$__cjs$29$__["useState"])([]);
     const [hoverPoly, setHoverPoly] = (0, __TURBOPACK__imported__module__$5b$externals$5d2f$react__$5b$external$5d$__$28$react$2c$__cjs$29$__["useState"])(null);
     const [selectedStateId, setSelectedStateId] = (0, __TURBOPACK__imported__module__$5b$externals$5d2f$react__$5b$external$5d$__$28$react$2c$__cjs$29$__["useState"])(null);
-    const [stainlessTex, setStainlessTex] = (0, __TURBOPACK__imported__module__$5b$externals$5d2f$react__$5b$external$5d$__$28$react$2c$__cjs$29$__["useState"])(null);
-    const [steelTex, setSteelTex] = (0, __TURBOPACK__imported__module__$5b$externals$5d2f$react__$5b$external$5d$__$28$react$2c$__cjs$29$__["useState"])(null);
-    const [blueTex, setBlueTex] = (0, __TURBOPACK__imported__module__$5b$externals$5d2f$react__$5b$external$5d$__$28$react$2c$__cjs$29$__["useState"])(null);
+    // texture maps
+    const [envTex, setEnvTex] = (0, __TURBOPACK__imported__module__$5b$externals$5d2f$react__$5b$external$5d$__$28$react$2c$__cjs$29$__["useState"])(null);
+    const [stateMetalTex, setStateMetalTex] = (0, __TURBOPACK__imported__module__$5b$externals$5d2f$react__$5b$external$5d$__$28$react$2c$__cjs$29$__["useState"])(null);
+    const [countryMetalTex, setCountryMetalTex] = (0, __TURBOPACK__imported__module__$5b$externals$5d2f$react__$5b$external$5d$__$28$react$2c$__cjs$29$__["useState"])(null);
     const isUS = region === 'unitedStates';
     // --- helpers --------------------------------------------------------------
     const getStatePostal = (poly)=>{
@@ -138,17 +139,19 @@ const GlobeStates = ({ region, onStateSelect, onViewChange, onRegionChange })=>{
     // --- textures for materials -----------------------------------------------
     (0, __TURBOPACK__imported__module__$5b$externals$5d2f$react__$5b$external$5d$__$28$react$2c$__cjs$29$__["useEffect"])(()=>{
         const loader = new __TURBOPACK__imported__module__$5b$externals$5d2f$three__$5b$external$5d$__$28$three$2c$__esm_import$29$__["TextureLoader"]();
-        loader.load('/textures/stainless.jpg', (tex)=>{
+        loader.load('/textures/state-metal.jpg', (tex)=>{
             tex.wrapS = tex.wrapT = __TURBOPACK__imported__module__$5b$externals$5d2f$three__$5b$external$5d$__$28$three$2c$__esm_import$29$__["RepeatWrapping"];
-            setStainlessTex(tex);
+            tex.repeat.set(2.5, 2.5);
+            setStateMetalTex(tex);
         });
-        loader.load('/textures/steel.jpg', (tex)=>{
+        loader.load('/textures/country-metal.jpg', (tex)=>{
             tex.wrapS = tex.wrapT = __TURBOPACK__imported__module__$5b$externals$5d2f$three__$5b$external$5d$__$28$three$2c$__esm_import$29$__["RepeatWrapping"];
-            setSteelTex(tex);
+            tex.repeat.set(3, 3);
+            setCountryMetalTex(tex);
         });
-        loader.load('/textures/blue-metal.jpg', (tex)=>{
-            tex.wrapS = tex.wrapT = __TURBOPACK__imported__module__$5b$externals$5d2f$three__$5b$external$5d$__$28$three$2c$__esm_import$29$__["RepeatWrapping"];
-            setBlueTex(tex);
+        loader.load('/textures/globe-env.jpg', (tex)=>{
+            tex.mapping = __TURBOPACK__imported__module__$5b$externals$5d2f$three__$5b$external$5d$__$28$three$2c$__esm_import$29$__["EquirectangularReflectionMapping"];
+            setEnvTex(tex);
         });
     }, []);
     // --- focus camera on region -----------------------------------------------
@@ -161,20 +164,33 @@ const GlobeStates = ({ region, onStateSelect, onViewChange, onRegionChange })=>{
             altitude: focus.altitude
         }, 1000);
     }, [
-        region,
-        usPolygons
+        region
     ]);
+    // --- zoom feel / controls tuning ------------------------------------------
+    (0, __TURBOPACK__imported__module__$5b$externals$5d2f$react__$5b$external$5d$__$28$react$2c$__cjs$29$__["useEffect"])(()=>{
+        if (!globeRef.current) return;
+        const controls = globeRef.current.controls?.();
+        if (!controls) return;
+        // generous zoom range – avoids "tiny zoom after first click"
+        controls.minDistance = 140;
+        controls.maxDistance = 780;
+        controls.enableDamping = true;
+        controls.dampingFactor = 0.12;
+        controls.zoomSpeed = 0.9;
+    }, []);
     // --- altitude reporting ----------------------------------------------------
     (0, __TURBOPACK__imported__module__$5b$externals$5d2f$react__$5b$external$5d$__$28$react$2c$__cjs$29$__["useEffect"])(()=>{
         if (!globeRef.current || !onViewChange) return;
         const globe = globeRef.current;
+        const controls = globe.controls?.();
+        if (!controls || !controls.addEventListener) return;
         const handle = ()=>{
             const { altitude } = globe.pointOfView();
             onViewChange(altitude);
         };
-        globe.controls().addEventListener('change', handle);
+        controls.addEventListener('change', handle);
         return ()=>{
-            globe.controls().removeEventListener('change', handle);
+            controls.removeEventListener('change', handle);
         };
     }, [
         onViewChange
@@ -188,12 +204,12 @@ const GlobeStates = ({ region, onStateSelect, onViewChange, onRegionChange })=>{
         usPolygons
     ]);
     // --- explosion / altitude logic -------------------------------------------
-    const BASE_ALT_STATE = 0.015; // base extrusion for US states
-    const BASE_ALT_COUNTRY = 0.008; // base extrusion for countries
+    const BASE_ALT_STATE = 0.015;
+    const BASE_ALT_COUNTRY = 0.008;
     const BASE_ALT_OTHER = 0.004;
-    // toned down ~30% from the previous “max boom”
-    const EXTRA_SELECTED = 0.010;
-    const EXTRA_HOVER = 0.005;
+    // turned up slightly for more punch
+    const EXTRA_SELECTED = 0.015;
+    const EXTRA_HOVER = 0.008;
     const polygonAltitude = (poly)=>{
         if (isState(poly)) {
             const id = getStatePostal(poly);
@@ -212,106 +228,101 @@ const GlobeStates = ({ region, onStateSelect, onViewChange, onRegionChange })=>{
     // --- render ----------------------------------------------------------------
     return /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$externals$5d2f$react$2f$jsx$2d$dev$2d$runtime__$5b$external$5d$__$28$react$2f$jsx$2d$dev$2d$runtime$2c$__cjs$29$__["jsxDEV"])("div", {
         className: "h-full w-full",
-        children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$externals$5d2f$react$2f$jsx$2d$dev$2d$runtime__$5b$external$5d$__$28$react$2f$jsx$2d$dev$2d$runtime$2c$__cjs$29$__["jsxDEV"])("div", {
-            className: "h-full w-full",
-            children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$externals$5d2f$react$2f$jsx$2d$dev$2d$runtime__$5b$external$5d$__$28$react$2f$jsx$2d$dev$2d$runtime$2c$__cjs$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$externals$5d2f$react$2d$globe$2e$gl__$5b$external$5d$__$28$react$2d$globe$2e$gl$2c$__esm_import$29$__["default"], {
-                ref: globeRef,
-                backgroundColor: "rgba(0,0,0,1)",
-                animateIn: true,
-                hexPolygonResolution: 3,
-                hexPolygonMargin: 0.4,
-                globeMaterial: new __TURBOPACK__imported__module__$5b$externals$5d2f$three__$5b$external$5d$__$28$three$2c$__esm_import$29$__["MeshStandardMaterial"]({
-                    metalness: 0.85,
-                    roughness: 0.28,
-                    color: new __TURBOPACK__imported__module__$5b$externals$5d2f$three__$5b$external$5d$__$28$three$2c$__esm_import$29$__["Color"]('#020617'),
-                    envMap: stainlessTex ?? undefined,
-                    envMapIntensity: 0.9
-                }),
-                polygonsData: allPolygons,
-                polygonAltitude: polygonAltitude,
-                polygonCapMaterial: (poly)=>{
-                    // state caps: dark, glossy, not bright blue
-                    if (isState(poly)) {
-                        const id = getStatePostal(poly);
-                        const isSelected = id && selectedStateId && id === selectedStateId;
-                        const isHovered = hoverPoly === poly;
-                        const emissiveBase = new __TURBOPACK__imported__module__$5b$externals$5d2f$three__$5b$external$5d$__$28$three$2c$__esm_import$29$__["Color"]('#020617');
-                        const emissiveHighlight = new __TURBOPACK__imported__module__$5b$externals$5d2f$three__$5b$external$5d$__$28$three$2c$__esm_import$29$__["Color"]('#22c55e'); // olive-ish
-                        return new __TURBOPACK__imported__module__$5b$externals$5d2f$three__$5b$external$5d$__$28$three$2c$__esm_import$29$__["MeshStandardMaterial"]({
-                            metalness: 0.96,
-                            roughness: 0.26,
-                            color: new __TURBOPACK__imported__module__$5b$externals$5d2f$three__$5b$external$5d$__$28$three$2c$__esm_import$29$__["Color"]('#020617'),
-                            emissive: isHovered || isSelected ? emissiveHighlight : emissiveBase,
-                            emissiveIntensity: isHovered ? 0.4 : isSelected ? 0.25 : 0.16,
-                            envMap: steelTex ?? undefined,
-                            envMapIntensity: isHovered || isSelected ? 1.2 : 0.9
-                        });
-                    }
-                    // countries: subtle metallic band
-                    if (isCountry(poly)) {
-                        return new __TURBOPACK__imported__module__$5b$externals$5d2f$three__$5b$external$5d$__$28$three$2c$__esm_import$29$__["MeshStandardMaterial"]({
-                            metalness: 0.75,
-                            roughness: 0.35,
-                            color: new __TURBOPACK__imported__module__$5b$externals$5d2f$three__$5b$external$5d$__$28$three$2c$__esm_import$29$__["Color"]('#020617'),
-                            emissive: new __TURBOPACK__imported__module__$5b$externals$5d2f$three__$5b$external$5d$__$28$three$2c$__esm_import$29$__["Color"]('#020617'),
-                            emissiveIntensity: 0.18,
-                            envMap: blueTex ?? undefined,
-                            envMapIntensity: 0.7
-                        });
-                    }
+        children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$externals$5d2f$react$2f$jsx$2d$dev$2d$runtime__$5b$external$5d$__$28$react$2f$jsx$2d$dev$2d$runtime$2c$__cjs$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$externals$5d2f$react$2d$globe$2e$gl__$5b$external$5d$__$28$react$2d$globe$2e$gl$2c$__esm_import$29$__["default"], {
+            ref: globeRef,
+            backgroundColor: "rgba(0,0,0,1)",
+            animateIn: true,
+            hexPolygonResolution: 3,
+            hexPolygonMargin: 0.4,
+            globeMaterial: new __TURBOPACK__imported__module__$5b$externals$5d2f$three__$5b$external$5d$__$28$three$2c$__esm_import$29$__["MeshStandardMaterial"]({
+                metalness: 0.9,
+                roughness: 0.32,
+                color: new __TURBOPACK__imported__module__$5b$externals$5d2f$three__$5b$external$5d$__$28$three$2c$__esm_import$29$__["Color"]('#020617'),
+                envMap: envTex ?? undefined,
+                envMapIntensity: 0.85
+            }),
+            polygonsData: allPolygons,
+            polygonAltitude: polygonAltitude,
+            polygonCapMaterial: (poly)=>{
+                // US states: metallic tiles with green emissive lift
+                if (isState(poly)) {
+                    const id = getStatePostal(poly);
+                    const isSelected = id && selectedStateId && id === selectedStateId;
+                    const isHovered = hoverPoly === poly;
+                    const emissiveBase = new __TURBOPACK__imported__module__$5b$externals$5d2f$three__$5b$external$5d$__$28$three$2c$__esm_import$29$__["Color"]('#020617');
+                    const emissiveHighlight = new __TURBOPACK__imported__module__$5b$externals$5d2f$three__$5b$external$5d$__$28$three$2c$__esm_import$29$__["Color"]('#22c55e');
                     return new __TURBOPACK__imported__module__$5b$externals$5d2f$three__$5b$external$5d$__$28$three$2c$__esm_import$29$__["MeshStandardMaterial"]({
-                        metalness: 0.6,
-                        roughness: 0.4,
-                        color: new __TURBOPACK__imported__module__$5b$externals$5d2f$three__$5b$external$5d$__$28$three$2c$__esm_import$29$__["Color"]('#020617')
+                        metalness: 0.95,
+                        roughness: 0.22,
+                        color: new __TURBOPACK__imported__module__$5b$externals$5d2f$three__$5b$external$5d$__$28$three$2c$__esm_import$29$__["Color"]('#020617'),
+                        emissive: isHovered || isSelected ? emissiveHighlight : emissiveBase,
+                        emissiveIntensity: isHovered ? 0.55 : isSelected ? 0.36 : 0.18,
+                        map: stateMetalTex ?? undefined,
+                        envMap: envTex ?? undefined,
+                        envMapIntensity: isHovered || isSelected ? 1.3 : 0.9
                     });
-                },
-                // sides: olive backlight – shows mainly in gaps between states
-                polygonSideColor: (poly)=>isState(poly) ? 'rgba(34,197,94,0.85)' // olive/emerald glow in the seams
-                     : '#020617',
-                // border lines: very subtle, no neon blue outline
-                polygonStrokeColor: (poly)=>isState(poly) ? 'rgba(21,94,49,0.45)' : 'rgba(30,64,175,0.25)',
-                polygonLabel: (poly)=>isState(poly) ? `${poly.properties?.name ?? ''} (${poly.properties?.postal})` : poly.properties?.name ?? '',
-                polygonsTransitionDuration: 260,
-                polygonCapCurvatureResolution: 2,
-                onPolygonHover: (poly)=>setHoverPoly(poly),
-                onPolygonClick: (poly, event)=>{
-                    const name = poly.properties?.name ?? '';
-                    const clickCoords = event && typeof event.clientX === 'number' ? {
-                        x: event.clientX,
-                        y: event.clientY
-                    } : undefined;
-                    if (isState(poly)) {
-                        const id = getStatePostal(poly) ?? poly.id ?? '';
-                        setSelectedStateId(id || null);
-                        if (onStateSelect) {
-                            onStateSelect(id, name, clickCoords);
-                        }
-                        return;
+                }
+                // countries: subtle metallic band
+                if (isCountry(poly)) {
+                    return new __TURBOPACK__imported__module__$5b$externals$5d2f$three__$5b$external$5d$__$28$three$2c$__esm_import$29$__["MeshStandardMaterial"]({
+                        metalness: 0.8,
+                        roughness: 0.38,
+                        color: new __TURBOPACK__imported__module__$5b$externals$5d2f$three__$5b$external$5d$__$28$three$2c$__esm_import$29$__["Color"]('#020617'),
+                        emissive: new __TURBOPACK__imported__module__$5b$externals$5d2f$three__$5b$external$5d$__$28$three$2c$__esm_import$29$__["Color"]('#020617'),
+                        emissiveIntensity: 0.2,
+                        map: countryMetalTex ?? undefined,
+                        envMap: envTex ?? undefined,
+                        envMapIntensity: 0.75
+                    });
+                }
+                // everything else
+                return new __TURBOPACK__imported__module__$5b$externals$5d2f$three__$5b$external$5d$__$28$three$2c$__esm_import$29$__["MeshStandardMaterial"]({
+                    metalness: 0.6,
+                    roughness: 0.4,
+                    color: new __TURBOPACK__imported__module__$5b$externals$5d2f$three__$5b$external$5d$__$28$three$2c$__esm_import$29$__["Color"]('#020617'),
+                    envMap: envTex ?? undefined,
+                    envMapIntensity: 0.4
+                });
+            },
+            polygonSideColor: (poly)=>isState(poly) ? 'rgba(34,197,94,0.9)' : '#020617',
+            polygonStrokeColor: (poly)=>isState(poly) ? 'rgba(21,94,49,0.5)' : 'rgba(30,64,175,0.25)',
+            polygonLabel: (poly)=>isState(poly) ? `${poly.properties?.name ?? ''} (${poly.properties?.postal})` : poly.properties?.name ?? '',
+            polygonsTransitionDuration: 260,
+            polygonCapCurvatureResolution: 2,
+            onPolygonHover: (poly)=>setHoverPoly(poly),
+            onPolygonClick: (poly, event)=>{
+                const name = poly.properties?.name ?? '';
+                const clickCoords = event && typeof event.clientX === 'number' ? {
+                    x: event.clientX,
+                    y: event.clientY
+                } : undefined;
+                if (isState(poly)) {
+                    const id = getStatePostal(poly) ?? poly.id ?? '';
+                    setSelectedStateId(id || null);
+                    if (onStateSelect) {
+                        onStateSelect(id, name, clickCoords);
                     }
-                    if (isCountry(poly)) {
-                        const regionFromCountry = getCountryRegion(poly);
-                        if (regionFromCountry && onRegionChange) {
-                            onRegionChange(regionFromCountry);
-                        }
-                        if (onStateSelect) {
-                            const id = name || poly.id || '';
-                            onStateSelect(id, name, clickCoords);
-                        }
+                    return;
+                }
+                if (isCountry(poly)) {
+                    const regionFromCountry = getCountryRegion(poly);
+                    if (regionFromCountry && onRegionChange) {
+                        onRegionChange(regionFromCountry);
+                    }
+                    if (onStateSelect) {
+                        const id = name || poly.id || '';
+                        onStateSelect(id, name, clickCoords);
                     }
                 }
-            }, void 0, false, {
-                fileName: "[project]/components/GlobeStates.tsx",
-                lineNumber: 218,
-                columnNumber: 9
-            }, ("TURBOPACK compile-time value", void 0))
+            }
         }, void 0, false, {
             fileName: "[project]/components/GlobeStates.tsx",
-            lineNumber: 217,
+            lineNumber: 241,
             columnNumber: 7
         }, ("TURBOPACK compile-time value", void 0))
     }, void 0, false, {
         fileName: "[project]/components/GlobeStates.tsx",
-        lineNumber: 216,
+        lineNumber: 240,
         columnNumber: 5
     }, ("TURBOPACK compile-time value", void 0));
 };
