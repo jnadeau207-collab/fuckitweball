@@ -1,6 +1,0 @@
-{
-  "version": 3,
-  "sources": [],
-  "sections": [
-    {"offset": {"line": 4, "column": 0}, "map": {"version":3,"sources":["file:///C:/Users/Jesse/Documents/cartfax_complete_v2/pages/index.tsx"],"sourcesContent":["import React from 'react';\nimport dynamic from 'next/dynamic';\nimport Head from 'next/head';\n\n// Use dynamic import to prevent SSR errors from react-globe.gl dependency\nconst AdminStateExplorer = dynamic(() => import('../components/AdminStateExplorer'), {\n    ssr: false,\n    loading: () => <div className=\"h-screen w-full bg-black flex items-center justify-center text-slate-400\">Loading Cartfax Atlas...</div>,\n});\n\nexport default function Home() {\n    return (\n        <>\n            <Head>\n                <title>Cartfax: The Global Legal Cannabis Atlas</title>\n                <meta name=\"description\" content=\"A data-driven guide to legal cannabis jurisdictions, retailers, and batch results.\" />\n            </Head>\n            {/* The Explorer is the new application shell */}\n            <AdminStateExplorer />\n        </>\n    );\n}"],"names":[],"mappings":";;;;;AACA;AACA;;;;;AAEA,0EAA0E;AAC1E,MAAM,qBAAqB,IAAA,mIAAO,EAAC;;;;;;IAC/B,KAAK;IACL,SAAS,kBAAM,qKAAC;YAAI,WAAU;sBAA2E;;;;;;;AAG9F,SAAS;IACpB,qBACI;;0BACI,qKAAC,gIAAI;;kCACD,qKAAC;kCAAM;;;;;;kCACP,qKAAC;wBAAK,MAAK;wBAAc,SAAQ;;;;;;;;;;;;0BAGrC,qKAAC;;;;;;;AAGb"}}]
-}
