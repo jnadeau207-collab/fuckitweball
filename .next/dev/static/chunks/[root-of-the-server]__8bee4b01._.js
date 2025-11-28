@@ -528,6 +528,7 @@ var _s = __turbopack_context__.k.signature();
 ;
 ;
 ;
+// Globe is client-only
 const GlobeStates = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dynamic$2e$js__$5b$client$5d$__$28$ecmascript$29$__["default"])(()=>__turbopack_context__.A("[project]/components/GlobeStates.tsx [client] (ecmascript, next/dynamic entry, async loader)"), {
     loadableGenerated: {
         modules: [
@@ -540,13 +541,13 @@ const GlobeStates = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_mod
             children: "Loading 3D atlas…"
         }, void 0, false, {
             fileName: "[project]/components/AdminStateExplorer.tsx",
-            lineNumber: 11,
+            lineNumber: 15,
             columnNumber: 5
         }, ("TURBOPACK compile-time value", void 0))
 });
 _c = GlobeStates;
 // Regions available on the globe
-const regionLabels = [
+const REGION_LABELS = [
     {
         id: 'unitedStates',
         label: 'United States'
@@ -564,45 +565,11 @@ const regionLabels = [
         label: 'Netherlands'
     }
 ];
+// Simple helper for formatting numbers
 const formatNumber = (n)=>n.toLocaleString(undefined, {
         maximumFractionDigits: 0
     });
-// a small hand-picked set of "edge" states for quick hops
-const EDGE_STATES = [
-    {
-        id: 'CA',
-        name: 'California'
-    },
-    {
-        id: 'WA',
-        name: 'Washington'
-    },
-    {
-        id: 'AK',
-        name: 'Alaska'
-    },
-    {
-        id: 'HI',
-        name: 'Hawaii'
-    },
-    {
-        id: 'TX',
-        name: 'Texas'
-    },
-    {
-        id: 'FL',
-        name: 'Florida'
-    },
-    {
-        id: 'ME',
-        name: 'Maine'
-    },
-    {
-        id: 'NY',
-        name: 'New York'
-    }
-];
-// FIPS → postal abbreviation map so we can resolve snapshot keys
+// US FIPS → postal map so snapshot keys resolve from us-atlas ids
 const FIPS_TO_STATE_CODE = {
     '01': 'AL',
     '02': 'AK',
@@ -671,568 +638,486 @@ const resolveStateCode = (rawId)=>{
 const AdminStateExplorer = ()=>{
     _s();
     const [region, setRegion] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$index$2e$js__$5b$client$5d$__$28$ecmascript$29$__["useState"])('unitedStates');
-    const [selected, setSelected] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$index$2e$js__$5b$client$5d$__$28$ecmascript$29$__["useState"])({
+    const [viewAltitude, setViewAltitude] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$index$2e$js__$5b$client$5d$__$28$ecmascript$29$__["useState"])(null);
+    // region or subregion selection
+    const [selection, setSelection] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$index$2e$js__$5b$client$5d$__$28$ecmascript$29$__["useState"])({
+        kind: 'subregion',
+        regionId: 'unitedStates',
         id: 'CA',
         name: 'California'
     });
-    const [viewAltitude, setViewAltitude] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$index$2e$js__$5b$client$5d$__$28$ecmascript$29$__["useState"])(null);
-    // lock page scroll so zoom vs scroll never fight
-    (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$index$2e$js__$5b$client$5d$__$28$ecmascript$29$__["useEffect"])({
-        "AdminStateExplorer.useEffect": ()=>{
-            const html = document.documentElement;
-            const body = document.body;
-            const prevHtmlOverflow = html.style.overflow;
-            const prevBodyOverflow = body.style.overflow;
-            html.style.overflow = 'hidden';
-            body.style.overflow = 'hidden';
-            return ({
-                "AdminStateExplorer.useEffect": ()=>{
-                    html.style.overflow = prevHtmlOverflow;
-                    body.style.overflow = prevBodyOverflow;
-                }
-            })["AdminStateExplorer.useEffect"];
-        }
-    }["AdminStateExplorer.useEffect"], []);
-    const isUS = region === 'unitedStates';
-    const zoomedIn = viewAltitude !== null && viewAltitude < 1.7;
-    const displayStateCode = isUS ? resolveStateCode(selected.id) ?? String(selected.id ?? '') : String(selected.id ?? '');
-    const snapshotKey = isUS ? resolveStateCode(selected.id) : null;
+    const isUS = selection.regionId === 'unitedStates';
+    // For US, we key into STATE_SNAPSHOTS using postal
+    const snapshotKey = isUS && selection.kind === 'subregion' ? resolveStateCode(selection.id) : null;
     const activeSnapshot = snapshotKey && __TURBOPACK__imported__module__$5b$project$5d2f$lib$2f$stateSnapshots$2e$ts__$5b$client$5d$__$28$ecmascript$29$__["STATE_SNAPSHOTS"][snapshotKey] ? __TURBOPACK__imported__module__$5b$project$5d2f$lib$2f$stateSnapshots$2e$ts__$5b$client$5d$__$28$ecmascript$29$__["STATE_SNAPSHOTS"][snapshotKey] : null;
     const coveragePct = activeSnapshot?.coverageScore ?? 0;
     const fullCoaRate = activeSnapshot?.fullCoaRate ?? 0;
-    const detailTitle = activeSnapshot?.name || selected.name || (isUS ? 'United States of America' : 'Selected region');
-    const detailKind = isUS ? 'State snapshot' : 'Region snapshot';
-    const adminHref = snapshotKey ? `/admin?state=${snapshotKey}` : '/admin';
-    const handleRegionChange = (next)=>{
-        setRegion(next);
-        const label = regionLabels.find((r)=>r.id === next)?.label ?? null;
-        if (next === 'unitedStates') {
-            setSelected((prev)=>prev && prev.id ? prev : {
-                    id: 'CA',
-                    name: 'California'
-                });
-        } else {
-            setSelected({
-                id: next,
-                name: label
-            });
-        }
-    };
-    const handleStateSelectFromGlobe = (id, name)=>{
-        setSelected({
-            id,
-            name: name || null
-        });
-    };
-    const crumbScope = isUS ? 'US · States' : 'Global · Regions';
-    const crumbLine = selected.name ? `${displayStateCode} · ${selected.name} — metallic glass tiles punched out of a spinning globe.` : 'Drag, hover, and click the atlas to explore live coverage.';
-    // "far away" quick jump chips – just edge states, minus the current one
-    const farJumpStates = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$index$2e$js__$5b$client$5d$__$28$ecmascript$29$__["useMemo"])({
-        "AdminStateExplorer.useMemo[farJumpStates]": ()=>{
-            if (!isUS) return [];
-            const current = resolveStateCode(selected.id);
-            return EDGE_STATES.filter({
-                "AdminStateExplorer.useMemo[farJumpStates]": (s)=>s.id !== current
-            }["AdminStateExplorer.useMemo[farJumpStates]"]);
-        }
-    }["AdminStateExplorer.useMemo[farJumpStates]"], [
-        isUS,
-        selected.id
-    ]);
+    const regionLabel = REGION_LABELS.find((r)=>r.id === selection.regionId)?.label ?? selection.regionId;
+    const title = selection.kind === 'region' ? regionLabel : selection.name || regionLabel;
+    const detailKind = selection.kind === 'region' ? `${regionLabel} · jurisdiction snapshot` : selection.regionId === 'unitedStates' ? 'State snapshot' : 'Sub-jurisdiction snapshot';
+    const adminHref = selection.kind === 'subregion' && isUS && snapshotKey ? `/admin?region=${selection.regionId}&sub=${snapshotKey}` : `/admin?region=${selection.regionId}`;
+    const crumbScope = `${regionLabel.toUpperCase()} · JURISDICTION`;
+    const crumbLine = selection.kind === 'region' ? `${regionLabel} — drag, hover, and click the atlas to explore coverage in different legal regimes.` : `${selection.name} — metallic glass tiles punched out of a spinning globe.`;
+    const zoomedIn = viewAltitude !== null && viewAltitude < 1.6;
     return /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("main", {
-        className: "relative h-[calc(100vh-4rem)] overflow-hidden bg-black text-slate-50",
+        className: "flex min-h-screen flex-col bg-black text-slate-50",
         children: [
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                className: "absolute inset-0",
-                children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])(GlobeStates, {
-                    region: region,
-                    onRegionChange: handleRegionChange,
-                    onStateSelect: handleStateSelectFromGlobe,
-                    onViewChange: (alt)=>setViewAltitude(alt)
-                }, void 0, false, {
-                    fileName: "[project]/components/AdminStateExplorer.tsx",
-                    lineNumber: 218,
-                    columnNumber: 9
-                }, ("TURBOPACK compile-time value", void 0))
-            }, void 0, false, {
-                fileName: "[project]/components/AdminStateExplorer.tsx",
-                lineNumber: 217,
-                columnNumber: 7
-            }, ("TURBOPACK compile-time value", void 0)),
-            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                className: "relative z-10 flex h-full flex-col pointer-events-none",
+                className: "mx-auto w-full max-w-6xl px-4 pt-6 pb-4",
                 children: [
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                        className: "pointer-events-auto",
-                        children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                            className: "mx-auto w-full max-w-6xl px-4 pt-4 pb-3",
-                            children: [
-                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                    className: "mb-2 flex flex-wrap items-baseline gap-3",
-                                    children: [
-                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
-                                            className: "text-[0.7rem] font-semibold uppercase tracking-[0.22em] text-sky-400",
-                                            children: crumbScope
-                                        }, void 0, false, {
-                                            fileName: "[project]/components/AdminStateExplorer.tsx",
-                                            lineNumber: 232,
-                                            columnNumber: 15
-                                        }, ("TURBOPACK compile-time value", void 0)),
-                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
-                                            className: "text-[0.75rem] text-slate-300",
-                                            children: crumbLine
-                                        }, void 0, false, {
-                                            fileName: "[project]/components/AdminStateExplorer.tsx",
-                                            lineNumber: 235,
-                                            columnNumber: 15
-                                        }, ("TURBOPACK compile-time value", void 0))
-                                    ]
-                                }, void 0, true, {
-                                    fileName: "[project]/components/AdminStateExplorer.tsx",
-                                    lineNumber: 231,
-                                    columnNumber: 13
-                                }, ("TURBOPACK compile-time value", void 0)),
-                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                    className: "flex flex-wrap items-center gap-3",
-                                    children: [
-                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                            className: "inline-flex rounded-full border border-slate-700/70 bg-black/80 px-1 py-1 shadow-sm shadow-slate-900/80",
-                                            children: regionLabels.map((r)=>/*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
-                                                    type: "button",
-                                                    onClick: ()=>handleRegionChange(r.id),
-                                                    className: 'rounded-full px-4 py-1.5 text-[11px] transition ' + (region === r.id ? 'bg-sky-500 text-white shadow-sm shadow-sky-500/40' : 'text-slate-300 hover:text-slate-50'),
-                                                    children: r.label
-                                                }, r.id, false, {
-                                                    fileName: "[project]/components/AdminStateExplorer.tsx",
-                                                    lineNumber: 241,
-                                                    columnNumber: 19
-                                                }, ("TURBOPACK compile-time value", void 0)))
-                                        }, void 0, false, {
-                                            fileName: "[project]/components/AdminStateExplorer.tsx",
-                                            lineNumber: 239,
-                                            columnNumber: 15
-                                        }, ("TURBOPACK compile-time value", void 0)),
-                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                            className: "flex items-center gap-2 text-[11px] text-slate-400",
-                                            children: [
-                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
-                                                    className: "inline-flex h-2 w-2 rounded-full bg-sky-400 shadow-[0_0_0_4px_rgba(56,189,248,0.40)]"
-                                                }, void 0, false, {
-                                                    fileName: "[project]/components/AdminStateExplorer.tsx",
-                                                    lineNumber: 257,
-                                                    columnNumber: 17
-                                                }, ("TURBOPACK compile-time value", void 0)),
-                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
-                                                    children: "Drag to spin · Hover to “lift” · Scroll to zoom · Click to drill in"
-                                                }, void 0, false, {
-                                                    fileName: "[project]/components/AdminStateExplorer.tsx",
-                                                    lineNumber: 258,
-                                                    columnNumber: 17
-                                                }, ("TURBOPACK compile-time value", void 0))
-                                            ]
-                                        }, void 0, true, {
-                                            fileName: "[project]/components/AdminStateExplorer.tsx",
-                                            lineNumber: 256,
-                                            columnNumber: 15
-                                        }, ("TURBOPACK compile-time value", void 0))
-                                    ]
-                                }, void 0, true, {
-                                    fileName: "[project]/components/AdminStateExplorer.tsx",
-                                    lineNumber: 238,
-                                    columnNumber: 13
-                                }, ("TURBOPACK compile-time value", void 0)),
-                                isUS && zoomedIn && farJumpStates.length > 0 && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                    className: "mt-3 flex flex-wrap items-center gap-1.5 text-[0.72rem]",
-                                    children: [
-                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
-                                            className: "mr-1 text-[0.68rem] font-semibold uppercase tracking-[0.18em] text-slate-500",
-                                            children: "Edge hops"
-                                        }, void 0, false, {
-                                            fileName: "[project]/components/AdminStateExplorer.tsx",
-                                            lineNumber: 267,
-                                            columnNumber: 17
-                                        }, ("TURBOPACK compile-time value", void 0)),
-                                        farJumpStates.map((s)=>/*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
-                                                type: "button",
-                                                onClick: ()=>setSelected({
-                                                        id: s.id,
-                                                        name: s.name
-                                                    }),
-                                                className: "rounded-full border border-sky-500/40 bg-black/70 px-2 py-1 text-[0.72rem] text-slate-100 shadow-sm shadow-sky-500/20 transition hover:bg-sky-500/30",
-                                                children: [
-                                                    s.id,
-                                                    " · ",
-                                                    s.name
-                                                ]
-                                            }, s.id, true, {
-                                                fileName: "[project]/components/AdminStateExplorer.tsx",
-                                                lineNumber: 271,
-                                                columnNumber: 19
-                                            }, ("TURBOPACK compile-time value", void 0)))
-                                    ]
-                                }, void 0, true, {
-                                    fileName: "[project]/components/AdminStateExplorer.tsx",
-                                    lineNumber: 266,
-                                    columnNumber: 15
-                                }, ("TURBOPACK compile-time value", void 0))
-                            ]
-                        }, void 0, true, {
-                            fileName: "[project]/components/AdminStateExplorer.tsx",
-                            lineNumber: 230,
-                            columnNumber: 11
-                        }, ("TURBOPACK compile-time value", void 0))
-                    }, void 0, false, {
+                        className: "mb-3 flex flex-wrap items-baseline gap-3",
+                        children: [
+                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
+                                className: "text-[0.7rem] font-semibold uppercase tracking-[0.22em] text-sky-400",
+                                children: crumbScope
+                            }, void 0, false, {
+                                fileName: "[project]/components/AdminStateExplorer.tsx",
+                                lineNumber: 175,
+                                columnNumber: 11
+                            }, ("TURBOPACK compile-time value", void 0)),
+                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
+                                className: "text-[0.75rem] text-slate-400",
+                                children: crumbLine
+                            }, void 0, false, {
+                                fileName: "[project]/components/AdminStateExplorer.tsx",
+                                lineNumber: 178,
+                                columnNumber: 11
+                            }, ("TURBOPACK compile-time value", void 0))
+                        ]
+                    }, void 0, true, {
                         fileName: "[project]/components/AdminStateExplorer.tsx",
-                        lineNumber: 229,
+                        lineNumber: 174,
                         columnNumber: 9
                     }, ("TURBOPACK compile-time value", void 0)),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                        className: "flex flex-1 items-start justify-end",
-                        children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                            className: "pointer-events-auto mx-auto flex w-full max-w-6xl justify-end px-4 pb-5",
-                            children: selected.name && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("section", {
-                                className: "w-full max-w-sm rounded-3xl border border-slate-700/70 bg-black/85 shadow-[0_22px_60px_rgba(0,0,0,0.75)] backdrop-blur",
+                        className: "flex flex-col items-center gap-3",
+                        children: [
+                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                className: "inline-flex rounded-full border border-slate-700 bg-black px-1 py-1 shadow-sm shadow-slate-900",
+                                children: REGION_LABELS.map((r)=>/*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
+                                        type: "button",
+                                        onClick: ()=>{
+                                            setRegion(r.id);
+                                            setSelection({
+                                                kind: 'region',
+                                                regionId: r.id,
+                                                id: r.id,
+                                                name: r.label
+                                            });
+                                        },
+                                        className: 'rounded-full px-4 py-1.5 text-[11px] transition ' + (region === r.id ? 'bg-sky-500 text-white shadow-sm shadow-sky-500/40' : 'text-slate-400 hover:text-slate-100'),
+                                        children: r.label
+                                    }, r.id, false, {
+                                        fileName: "[project]/components/AdminStateExplorer.tsx",
+                                        lineNumber: 184,
+                                        columnNumber: 15
+                                    }, ("TURBOPACK compile-time value", void 0)))
+                            }, void 0, false, {
+                                fileName: "[project]/components/AdminStateExplorer.tsx",
+                                lineNumber: 182,
+                                columnNumber: 11
+                            }, ("TURBOPACK compile-time value", void 0)),
+                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                className: "flex items-center gap-2 text-[11px] text-slate-500",
                                 children: [
-                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("header", {
-                                        className: "border-b border-slate-800 px-4 pb-2 pt-3",
-                                        children: [
-                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
-                                                className: "mb-1 text-[0.68rem] font-semibold uppercase tracking-[0.22em] text-sky-400",
-                                                children: [
-                                                    displayStateCode ?? selected.id ?? '',
-                                                    " · ",
-                                                    detailKind
-                                                ]
-                                            }, void 0, true, {
-                                                fileName: "[project]/components/AdminStateExplorer.tsx",
-                                                lineNumber: 291,
-                                                columnNumber: 19
-                                            }, ("TURBOPACK compile-time value", void 0)),
-                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("h2", {
-                                                className: "text-lg font-semibold text-slate-50",
-                                                children: detailTitle
-                                            }, void 0, false, {
-                                                fileName: "[project]/components/AdminStateExplorer.tsx",
-                                                lineNumber: 294,
-                                                columnNumber: 19
-                                            }, ("TURBOPACK compile-time value", void 0)),
-                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
-                                                className: "mt-1 text-[0.78rem] text-slate-400",
-                                                children: activeSnapshot ? 'Illustrative coverage metrics while we connect live COA feeds and lab integrations.' : 'We haven’t wired live coverage here yet. COA parsing and map tiles are coming soon.'
-                                            }, void 0, false, {
-                                                fileName: "[project]/components/AdminStateExplorer.tsx",
-                                                lineNumber: 297,
-                                                columnNumber: 19
-                                            }, ("TURBOPACK compile-time value", void 0))
-                                        ]
-                                    }, void 0, true, {
+                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                        className: "inline-flex h-2 w-2 rounded-full bg-sky-400 shadow-[0_0_0_4px_rgba(56,189,248,0.40)]"
+                                    }, void 0, false, {
                                         fileName: "[project]/components/AdminStateExplorer.tsx",
-                                        lineNumber: 290,
-                                        columnNumber: 17
+                                        lineNumber: 208,
+                                        columnNumber: 13
                                     }, ("TURBOPACK compile-time value", void 0)),
-                                    activeSnapshot && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                        className: "px-4 pb-3 pt-3",
-                                        children: [
-                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("dl", {
-                                                className: "mb-4 grid grid-cols-2 gap-3 text-[0.78rem]",
-                                                children: [
-                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                                        children: [
-                                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("dt", {
-                                                                className: "text-[0.68rem] font-medium uppercase tracking-[0.16em] text-slate-500",
-                                                                children: "Batches tracked"
-                                                            }, void 0, false, {
-                                                                fileName: "[project]/components/AdminStateExplorer.tsx",
-                                                                lineNumber: 308,
-                                                                columnNumber: 25
-                                                            }, ("TURBOPACK compile-time value", void 0)),
-                                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("dd", {
-                                                                className: "mt-1 text-sm font-semibold text-slate-50",
-                                                                children: formatNumber(activeSnapshot.batchesTracked)
-                                                            }, void 0, false, {
-                                                                fileName: "[project]/components/AdminStateExplorer.tsx",
-                                                                lineNumber: 311,
-                                                                columnNumber: 25
-                                                            }, ("TURBOPACK compile-time value", void 0))
-                                                        ]
-                                                    }, void 0, true, {
-                                                        fileName: "[project]/components/AdminStateExplorer.tsx",
-                                                        lineNumber: 307,
-                                                        columnNumber: 23
-                                                    }, ("TURBOPACK compile-time value", void 0)),
-                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                                        children: [
-                                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("dt", {
-                                                                className: "text-[0.68rem] font-medium uppercase tracking-[0.16em] text-slate-500",
-                                                                children: "Labs reporting"
-                                                            }, void 0, false, {
-                                                                fileName: "[project]/components/AdminStateExplorer.tsx",
-                                                                lineNumber: 316,
-                                                                columnNumber: 25
-                                                            }, ("TURBOPACK compile-time value", void 0)),
-                                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("dd", {
-                                                                className: "mt-1 text-sm font-semibold text-slate-50",
-                                                                children: formatNumber(activeSnapshot.labsReporting)
-                                                            }, void 0, false, {
-                                                                fileName: "[project]/components/AdminStateExplorer.tsx",
-                                                                lineNumber: 319,
-                                                                columnNumber: 25
-                                                            }, ("TURBOPACK compile-time value", void 0))
-                                                        ]
-                                                    }, void 0, true, {
-                                                        fileName: "[project]/components/AdminStateExplorer.tsx",
-                                                        lineNumber: 315,
-                                                        columnNumber: 23
-                                                    }, ("TURBOPACK compile-time value", void 0)),
-                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                                        children: [
-                                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("dt", {
-                                                                className: "text-[0.68rem] font-medium uppercase tracking-[0.16em] text-slate-500",
-                                                                children: "Coverage score"
-                                                            }, void 0, false, {
-                                                                fileName: "[project]/components/AdminStateExplorer.tsx",
-                                                                lineNumber: 324,
-                                                                columnNumber: 25
-                                                            }, ("TURBOPACK compile-time value", void 0)),
-                                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("dd", {
-                                                                className: "mt-1 text-sm font-semibold text-slate-50",
-                                                                children: [
-                                                                    coveragePct,
-                                                                    "/100"
-                                                                ]
-                                                            }, void 0, true, {
-                                                                fileName: "[project]/components/AdminStateExplorer.tsx",
-                                                                lineNumber: 327,
-                                                                columnNumber: 25
-                                                            }, ("TURBOPACK compile-time value", void 0))
-                                                        ]
-                                                    }, void 0, true, {
-                                                        fileName: "[project]/components/AdminStateExplorer.tsx",
-                                                        lineNumber: 323,
-                                                        columnNumber: 23
-                                                    }, ("TURBOPACK compile-time value", void 0)),
-                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                                        children: [
-                                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("dt", {
-                                                                className: "text-[0.68rem] font-medium uppercase tracking-[0.16em] text-slate-500",
-                                                                children: "Recent recalls"
-                                                            }, void 0, false, {
-                                                                fileName: "[project]/components/AdminStateExplorer.tsx",
-                                                                lineNumber: 332,
-                                                                columnNumber: 25
-                                                            }, ("TURBOPACK compile-time value", void 0)),
-                                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("dd", {
-                                                                className: "mt-1 text-sm font-semibold text-slate-50",
-                                                                children: activeSnapshot.recentRecalls
-                                                            }, void 0, false, {
-                                                                fileName: "[project]/components/AdminStateExplorer.tsx",
-                                                                lineNumber: 335,
-                                                                columnNumber: 25
-                                                            }, ("TURBOPACK compile-time value", void 0))
-                                                        ]
-                                                    }, void 0, true, {
-                                                        fileName: "[project]/components/AdminStateExplorer.tsx",
-                                                        lineNumber: 331,
-                                                        columnNumber: 23
-                                                    }, ("TURBOPACK compile-time value", void 0))
-                                                ]
-                                            }, void 0, true, {
-                                                fileName: "[project]/components/AdminStateExplorer.tsx",
-                                                lineNumber: 306,
-                                                columnNumber: 21
-                                            }, ("TURBOPACK compile-time value", void 0)),
-                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                                className: "space-y-3",
-                                                children: [
-                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                                        children: [
-                                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                                                className: "flex items-center justify-between text-[0.7rem] text-slate-400",
-                                                                children: [
-                                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
-                                                                        className: "font-medium uppercase tracking-[0.16em]",
-                                                                        children: "Coverage"
-                                                                    }, void 0, false, {
-                                                                        fileName: "[project]/components/AdminStateExplorer.tsx",
-                                                                        lineNumber: 344,
-                                                                        columnNumber: 27
-                                                                    }, ("TURBOPACK compile-time value", void 0)),
-                                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
-                                                                        className: "font-semibold text-slate-100",
-                                                                        children: [
-                                                                            coveragePct,
-                                                                            "%"
-                                                                        ]
-                                                                    }, void 0, true, {
-                                                                        fileName: "[project]/components/AdminStateExplorer.tsx",
-                                                                        lineNumber: 347,
-                                                                        columnNumber: 27
-                                                                    }, ("TURBOPACK compile-time value", void 0))
-                                                                ]
-                                                            }, void 0, true, {
-                                                                fileName: "[project]/components/AdminStateExplorer.tsx",
-                                                                lineNumber: 343,
-                                                                columnNumber: 25
-                                                            }, ("TURBOPACK compile-time value", void 0)),
-                                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                                                className: "mt-1 h-2 rounded-full bg-slate-800",
-                                                                children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                                                    className: "h-2 rounded-full bg-gradient-to-r from-emerald-400 to-sky-500 shadow-[0_0_12px_rgba(56,189,248,0.6)]",
-                                                                    style: {
-                                                                        width: `${Math.min(coveragePct, 100)}%`
-                                                                    }
-                                                                }, void 0, false, {
-                                                                    fileName: "[project]/components/AdminStateExplorer.tsx",
-                                                                    lineNumber: 352,
-                                                                    columnNumber: 27
-                                                                }, ("TURBOPACK compile-time value", void 0))
-                                                            }, void 0, false, {
-                                                                fileName: "[project]/components/AdminStateExplorer.tsx",
-                                                                lineNumber: 351,
-                                                                columnNumber: 25
-                                                            }, ("TURBOPACK compile-time value", void 0))
-                                                        ]
-                                                    }, void 0, true, {
-                                                        fileName: "[project]/components/AdminStateExplorer.tsx",
-                                                        lineNumber: 342,
-                                                        columnNumber: 23
-                                                    }, ("TURBOPACK compile-time value", void 0)),
-                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                                        children: [
-                                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                                                className: "flex items-center justify-between text-[0.7rem] text-slate-400",
-                                                                children: [
-                                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
-                                                                        className: "font-medium uppercase tracking-[0.16em]",
-                                                                        children: "Full COA coverage"
-                                                                    }, void 0, false, {
-                                                                        fileName: "[project]/components/AdminStateExplorer.tsx",
-                                                                        lineNumber: 363,
-                                                                        columnNumber: 27
-                                                                    }, ("TURBOPACK compile-time value", void 0)),
-                                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
-                                                                        className: "font-semibold text-slate-100",
-                                                                        children: [
-                                                                            fullCoaRate,
-                                                                            "%"
-                                                                        ]
-                                                                    }, void 0, true, {
-                                                                        fileName: "[project]/components/AdminStateExplorer.tsx",
-                                                                        lineNumber: 366,
-                                                                        columnNumber: 27
-                                                                    }, ("TURBOPACK compile-time value", void 0))
-                                                                ]
-                                                            }, void 0, true, {
-                                                                fileName: "[project]/components/AdminStateExplorer.tsx",
-                                                                lineNumber: 362,
-                                                                columnNumber: 25
-                                                            }, ("TURBOPACK compile-time value", void 0)),
-                                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                                                className: "mt-1 h-2 rounded-full bg-slate-800",
-                                                                children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                                                    className: "h-2 rounded-full bg-gradient-to-r from-sky-400 to-indigo-500 shadow-[0_0_10px_rgba(129,140,248,0.6)]",
-                                                                    style: {
-                                                                        width: `${Math.min(fullCoaRate, 100)}%`
-                                                                    }
-                                                                }, void 0, false, {
-                                                                    fileName: "[project]/components/AdminStateExplorer.tsx",
-                                                                    lineNumber: 371,
-                                                                    columnNumber: 27
-                                                                }, ("TURBOPACK compile-time value", void 0))
-                                                            }, void 0, false, {
-                                                                fileName: "[project]/components/AdminStateExplorer.tsx",
-                                                                lineNumber: 370,
-                                                                columnNumber: 25
-                                                            }, ("TURBOPACK compile-time value", void 0))
-                                                        ]
-                                                    }, void 0, true, {
-                                                        fileName: "[project]/components/AdminStateExplorer.tsx",
-                                                        lineNumber: 361,
-                                                        columnNumber: 23
-                                                    }, ("TURBOPACK compile-time value", void 0)),
-                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
-                                                        className: "text-[0.7rem] text-slate-500",
-                                                        children: "Metrics shown are illustrative only. In production this panel will be driven by live batch, lab, and recall data from your CartFax deployment."
-                                                    }, void 0, false, {
-                                                        fileName: "[project]/components/AdminStateExplorer.tsx",
-                                                        lineNumber: 380,
-                                                        columnNumber: 23
-                                                    }, ("TURBOPACK compile-time value", void 0))
-                                                ]
-                                            }, void 0, true, {
-                                                fileName: "[project]/components/AdminStateExplorer.tsx",
-                                                lineNumber: 341,
-                                                columnNumber: 21
-                                            }, ("TURBOPACK compile-time value", void 0))
-                                        ]
-                                    }, void 0, true, {
+                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                        children: "Drag to spin · Hover to “lift” · Scroll to zoom · Click to drill into a region"
+                                    }, void 0, false, {
                                         fileName: "[project]/components/AdminStateExplorer.tsx",
-                                        lineNumber: 305,
-                                        columnNumber: 19
-                                    }, ("TURBOPACK compile-time value", void 0)),
-                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("footer", {
-                                        className: "flex items-center justify-between gap-3 border-t border-slate-800 px-4 py-2.5",
-                                        children: [
-                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$link$2e$js__$5b$client$5d$__$28$ecmascript$29$__["default"], {
-                                                href: adminHref,
-                                                className: "inline-flex items-center justify-center rounded-full bg-sky-500 px-3 py-1.5 text-[0.78rem] font-medium text-white shadow-sm shadow-sky-500/40 transition hover:bg-sky-600",
-                                                children: "Open admin data tools"
-                                            }, void 0, false, {
-                                                fileName: "[project]/components/AdminStateExplorer.tsx",
-                                                lineNumber: 390,
-                                                columnNumber: 19
-                                            }, ("TURBOPACK compile-time value", void 0)),
-                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
-                                                type: "button",
-                                                onClick: ()=>{
-                                                    setSelected({
-                                                        id: null,
-                                                        name: null
-                                                    });
-                                                },
-                                                className: "text-[11px] text-slate-500 hover:text-slate-300",
-                                                children: "Dismiss"
-                                            }, void 0, false, {
-                                                fileName: "[project]/components/AdminStateExplorer.tsx",
-                                                lineNumber: 396,
-                                                columnNumber: 19
-                                            }, ("TURBOPACK compile-time value", void 0))
-                                        ]
-                                    }, void 0, true, {
-                                        fileName: "[project]/components/AdminStateExplorer.tsx",
-                                        lineNumber: 389,
-                                        columnNumber: 17
+                                        lineNumber: 209,
+                                        columnNumber: 13
                                     }, ("TURBOPACK compile-time value", void 0))
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/components/AdminStateExplorer.tsx",
-                                lineNumber: 289,
-                                columnNumber: 15
+                                lineNumber: 207,
+                                columnNumber: 11
                             }, ("TURBOPACK compile-time value", void 0))
-                        }, void 0, false, {
-                            fileName: "[project]/components/AdminStateExplorer.tsx",
-                            lineNumber: 287,
-                            columnNumber: 11
-                        }, ("TURBOPACK compile-time value", void 0))
-                    }, void 0, false, {
+                        ]
+                    }, void 0, true, {
                         fileName: "[project]/components/AdminStateExplorer.tsx",
-                        lineNumber: 286,
+                        lineNumber: 181,
                         columnNumber: 9
                     }, ("TURBOPACK compile-time value", void 0))
                 ]
             }, void 0, true, {
                 fileName: "[project]/components/AdminStateExplorer.tsx",
-                lineNumber: 227,
+                lineNumber: 173,
+                columnNumber: 7
+            }, ("TURBOPACK compile-time value", void 0)),
+            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                className: "relative flex-1 overflow-hidden",
+                children: [
+                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                        className: "pointer-events-auto absolute inset-0 flex items-center justify-center",
+                        children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                            className: "h-full w-full max-w-5xl",
+                            children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])(GlobeStates, {
+                                region: region,
+                                onRegionChange: setRegion,
+                                onStateSelect: (id, name)=>{
+                                    setSelection({
+                                        kind: 'subregion',
+                                        regionId: region,
+                                        id,
+                                        name: name || null
+                                    });
+                                },
+                                onViewChange: (alt)=>setViewAltitude(alt)
+                            }, void 0, false, {
+                                fileName: "[project]/components/AdminStateExplorer.tsx",
+                                lineNumber: 222,
+                                columnNumber: 13
+                            }, ("TURBOPACK compile-time value", void 0))
+                        }, void 0, false, {
+                            fileName: "[project]/components/AdminStateExplorer.tsx",
+                            lineNumber: 221,
+                            columnNumber: 11
+                        }, ("TURBOPACK compile-time value", void 0))
+                    }, void 0, false, {
+                        fileName: "[project]/components/AdminStateExplorer.tsx",
+                        lineNumber: 220,
+                        columnNumber: 9
+                    }, ("TURBOPACK compile-time value", void 0)),
+                    selection && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("section", {
+                        className: "pointer-events-auto absolute right-6 top-20 z-20 w-full max-w-sm rounded-3xl border border-slate-700 bg-black/85 shadow-[0_22px_60px_rgba(0,0,0,0.75)] backdrop-blur",
+                        children: [
+                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("header", {
+                                className: "border-b border-slate-800 px-4 pb-2 pt-3",
+                                children: [
+                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
+                                        className: "mb-1 text-[0.68rem] font-semibold uppercase tracking-[0.22em] text-sky-400",
+                                        children: detailKind
+                                    }, void 0, false, {
+                                        fileName: "[project]/components/AdminStateExplorer.tsx",
+                                        lineNumber: 242,
+                                        columnNumber: 15
+                                    }, ("TURBOPACK compile-time value", void 0)),
+                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("h2", {
+                                        className: "text-lg font-semibold text-slate-50",
+                                        children: title
+                                    }, void 0, false, {
+                                        fileName: "[project]/components/AdminStateExplorer.tsx",
+                                        lineNumber: 245,
+                                        columnNumber: 15
+                                    }, ("TURBOPACK compile-time value", void 0)),
+                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
+                                        className: "mt-1 text-[0.78rem] text-slate-400",
+                                        children: selection.regionId === 'unitedStates' ? 'Illustrative coverage metrics while we connect live COA feeds and lab integrations.' : 'National or regional coverage snapshot while we wire in live feeds for this jurisdiction.'
+                                    }, void 0, false, {
+                                        fileName: "[project]/components/AdminStateExplorer.tsx",
+                                        lineNumber: 246,
+                                        columnNumber: 15
+                                    }, ("TURBOPACK compile-time value", void 0))
+                                ]
+                            }, void 0, true, {
+                                fileName: "[project]/components/AdminStateExplorer.tsx",
+                                lineNumber: 241,
+                                columnNumber: 13
+                            }, ("TURBOPACK compile-time value", void 0)),
+                            isUS && activeSnapshot && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                className: "px-4 pb-3 pt-3",
+                                children: [
+                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("dl", {
+                                        className: "mb-4 grid grid-cols-2 gap-3 text-[0.78rem]",
+                                        children: [
+                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                children: [
+                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("dt", {
+                                                        className: "text-[0.68rem] font-medium uppercase tracking-[0.16em] text-slate-500",
+                                                        children: "Batches tracked"
+                                                    }, void 0, false, {
+                                                        fileName: "[project]/components/AdminStateExplorer.tsx",
+                                                        lineNumber: 258,
+                                                        columnNumber: 21
+                                                    }, ("TURBOPACK compile-time value", void 0)),
+                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("dd", {
+                                                        className: "mt-1 text-sm font-semibold text-slate-50",
+                                                        children: formatNumber(activeSnapshot.batchesTracked)
+                                                    }, void 0, false, {
+                                                        fileName: "[project]/components/AdminStateExplorer.tsx",
+                                                        lineNumber: 261,
+                                                        columnNumber: 21
+                                                    }, ("TURBOPACK compile-time value", void 0))
+                                                ]
+                                            }, void 0, true, {
+                                                fileName: "[project]/components/AdminStateExplorer.tsx",
+                                                lineNumber: 257,
+                                                columnNumber: 19
+                                            }, ("TURBOPACK compile-time value", void 0)),
+                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                children: [
+                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("dt", {
+                                                        className: "text-[0.68rem] font-medium uppercase tracking-[0.16em] text-slate-500",
+                                                        children: "Labs reporting"
+                                                    }, void 0, false, {
+                                                        fileName: "[project]/components/AdminStateExplorer.tsx",
+                                                        lineNumber: 266,
+                                                        columnNumber: 21
+                                                    }, ("TURBOPACK compile-time value", void 0)),
+                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("dd", {
+                                                        className: "mt-1 text-sm font-semibold text-slate-50",
+                                                        children: formatNumber(activeSnapshot.labsReporting)
+                                                    }, void 0, false, {
+                                                        fileName: "[project]/components/AdminStateExplorer.tsx",
+                                                        lineNumber: 269,
+                                                        columnNumber: 21
+                                                    }, ("TURBOPACK compile-time value", void 0))
+                                                ]
+                                            }, void 0, true, {
+                                                fileName: "[project]/components/AdminStateExplorer.tsx",
+                                                lineNumber: 265,
+                                                columnNumber: 19
+                                            }, ("TURBOPACK compile-time value", void 0)),
+                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                children: [
+                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("dt", {
+                                                        className: "text-[0.68rem] font-medium uppercase tracking-[0.16em] text-slate-500",
+                                                        children: "Coverage score"
+                                                    }, void 0, false, {
+                                                        fileName: "[project]/components/AdminStateExplorer.tsx",
+                                                        lineNumber: 274,
+                                                        columnNumber: 21
+                                                    }, ("TURBOPACK compile-time value", void 0)),
+                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("dd", {
+                                                        className: "mt-1 text-sm font-semibold text-slate-50",
+                                                        children: [
+                                                            coveragePct,
+                                                            "/100"
+                                                        ]
+                                                    }, void 0, true, {
+                                                        fileName: "[project]/components/AdminStateExplorer.tsx",
+                                                        lineNumber: 277,
+                                                        columnNumber: 21
+                                                    }, ("TURBOPACK compile-time value", void 0))
+                                                ]
+                                            }, void 0, true, {
+                                                fileName: "[project]/components/AdminStateExplorer.tsx",
+                                                lineNumber: 273,
+                                                columnNumber: 19
+                                            }, ("TURBOPACK compile-time value", void 0)),
+                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                children: [
+                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("dt", {
+                                                        className: "text-[0.68rem] font-medium uppercase tracking-[0.16em] text-slate-500",
+                                                        children: "Recent recalls"
+                                                    }, void 0, false, {
+                                                        fileName: "[project]/components/AdminStateExplorer.tsx",
+                                                        lineNumber: 282,
+                                                        columnNumber: 21
+                                                    }, ("TURBOPACK compile-time value", void 0)),
+                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("dd", {
+                                                        className: "mt-1 text-sm font-semibold text-slate-50",
+                                                        children: activeSnapshot.recentRecalls
+                                                    }, void 0, false, {
+                                                        fileName: "[project]/components/AdminStateExplorer.tsx",
+                                                        lineNumber: 285,
+                                                        columnNumber: 21
+                                                    }, ("TURBOPACK compile-time value", void 0))
+                                                ]
+                                            }, void 0, true, {
+                                                fileName: "[project]/components/AdminStateExplorer.tsx",
+                                                lineNumber: 281,
+                                                columnNumber: 19
+                                            }, ("TURBOPACK compile-time value", void 0))
+                                        ]
+                                    }, void 0, true, {
+                                        fileName: "[project]/components/AdminStateExplorer.tsx",
+                                        lineNumber: 256,
+                                        columnNumber: 17
+                                    }, ("TURBOPACK compile-time value", void 0)),
+                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                        className: "space-y-3",
+                                        children: [
+                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                children: [
+                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                        className: "flex items-center justify-between text-[0.7rem] text-slate-400",
+                                                        children: [
+                                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                                                className: "font-medium uppercase tracking-[0.16em]",
+                                                                children: "Coverage"
+                                                            }, void 0, false, {
+                                                                fileName: "[project]/components/AdminStateExplorer.tsx",
+                                                                lineNumber: 294,
+                                                                columnNumber: 23
+                                                            }, ("TURBOPACK compile-time value", void 0)),
+                                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                                                className: "font-semibold text-slate-100",
+                                                                children: [
+                                                                    coveragePct,
+                                                                    "%"
+                                                                ]
+                                                            }, void 0, true, {
+                                                                fileName: "[project]/components/AdminStateExplorer.tsx",
+                                                                lineNumber: 297,
+                                                                columnNumber: 23
+                                                            }, ("TURBOPACK compile-time value", void 0))
+                                                        ]
+                                                    }, void 0, true, {
+                                                        fileName: "[project]/components/AdminStateExplorer.tsx",
+                                                        lineNumber: 293,
+                                                        columnNumber: 21
+                                                    }, ("TURBOPACK compile-time value", void 0)),
+                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                        className: "mt-1 h-2 rounded-full bg-slate-800",
+                                                        children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                            className: "h-2 rounded-full bg-gradient-to-r from-emerald-400 to-sky-500 shadow-[0_0_12px_rgba(56,189,248,0.6)]",
+                                                            style: {
+                                                                width: `${Math.min(coveragePct, 100)}%`
+                                                            }
+                                                        }, void 0, false, {
+                                                            fileName: "[project]/components/AdminStateExplorer.tsx",
+                                                            lineNumber: 302,
+                                                            columnNumber: 23
+                                                        }, ("TURBOPACK compile-time value", void 0))
+                                                    }, void 0, false, {
+                                                        fileName: "[project]/components/AdminStateExplorer.tsx",
+                                                        lineNumber: 301,
+                                                        columnNumber: 21
+                                                    }, ("TURBOPACK compile-time value", void 0))
+                                                ]
+                                            }, void 0, true, {
+                                                fileName: "[project]/components/AdminStateExplorer.tsx",
+                                                lineNumber: 292,
+                                                columnNumber: 19
+                                            }, ("TURBOPACK compile-time value", void 0)),
+                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                children: [
+                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                        className: "flex items-center justify-between text-[0.7rem] text-slate-400",
+                                                        children: [
+                                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                                                className: "font-medium uppercase tracking-[0.16em]",
+                                                                children: "Full COA coverage"
+                                                            }, void 0, false, {
+                                                                fileName: "[project]/components/AdminStateExplorer.tsx",
+                                                                lineNumber: 313,
+                                                                columnNumber: 23
+                                                            }, ("TURBOPACK compile-time value", void 0)),
+                                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                                                className: "font-semibold text-slate-100",
+                                                                children: [
+                                                                    fullCoaRate,
+                                                                    "%"
+                                                                ]
+                                                            }, void 0, true, {
+                                                                fileName: "[project]/components/AdminStateExplorer.tsx",
+                                                                lineNumber: 316,
+                                                                columnNumber: 23
+                                                            }, ("TURBOPACK compile-time value", void 0))
+                                                        ]
+                                                    }, void 0, true, {
+                                                        fileName: "[project]/components/AdminStateExplorer.tsx",
+                                                        lineNumber: 312,
+                                                        columnNumber: 21
+                                                    }, ("TURBOPACK compile-time value", void 0)),
+                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                        className: "mt-1 h-2 rounded-full bg-slate-800",
+                                                        children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                            className: "h-2 rounded-full bg-gradient-to-r from-sky-400 to-indigo-500 shadow-[0_0_10px_rgba(129,140,248,0.6)]",
+                                                            style: {
+                                                                width: `${Math.min(fullCoaRate, 100)}%`
+                                                            }
+                                                        }, void 0, false, {
+                                                            fileName: "[project]/components/AdminStateExplorer.tsx",
+                                                            lineNumber: 321,
+                                                            columnNumber: 23
+                                                        }, ("TURBOPACK compile-time value", void 0))
+                                                    }, void 0, false, {
+                                                        fileName: "[project]/components/AdminStateExplorer.tsx",
+                                                        lineNumber: 320,
+                                                        columnNumber: 21
+                                                    }, ("TURBOPACK compile-time value", void 0))
+                                                ]
+                                            }, void 0, true, {
+                                                fileName: "[project]/components/AdminStateExplorer.tsx",
+                                                lineNumber: 311,
+                                                columnNumber: 19
+                                            }, ("TURBOPACK compile-time value", void 0)),
+                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
+                                                className: "text-[0.7rem] text-slate-500",
+                                                children: "Metrics shown are illustrative only. In production this panel will be driven by live batch, lab, and recall data from your CartFax deployment."
+                                            }, void 0, false, {
+                                                fileName: "[project]/components/AdminStateExplorer.tsx",
+                                                lineNumber: 330,
+                                                columnNumber: 19
+                                            }, ("TURBOPACK compile-time value", void 0))
+                                        ]
+                                    }, void 0, true, {
+                                        fileName: "[project]/components/AdminStateExplorer.tsx",
+                                        lineNumber: 291,
+                                        columnNumber: 17
+                                    }, ("TURBOPACK compile-time value", void 0))
+                                ]
+                            }, void 0, true, {
+                                fileName: "[project]/components/AdminStateExplorer.tsx",
+                                lineNumber: 255,
+                                columnNumber: 15
+                            }, ("TURBOPACK compile-time value", void 0)),
+                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("footer", {
+                                className: "flex items-center justify-between gap-3 border-t border-slate-800 px-4 py-2.5",
+                                children: [
+                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$link$2e$js__$5b$client$5d$__$28$ecmascript$29$__["default"], {
+                                        href: adminHref,
+                                        className: "inline-flex items-center justify-center rounded-full bg-sky-500 px-3 py-1.5 text-[0.78rem] font-medium text-white shadow-sm shadow-sky-500/40 transition hover:bg-sky-600",
+                                        children: "Open admin data tools"
+                                    }, void 0, false, {
+                                        fileName: "[project]/components/AdminStateExplorer.tsx",
+                                        lineNumber: 340,
+                                        columnNumber: 15
+                                    }, ("TURBOPACK compile-time value", void 0)),
+                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
+                                        type: "button",
+                                        onClick: ()=>{
+                                            setSelection((prev)=>({
+                                                    kind: 'region',
+                                                    regionId: prev.regionId,
+                                                    id: prev.regionId,
+                                                    name: REGION_LABELS.find((r)=>r.id === prev.regionId)?.label ?? prev.regionId
+                                                }));
+                                        },
+                                        className: "text-[11px] text-slate-500 hover:text-slate-300",
+                                        children: "Reset to region"
+                                    }, void 0, false, {
+                                        fileName: "[project]/components/AdminStateExplorer.tsx",
+                                        lineNumber: 346,
+                                        columnNumber: 15
+                                    }, ("TURBOPACK compile-time value", void 0))
+                                ]
+                            }, void 0, true, {
+                                fileName: "[project]/components/AdminStateExplorer.tsx",
+                                lineNumber: 339,
+                                columnNumber: 13
+                            }, ("TURBOPACK compile-time value", void 0))
+                        ]
+                    }, void 0, true, {
+                        fileName: "[project]/components/AdminStateExplorer.tsx",
+                        lineNumber: 240,
+                        columnNumber: 11
+                    }, ("TURBOPACK compile-time value", void 0))
+                ]
+            }, void 0, true, {
+                fileName: "[project]/components/AdminStateExplorer.tsx",
+                lineNumber: 218,
                 columnNumber: 7
             }, ("TURBOPACK compile-time value", void 0))
         ]
     }, void 0, true, {
         fileName: "[project]/components/AdminStateExplorer.tsx",
-        lineNumber: 215,
+        lineNumber: 171,
         columnNumber: 5
     }, ("TURBOPACK compile-time value", void 0));
 };
-_s(AdminStateExplorer, "Ytp0lcd42sGEKAn5TwOfjK6Rs44=");
+_s(AdminStateExplorer, "G2QHoTbkN70KizIGjUcskxLopi0=");
 _c1 = AdminStateExplorer;
 const __TURBOPACK__default__export__ = AdminStateExplorer;
 var _c, _c1;
