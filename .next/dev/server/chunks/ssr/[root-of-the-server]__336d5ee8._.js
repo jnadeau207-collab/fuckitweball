@@ -60,46 +60,29 @@ function Layout({ children }) {
     };
     const authLabel = isAuthed ? 'Log out' : 'Log in';
     return /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$externals$5d2f$react$2f$jsx$2d$dev$2d$runtime__$5b$external$5d$__$28$react$2f$jsx$2d$dev$2d$runtime$2c$__cjs$29$__["jsxDEV"])("div", {
-        className: "min-h-screen bg-slate-950 text-slate-50 flex flex-col",
+        className: "min-h-screen bg-black text-slate-50 flex flex-col",
         children: [
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$externals$5d2f$react$2f$jsx$2d$dev$2d$runtime__$5b$external$5d$__$28$react$2f$jsx$2d$dev$2d$runtime$2c$__cjs$29$__["jsxDEV"])("header", {
-                className: "border-b border-slate-800 bg-slate-900/70 backdrop-blur",
+                className: "border-b border-slate-800 bg-black/80 backdrop-blur",
                 children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$externals$5d2f$react$2f$jsx$2d$dev$2d$runtime__$5b$external$5d$__$28$react$2f$jsx$2d$dev$2d$runtime$2c$__cjs$29$__["jsxDEV"])("div", {
-                    className: "max-w-6xl mx-auto px-4 py-3 flex items-center justify-between",
+                    className: "max-w-6xl mx-auto px-4 py-3 flex items-center justify-between gap-3",
                     children: [
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$externals$5d2f$react$2f$jsx$2d$dev$2d$runtime__$5b$external$5d$__$28$react$2f$jsx$2d$dev$2d$runtime$2c$__cjs$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$link$2e$js__$5b$ssr$5d$__$28$ecmascript$29$__["default"], {
                             href: "/",
                             className: "flex items-center gap-2",
                             children: [
-                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$externals$5d2f$react$2f$jsx$2d$dev$2d$runtime__$5b$external$5d$__$28$react$2f$jsx$2d$dev$2d$runtime$2c$__cjs$29$__["jsxDEV"])("div", {
-                                    className: "h-8 w-8 rounded-lg bg-emerald-500 flex items-center justify-center text-sm font-bold text-slate-950 shadow-md shadow-emerald-500/40",
-                                    children: "C"
+                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$externals$5d2f$react$2f$jsx$2d$dev$2d$runtime__$5b$external$5d$__$28$react$2f$jsx$2d$dev$2d$runtime$2c$__cjs$29$__["jsxDEV"])("span", {
+                                    className: "inline-flex h-6 w-6 items-center justify-center rounded-lg bg-sky-500 text-[11px] font-bold text-slate-950 shadow-sm shadow-sky-500/50",
+                                    children: "CF"
                                 }, void 0, false, {
                                     fileName: "[project]/components/Layout.tsx",
                                     lineNumber: 29,
                                     columnNumber: 13
                                 }, this),
-                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$externals$5d2f$react$2f$jsx$2d$dev$2d$runtime__$5b$external$5d$__$28$react$2f$jsx$2d$dev$2d$runtime$2c$__cjs$29$__["jsxDEV"])("div", {
-                                    className: "leading-tight",
-                                    children: [
-                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$externals$5d2f$react$2f$jsx$2d$dev$2d$runtime__$5b$external$5d$__$28$react$2f$jsx$2d$dev$2d$runtime$2c$__cjs$29$__["jsxDEV"])("div", {
-                                            className: "font-semibold tracking-wide",
-                                            children: "CartFax"
-                                        }, void 0, false, {
-                                            fileName: "[project]/components/Layout.tsx",
-                                            lineNumber: 33,
-                                            columnNumber: 15
-                                        }, this),
-                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$externals$5d2f$react$2f$jsx$2d$dev$2d$runtime__$5b$external$5d$__$28$react$2f$jsx$2d$dev$2d$runtime$2c$__cjs$29$__["jsxDEV"])("div", {
-                                            className: "text-[11px] text-slate-400",
-                                            children: "Cannabis Retail Transparency"
-                                        }, void 0, false, {
-                                            fileName: "[project]/components/Layout.tsx",
-                                            lineNumber: 34,
-                                            columnNumber: 15
-                                        }, this)
-                                    ]
-                                }, void 0, true, {
+                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$externals$5d2f$react$2f$jsx$2d$dev$2d$runtime__$5b$external$5d$__$28$react$2f$jsx$2d$dev$2d$runtime$2c$__cjs$29$__["jsxDEV"])("span", {
+                                    className: "text-sm font-semibold tracking-tight",
+                                    children: "CartFax"
+                                }, void 0, false, {
                                     fileName: "[project]/components/Layout.tsx",
                                     lineNumber: 32,
                                     columnNumber: 13
@@ -110,48 +93,31 @@ function Layout({ children }) {
                             lineNumber: 28,
                             columnNumber: 11
                         }, this),
-                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$externals$5d2f$react$2f$jsx$2d$dev$2d$runtime__$5b$external$5d$__$28$react$2f$jsx$2d$dev$2d$runtime$2c$__cjs$29$__["jsxDEV"])("nav", {
-                            className: "flex items-center gap-4 text-sm",
+                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$externals$5d2f$react$2f$jsx$2d$dev$2d$runtime__$5b$external$5d$__$28$react$2f$jsx$2d$dev$2d$runtime$2c$__cjs$29$__["jsxDEV"])("div", {
+                            className: "flex items-center gap-3",
                             children: [
-                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$externals$5d2f$react$2f$jsx$2d$dev$2d$runtime__$5b$external$5d$__$28$react$2f$jsx$2d$dev$2d$runtime$2c$__cjs$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$link$2e$js__$5b$ssr$5d$__$28$ecmascript$29$__["default"], {
-                                    href: "/",
-                                    className: "text-slate-300 hover:text-emerald-400 transition-colors",
-                                    children: "Explore map"
+                                session?.user?.email && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$externals$5d2f$react$2f$jsx$2d$dev$2d$runtime__$5b$external$5d$__$28$react$2f$jsx$2d$dev$2d$runtime$2c$__cjs$29$__["jsxDEV"])("span", {
+                                    className: "hidden text-xs text-slate-400 sm:inline",
+                                    children: session.user.email
                                 }, void 0, false, {
                                     fileName: "[project]/components/Layout.tsx",
-                                    lineNumber: 41,
-                                    columnNumber: 13
+                                    lineNumber: 39,
+                                    columnNumber: 15
                                 }, this),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$externals$5d2f$react$2f$jsx$2d$dev$2d$runtime__$5b$external$5d$__$28$react$2f$jsx$2d$dev$2d$runtime$2c$__cjs$29$__["jsxDEV"])("button", {
                                     type: "button",
                                     onClick: handleAuthClick,
-                                    className: "inline-flex items-center gap-2 rounded-full border border-slate-700 px-3 py-1 text-xs font-semibold text-slate-100 hover:border-emerald-400 hover:text-emerald-300 hover:shadow-[0_0_20px_rgba(16,185,129,0.4)] transition-all",
-                                    children: [
-                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$externals$5d2f$react$2f$jsx$2d$dev$2d$runtime__$5b$external$5d$__$28$react$2f$jsx$2d$dev$2d$runtime$2c$__cjs$29$__["jsxDEV"])("span", {
-                                            className: "inline-flex h-5 w-5 items-center justify-center rounded-full bg-slate-800 text-[10px]",
-                                            children: isAuthed ? session?.user?.email?.[0]?.toUpperCase() || '✓' : '⭑'
-                                        }, void 0, false, {
-                                            fileName: "[project]/components/Layout.tsx",
-                                            lineNumber: 54,
-                                            columnNumber: 15
-                                        }, this),
-                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$externals$5d2f$react$2f$jsx$2d$dev$2d$runtime__$5b$external$5d$__$28$react$2f$jsx$2d$dev$2d$runtime$2c$__cjs$29$__["jsxDEV"])("span", {
-                                            children: authLabel
-                                        }, void 0, false, {
-                                            fileName: "[project]/components/Layout.tsx",
-                                            lineNumber: 59,
-                                            columnNumber: 15
-                                        }, this)
-                                    ]
-                                }, void 0, true, {
+                                    className: "inline-flex items-center justify-center rounded-full border border-slate-600 bg-slate-900 px-3 py-1.5 text-xs font-medium text-slate-50 shadow-sm hover:bg-slate-800",
+                                    children: authLabel
+                                }, void 0, false, {
                                     fileName: "[project]/components/Layout.tsx",
-                                    lineNumber: 49,
+                                    lineNumber: 43,
                                     columnNumber: 13
                                 }, this)
                             ]
                         }, void 0, true, {
                             fileName: "[project]/components/Layout.tsx",
-                            lineNumber: 40,
+                            lineNumber: 37,
                             columnNumber: 11
                         }, this)
                     ]
@@ -167,21 +133,14 @@ function Layout({ children }) {
             }, this),
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$externals$5d2f$react$2f$jsx$2d$dev$2d$runtime__$5b$external$5d$__$28$react$2f$jsx$2d$dev$2d$runtime$2c$__cjs$29$__["jsxDEV"])("main", {
                 className: "flex-1",
-                children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$externals$5d2f$react$2f$jsx$2d$dev$2d$runtime__$5b$external$5d$__$28$react$2f$jsx$2d$dev$2d$runtime$2c$__cjs$29$__["jsxDEV"])("div", {
-                    className: "max-w-6xl mx-auto px-4 py-6",
-                    children: children
-                }, void 0, false, {
-                    fileName: "[project]/components/Layout.tsx",
-                    lineNumber: 67,
-                    columnNumber: 9
-                }, this)
+                children: children
             }, void 0, false, {
                 fileName: "[project]/components/Layout.tsx",
-                lineNumber: 66,
+                lineNumber: 55,
                 columnNumber: 7
             }, this),
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$externals$5d2f$react$2f$jsx$2d$dev$2d$runtime__$5b$external$5d$__$28$react$2f$jsx$2d$dev$2d$runtime$2c$__cjs$29$__["jsxDEV"])("footer", {
-                className: "border-t border-slate-800 bg-slate-950/90 text-xs text-slate-500",
+                className: "border-t border-slate-800 bg-black/90 text-xs text-slate-500",
                 children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$externals$5d2f$react$2f$jsx$2d$dev$2d$runtime__$5b$external$5d$__$28$react$2f$jsx$2d$dev$2d$runtime$2c$__cjs$29$__["jsxDEV"])("div", {
                     className: "max-w-6xl mx-auto px-4 py-4 flex items-center justify-between gap-3",
                     children: [
@@ -193,7 +152,7 @@ function Layout({ children }) {
                             ]
                         }, void 0, true, {
                             fileName: "[project]/components/Layout.tsx",
-                            lineNumber: 73,
+                            lineNumber: 62,
                             columnNumber: 11
                         }, this),
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$externals$5d2f$react$2f$jsx$2d$dev$2d$runtime__$5b$external$5d$__$28$react$2f$jsx$2d$dev$2d$runtime$2c$__cjs$29$__["jsxDEV"])("span", {
@@ -201,18 +160,18 @@ function Layout({ children }) {
                             children: "Independent data on legal cannabis retailers & batches."
                         }, void 0, false, {
                             fileName: "[project]/components/Layout.tsx",
-                            lineNumber: 74,
+                            lineNumber: 63,
                             columnNumber: 11
                         }, this)
                     ]
                 }, void 0, true, {
                     fileName: "[project]/components/Layout.tsx",
-                    lineNumber: 72,
+                    lineNumber: 61,
                     columnNumber: 9
                 }, this)
             }, void 0, false, {
                 fileName: "[project]/components/Layout.tsx",
-                lineNumber: 71,
+                lineNumber: 60,
                 columnNumber: 7
             }, this)
         ]

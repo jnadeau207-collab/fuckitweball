@@ -22,11 +22,9 @@ const regionLabels: { id: RegionId; label: string }[] = [
   { id: 'netherlands', label: 'Netherlands' },
 ];
 
-// Simple helper for formatting numbers in the UI
 const formatNumber = (n: number) =>
   n.toLocaleString(undefined, { maximumFractionDigits: 0 });
 
-// For the quick-jump pill list when zoomed in on the US
 const US_STATES: { id: string; name: string }[] = [
   { id: 'AL', name: 'Alabama' },
   { id: 'AK', name: 'Alaska' },
@@ -135,25 +133,16 @@ const FIPS_TO_STATE_CODE: Record<string, string> = {
   '56': 'WY',
 };
 
-/**
- * Take whatever ID the globe gives us (e.g. "CA", "06", or even 6)
- * and resolve a two-letter state code suitable for STATE_SNAPSHOTS lookups.
- */
 const resolveStateCode = (
   rawId: string | number | null,
 ): string | null => {
   if (rawId === null || rawId === undefined) return null;
-
-  // Normalize everything to a trimmed string first
   const trimmed = String(rawId).trim();
   if (!trimmed) return null;
 
   const upper = trimmed.toUpperCase();
-
-  // Already looks like a postal code (e.g. "CA")
   if (/^[A-Z]{2}$/.test(upper)) return upper;
 
-  // FIPS → postal (e.g. "06" → "CA"). Handle unpadded numbers like "6".
   const fipsKey =
     trimmed.length === 1 ? trimmed.padStart(2, '0') : trimmed;
 
@@ -171,7 +160,7 @@ const AdminStateExplorer: React.FC = () => {
     id: string | number | null;
     name: string | null;
   }>({
-    id: 'CA', // initial: CA
+    id: 'CA',
     name: 'California',
   });
 
@@ -182,13 +171,12 @@ const AdminStateExplorer: React.FC = () => {
     y: number;
   } | null>(null);
 
-  // Initialise a sensible default position for the floating panel
   useEffect(() => {
     if (typeof window === 'undefined') return;
     const vw = window.innerWidth;
     const vh = window.innerHeight;
     const width = 360;
-    const height = 240;
+    const height = 260;
     const padding = 16;
 
     setPanelPosition({
@@ -201,11 +189,11 @@ const AdminStateExplorer: React.FC = () => {
   const zoomedIn = viewAltitude !== null && viewAltitude < 1.6;
   const quickStates = isUS && zoomedIn ? US_STATES : [];
 
-  // For UI: what code should we *show* (CA vs 06)?
   const displayStateCode =
-    isUS ? resolveStateCode(selected.id) ?? String(selected.id ?? '') : String(selected.id ?? '');
+    isUS
+      ? resolveStateCode(selected.id) ?? String(selected.id ?? '')
+      : String(selected.id ?? '');
 
-  // For metrics: what key should we use to look up STATE_SNAPSHOTS?
   const snapshotKey = isUS ? resolveStateCode(selected.id) : null;
 
   const activeSnapshot: StateSnapshot | null =
@@ -214,6 +202,7 @@ const AdminStateExplorer: React.FC = () => {
       : null;
 
   const coveragePct = activeSnapshot?.coverageScore ?? 0;
+  const fullCoaRate = activeSnapshot?.fullCoaRate ?? 0;
 
   const detailTitle =
     activeSnapshot?.name ||
@@ -222,6 +211,8 @@ const AdminStateExplorer: React.FC = () => {
 
   const detailKind = isUS ? 'State snapshot' : 'Region snapshot';
 
+  const adminHref = snapshotKey ? `/admin?state=${snapshotKey}` : '/admin';
+
   const handleRegionChange = (next: RegionId) => {
     setRegion(next);
 
@@ -229,14 +220,12 @@ const AdminStateExplorer: React.FC = () => {
       regionLabels.find(r => r.id === next)?.label ?? null;
 
     if (next === 'unitedStates') {
-      // When coming back to US, default to CA if nothing obvious is selected
       setSelected(prev =>
         prev && prev.id
           ? prev
           : { id: 'CA', name: 'California' },
       );
     } else {
-      // For non-US regions we treat the region itself as the "selection"
       setSelected({
         id: next,
         name: label,
@@ -257,139 +246,86 @@ const AdminStateExplorer: React.FC = () => {
     if (typeof window === 'undefined' || !coords) return;
 
     const panelWidth = 360;
-    const panelHeight = 240;
+    const panelHeight = 260;
     const padding = 16;
 
     const vw = window.innerWidth;
     const vh = window.innerHeight;
 
-    let x = coords.x + 16;
-    let y = coords.y + 16;
+    // Nudge toward the click, but keep the card hugging the edge
+    let x = Math.max(
+      vw - panelWidth - padding,
+      Math.min(coords.x + 24, vw - panelWidth - padding),
+    );
+    let y = Math.min(coords.y + 24, vh - panelHeight - padding);
 
-    if (x + panelWidth + padding > vw) {
-      x = vw - panelWidth - padding;
-    }
-    if (y + panelHeight + padding > vh) {
-      y = vh - panelHeight - padding;
-    }
-    if (x < padding) x = padding;
     if (y < padding) y = padding;
 
     setPanelPosition({ x, y });
   };
 
+  const crumbScope = isUS ? 'US · States' : 'Global · Regions';
+
+  const crumbLine = selected.name
+    ? `${displayStateCode} · ${selected.name} — metallic glass tiles punched out of a spinning globe.`
+    : 'Drag, hover, and click the atlas to explore live coverage.';
+
   return (
-    <main className="relative min-h-[calc(100vh-3.5rem)] bg-black text-slate-50">
-      <div className="mx-auto max-w-6xl px-4 py-8">
-        {/* Header */}
-        <header className="mb-6 flex flex-col gap-3 md:flex-row md:items-baseline md:justify-between">
-          <div>
-            <p className="text-[0.7rem] font-semibold uppercase tracking-[0.2em] text-sky-400">
-              CartFax · Atlas
-            </p>
-            <h1 className="mt-1 text-2xl font-semibold tracking-tight text-slate-50">
-              COA coverage across legal markets
-            </h1>
-            <p className="mt-1 max-w-xl text-sm text-slate-400">
-              Spin the globe and click any state or region to see where
-              CartFax is actively tracking batches, labs, and recalls.
-              Data here is synthetic while we wire live feeds into the
-              atlas.
-            </p>
-          </div>
-        </header>
-
-        {/* Globe container with subtle gradient */}
-        <div className="relative overflow-hidden rounded-3xl bg-black">
-          {/* Glow blobs */}
-          <div className="pointer-events-none absolute -left-28 -top-32 h-64 w-64 rounded-full bg-sky-500/20 blur-3xl" />
-          <div className="pointer-events-none absolute -right-40 bottom-0 h-72 w-72 rounded-full bg-emerald-500/20 blur-[72px]" />
-
-          <div className="relative flex flex-col gap-4 p-4 lg:p-5">
-            {/* Region tabs + interaction hint */}
-            <div className="flex flex-col items-center gap-3">
-              <div className="inline-flex rounded-full border border-slate-700 bg-black px-1 py-1 shadow-sm shadow-slate-900">
-                {regionLabels.map(r => (
-                  <button
-                    key={r.id}
-                    type="button"
-                    onClick={() => handleRegionChange(r.id)}
-                    className={
-                      'rounded-full px-4 py-1.5 text-[11px] transition ' +
-                      (region === r.id
-                        ? 'bg-sky-500 text-white shadow-sm shadow-sky-500/40'
-                        : 'text-slate-400 hover:text-slate-100')
-                    }
-                  >
-                    {r.label}
-                  </button>
-                ))}
-              </div>
-              <div className="flex items-center gap-2 text-[11px] text-slate-500">
-                <span className="inline-flex h-2 w-2 rounded-full bg-sky-400 shadow-[0_0_0_4px_rgba(56,189,248,0.40)]" />
-                <span>
-                  Drag to spin · Hover to “lift” · Scroll to zoom · Click to
-                  drill in
-                </span>
-              </div>
-            </div>
-
-            {/* Globe */}
-            <div className="relative mt-3 aspect-[4/3] w-full overflow-hidden rounded-2xl">
-              {/* Dark rectangle that fades into the background at the edges */}
-              <div className="pointer-events-none absolute inset-0 rounded-2xl bg-[radial-gradient(circle_at_center,rgba(15,23,42,0.95)_0%,rgba(15,23,42,0.9)_55%,rgba(15,23,42,0)_100%)]" />
-              <div className="relative z-10 h-full w-full rounded-2xl border border-slate-800/80 bg-black/90">
-                <GlobeStates
-                  region={region}
-                  onRegionChange={handleRegionChange}
-                  onStateSelect={handleStateSelectFromGlobe}
-                  onViewChange={alt => setViewAltitude(alt)}
-                />
-              </div>
-            </div>
-          </div>
+    <main className="flex min-h-screen flex-col bg-black text-slate-50">
+      {/* Top crumb + region tabs */}
+      <div className="mx-auto w-full max-w-5xl px-4 pt-6 pb-4">
+        <div className="mb-3 flex flex-wrap items-baseline gap-3">
+          <p className="text-[0.7rem] font-semibold uppercase tracking-[0.22em] text-sky-400">
+            {crumbScope}
+          </p>
+          <p className="text-[0.75rem] text-slate-400">{crumbLine}</p>
         </div>
 
-        {/* Info panels BELOW the map instead of on the side */}
-        <div className="mt-6 grid gap-4 md:grid-cols-2">
-          <section className="rounded-2xl border border-slate-800 bg-black/80 p-4 shadow-[0_18px_60px_rgba(0,0,0,0.85)]">
-            <p className="text-[0.7rem] font-semibold uppercase tracking-[0.2em] text-slate-400">
-              Why this exists
-            </p>
-            <h2 className="mt-2 text-base font-semibold text-slate-50">
-              A single cockpit for cannabis safety data
-            </h2>
-            <p className="mt-2 text-xs text-slate-400">
-              CartFax ingests COAs from licensed labs, normalizes the data,
-              and maps it down to batches, dispensaries, and brands. The
-              atlas gives regulators, operators, and patients a live view of
-              where safety data is strong—and where it&apos;s missing.
-            </p>
-            <p className="mt-3 text-[0.7rem] text-slate-500">
-              Today you&apos;re seeing demo numbers so we can iterate on the
-              experience while we finish wiring live ingestion,
-              deduplication, and alerting pipelines.
-            </p>
-          </section>
-
-          <section className="rounded-2xl border border-emerald-500/30 bg-emerald-500/10 p-4 text-xs text-emerald-50 shadow-[0_18px_60px_rgba(0,0,0,0.85)]">
-            <p className="text-[0.7rem] font-semibold uppercase tracking-[0.18em] text-emerald-300">
-              Admin access
-            </p>
-            <p className="mt-1 text-xs text-emerald-50">
-              If you&apos;re an operator, lab, or regulator, you can use the
-              admin tools to manage batches, COA uploads, and locations in
-              more detail.
-            </p>
-            <p className="mt-2 text-[0.7rem] text-emerald-200/80">
-              Use the &ldquo;Log in&rdquo; button in the top-right, then
-              come back to this atlas or open the dedicated admin hub.
-            </p>
-          </section>
+        <div className="flex flex-col items-center gap-3">
+          <div className="inline-flex rounded-full border border-slate-700 bg-black px-1 py-1 shadow-sm shadow-slate-900">
+            {regionLabels.map(r => (
+              <button
+                key={r.id}
+                type="button"
+                onClick={() => handleRegionChange(r.id)}
+                className={
+                  'rounded-full px-4 py-1.5 text-[11px] transition ' +
+                  (region === r.id
+                    ? 'bg-sky-500 text-white shadow-sm shadow-sky-500/40'
+                    : 'text-slate-400 hover:text-slate-100')
+                }
+              >
+                {r.label}
+              </button>
+            ))}
+          </div>
+          <div className="flex items-center gap-2 text-[11px] text-slate-500">
+            <span className="inline-flex h-2 w-2 rounded-full bg-sky-400 shadow-[0_0_0_4px_rgba(56,189,248,0.40)]" />
+            <span>
+              Drag to spin · Hover to “lift” · Scroll to zoom · Click to drill
+              in
+            </span>
+          </div>
         </div>
       </div>
 
-      {/* Quick-jump overlay for US only, when zoomed in */}
+      {/* Centered globe takes up the remaining space */}
+      <div className="relative flex flex-1 items-center justify-center">
+        <div className="relative aspect-square w-[min(80vw,80vh)] max-w-[820px]">
+          {/* halo */}
+          <div className="pointer-events-none absolute inset-0 rounded-full bg-[radial-gradient(circle_at_center,rgba(8,47,73,0.8)_0%,rgba(8,47,73,0.35)_60%,rgba(0,0,0,0)_100%)]" />
+          <div className="relative z-10 h-full w-full overflow-hidden rounded-full border border-slate-900 bg-black">
+            <GlobeStates
+              region={region}
+              onRegionChange={handleRegionChange}
+              onStateSelect={handleStateSelectFromGlobe}
+              onViewChange={alt => setViewAltitude(alt)}
+            />
+          </div>
+        </div>
+      </div>
+
+      {/* Quick-jump overlay for US when zoomed in */}
       {quickStates.length > 0 && (
         <aside className="pointer-events-auto fixed left-6 top-1/2 z-30 hidden max-h-[420px] w-[220px] -translate-y-1/2 rounded-3xl border border-slate-700 bg-black/85 p-3 shadow-[0_18px_60px_rgba(0,0,0,0.9)] backdrop-blur lg:block">
           <p className="mb-2 px-1 text-[10px] font-semibold uppercase tracking-[0.18em] text-slate-400">
@@ -413,7 +349,7 @@ const AdminStateExplorer: React.FC = () => {
                       const vw = window.innerWidth;
                       const vh = window.innerHeight;
                       const width = 360;
-                      const height = 240;
+                      const height = 260;
                       const padding = 16;
 
                       const x = Math.min(
@@ -443,7 +379,7 @@ const AdminStateExplorer: React.FC = () => {
         </aside>
       )}
 
-      {/* Floating detail panel that follows the click position */}
+      {/* Floating detail panel */}
       {selected.name && panelPosition && (
         <section
           className="pointer-events-auto fixed z-30 max-w-sm rounded-3xl border border-slate-700 bg-black/95 shadow-[0_22px_70px_rgba(0,0,0,0.9)] backdrop-blur"
@@ -461,7 +397,7 @@ const AdminStateExplorer: React.FC = () => {
             </h2>
             <p className="mt-1 text-[0.78rem] text-slate-400">
               {activeSnapshot
-                ? 'Synthetic coverage metrics while we connect live COA feeds and lab integrations.'
+                ? 'Illustrative coverage metrics while we connect live COA feeds and lab integrations.'
                 : 'We haven’t wired live coverage here yet. COA parsing and map tiles are coming soon.'}
             </p>
           </header>
@@ -490,12 +426,12 @@ const AdminStateExplorer: React.FC = () => {
                     Coverage score
                   </dt>
                   <dd className="mt-1 text-sm font-semibold text-slate-50">
-                    {activeSnapshot.coverageScore}/100
+                    {coveragePct}/100
                   </dd>
                 </div>
                 <div>
                   <dt className="text-[0.68rem] font-medium uppercase tracking-[0.16em] text-slate-500">
-                    Recalls
+                    Recent recalls
                   </dt>
                   <dd className="mt-1 text-sm font-semibold text-slate-50">
                     {activeSnapshot.recentRecalls}
@@ -503,27 +439,49 @@ const AdminStateExplorer: React.FC = () => {
                 </div>
               </dl>
 
-              {/* Coverage bar */}
-              <div className="mb-4">
-                <div className="flex items-center justify-between text-[0.7rem] text-slate-400">
-                  <span className="font-medium uppercase tracking-[0.16em]">
-                    Coverage
-                  </span>
-                  <span className="font-semibold text-slate-100">
-                    {coveragePct}%
-                  </span>
+              <div className="space-y-3">
+                <div>
+                  <div className="flex items-center justify-between text-[0.7rem] text-slate-400">
+                    <span className="font-medium uppercase tracking-[0.16em]">
+                      Coverage
+                    </span>
+                    <span className="font-semibold text-slate-100">
+                      {coveragePct}%
+                    </span>
+                  </div>
+                  <div className="mt-1 h-2 rounded-full bg-slate-800">
+                    <div
+                      className="h-2 rounded-full bg-gradient-to-r from-emerald-400 to-sky-500 shadow-[0_0_12px_rgba(56,189,248,0.6)]"
+                      style={{
+                        width: `${Math.min(coveragePct, 100)}%`,
+                      }}
+                    />
+                  </div>
                 </div>
-                <div className="mt-1 h-2 rounded-full bg-slate-800">
-                  <div
-                    className="h-2 rounded-full bg-gradient-to-r from-emerald-400 to-sky-500 shadow-[0_0_12px_rgba(56,189,248,0.6)]"
-                    style={{
-                      width: `${Math.min(coveragePct, 100)}%`,
-                    }}
-                  />
+
+                <div>
+                  <div className="flex items-center justify-between text-[0.7rem] text-slate-400">
+                    <span className="font-medium uppercase tracking-[0.16em]">
+                      Full COA coverage
+                    </span>
+                    <span className="font-semibold text-slate-100">
+                      {fullCoaRate}%
+                    </span>
+                  </div>
+                  <div className="mt-1 h-2 rounded-full bg-slate-800">
+                    <div
+                      className="h-2 rounded-full bg-gradient-to-r from-sky-400 to-indigo-500 shadow-[0_0_10px_rgba(129,140,248,0.6)]"
+                      style={{
+                        width: `${Math.min(fullCoaRate, 100)}%`,
+                      }}
+                    />
+                  </div>
                 </div>
-                <p className="mt-1 text-[0.7rem] text-slate-500">
-                  {coveragePct}% estimated coverage of the legal market in
-                  this state.
+
+                <p className="text-[0.7rem] text-slate-500">
+                  Metrics shown are illustrative only. In production this
+                  panel will be driven by live batch, lab, and recall data
+                  from your CartFax deployment.
                 </p>
               </div>
             </div>
@@ -531,7 +489,7 @@ const AdminStateExplorer: React.FC = () => {
 
           <footer className="flex items-center justify-between gap-3 border-t border-slate-800 px-4 py-2.5">
             <Link
-              href="/admin"
+              href={adminHref}
               className="inline-flex items-center justify-center rounded-full bg-sky-500 px-3 py-1.5 text-[0.78rem] font-medium text-white shadow-sm shadow-sky-500/40 transition hover:bg-sky-600"
             >
               Open admin data tools

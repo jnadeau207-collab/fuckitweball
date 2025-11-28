@@ -53,6 +53,7 @@ const GlobeStates: React.FC<GlobeStatesProps> = ({
   const [usPolygons, setUsPolygons] = useState<any[]>([]);
   const [worldPolygons, setWorldPolygons] = useState<any[]>([]);
   const [hoverPoly, setHoverPoly] = useState<any | null>(null);
+  const [selectedStateId, setSelectedStateId] = useState<string | null>(null);
 
   const [stainlessTex, setStainlessTex] = useState<THREE.Texture | null>(null);
   const [steelTex, setSteelTex] = useState<THREE.Texture | null>(null);
@@ -60,7 +61,31 @@ const GlobeStates: React.FC<GlobeStatesProps> = ({
 
   const isUS = region === 'unitedStates';
 
-  // --- load topojson ---
+  // --- helpers --------------------------------------------------------------
+
+  const getStatePostal = (poly: any): string | null => {
+    const postal = poly?.properties?.postal ?? poly?.id;
+    if (!postal) return null;
+    return String(postal).toUpperCase();
+  };
+
+  const isState = (poly: any) =>
+    !!poly?.properties && typeof poly.properties.postal !== 'undefined';
+
+  const isCountry = (poly: any) =>
+    poly?.properties && typeof poly.id !== 'undefined' && !isState(poly);
+
+  const getCountryRegion = (poly: any): RegionId | null => {
+    const idNum =
+      typeof poly.id === 'number'
+        ? poly.id
+        : Number.parseInt(String(poly.id), 10);
+
+    if (Number.isNaN(idNum)) return null;
+    return COUNTRY_ID_TO_REGION[idNum] ?? null;
+  };
+
+  // --- load topojson --------------------------------------------------------
 
   useEffect(() => {
     (async () => {
@@ -95,7 +120,7 @@ const GlobeStates: React.FC<GlobeStatesProps> = ({
     })();
   }, []);
 
-  // --- textures for materials ---
+  // --- textures for materials -----------------------------------------------
 
   useEffect(() => {
     const loader = new THREE.TextureLoader();
@@ -116,7 +141,7 @@ const GlobeStates: React.FC<GlobeStatesProps> = ({
     });
   }, []);
 
-  // --- focus camera on region ---
+  // --- focus camera on region -----------------------------------------------
 
   useEffect(() => {
     if (!globeRef.current) return;
@@ -131,7 +156,7 @@ const GlobeStates: React.FC<GlobeStatesProps> = ({
     );
   }, [region, usPolygons]);
 
-  // --- altitude reporting ---
+  // --- altitude reporting ----------------------------------------------------
 
   useEffect(() => {
     if (!globeRef.current || !onViewChange) return;
@@ -148,30 +173,44 @@ const GlobeStates: React.FC<GlobeStatesProps> = ({
     };
   }, [onViewChange]);
 
-  // --- helpers ---
+  // --- combined polygon data -------------------------------------------------
 
   const allPolygons = useMemo(
     () => [...worldPolygons, ...usPolygons],
     [worldPolygons, usPolygons],
   );
 
-  const isState = (poly: any) =>
-    poly.properties && typeof poly.properties.postal !== 'undefined';
+  // --- explosion / altitude logic -------------------------------------------
 
-  const isCountry = (poly: any) =>
-    poly.properties && typeof poly.id !== 'undefined' && !isState(poly);
+  const BASE_ALT_STATE = 0.015;      // base extrusion for US states
+  const BASE_ALT_COUNTRY = 0.008;    // base extrusion for countries
+  const BASE_ALT_OTHER = 0.004;
 
-  const getCountryRegion = (poly: any): RegionId | null => {
-    const idNum =
-      typeof poly.id === 'number'
-        ? poly.id
-        : Number.parseInt(String(poly.id), 10);
+  // toned down ~30% from the previous “max boom”
+  const EXTRA_SELECTED = 0.010;
+  const EXTRA_HOVER = 0.005;
 
-    if (Number.isNaN(idNum)) return null;
-    return COUNTRY_ID_TO_REGION[idNum] ?? null;
+  const polygonAltitude = (poly: any) => {
+    if (isState(poly)) {
+      const id = getStatePostal(poly);
+      const isSelected = id && selectedStateId && id === selectedStateId;
+      const isHovered = hoverPoly === poly;
+
+      let extra = 0;
+      if (isSelected) extra += EXTRA_SELECTED;
+      if (isHovered) extra += EXTRA_HOVER;
+
+      return BASE_ALT_STATE + extra;
+    }
+
+    if (isCountry(poly)) {
+      return BASE_ALT_COUNTRY;
+    }
+
+    return BASE_ALT_OTHER;
   };
 
-  // --- render ---
+  // --- render ----------------------------------------------------------------
 
   return (
     <div className="h-full w-full">
@@ -184,42 +223,49 @@ const GlobeStates: React.FC<GlobeStatesProps> = ({
           hexPolygonMargin={0.4}
           globeMaterial={
             new THREE.MeshStandardMaterial({
-              metalness: 0.8,
-              roughness: 0.25,
+              metalness: 0.85,
+              roughness: 0.28,
               color: new THREE.Color('#020617'),
               envMap: stainlessTex ?? undefined,
               envMapIntensity: 0.9,
             })
           }
           polygonsData={allPolygons}
-          polygonAltitude={poly =>
-            isState(poly) ? 0.02 : isCountry(poly) ? 0.01 : 0.005
-          }
+          polygonAltitude={polygonAltitude}
           polygonCapMaterial={poly => {
+            // state caps: dark, glossy, not bright blue
             if (isState(poly)) {
+              const id = getStatePostal(poly);
+              const isSelected = id && selectedStateId && id === selectedStateId;
+              const isHovered = hoverPoly === poly;
+
+              const emissiveBase = new THREE.Color('#020617');
+              const emissiveHighlight = new THREE.Color('#22c55e'); // olive-ish
+
               return new THREE.MeshStandardMaterial({
-                metalness: 0.95,
-                roughness: 0.3,
-                color:
-                  hoverPoly && hoverPoly === poly
-                    ? new THREE.Color('#38bdf8')
-                    : new THREE.Color('#020617'),
-                emissive: new THREE.Color(
-                  hoverPoly && hoverPoly === poly ? '#38bdf8' : '#020617',
-                ),
-                emissiveIntensity: hoverPoly && hoverPoly === poly ? 0.8 : 0.3,
+                metalness: 0.96,
+                roughness: 0.26,
+                color: new THREE.Color('#020617'),
+                emissive:
+                  isHovered || isSelected ? emissiveHighlight : emissiveBase,
+                emissiveIntensity: isHovered
+                  ? 0.4
+                  : isSelected
+                  ? 0.25
+                  : 0.16,
                 envMap: steelTex ?? undefined,
-                envMapIntensity: 0.9,
+                envMapIntensity: isHovered || isSelected ? 1.2 : 0.9,
               });
             }
 
+            // countries: subtle metallic band
             if (isCountry(poly)) {
               return new THREE.MeshStandardMaterial({
                 metalness: 0.75,
                 roughness: 0.35,
                 color: new THREE.Color('#020617'),
                 emissive: new THREE.Color('#020617'),
-                emissiveIntensity: 0.2,
+                emissiveIntensity: 0.18,
                 envMap: blueTex ?? undefined,
                 envMapIntensity: 0.7,
               });
@@ -231,9 +277,17 @@ const GlobeStates: React.FC<GlobeStatesProps> = ({
               color: new THREE.Color('#020617'),
             });
           }}
-          polygonSideColor={() => '#020617'}
+          // sides: olive backlight – shows mainly in gaps between states
+          polygonSideColor={poly =>
+            isState(poly)
+              ? 'rgba(34,197,94,0.85)' // olive/emerald glow in the seams
+              : '#020617'
+          }
+          // border lines: very subtle, no neon blue outline
           polygonStrokeColor={poly =>
-            isState(poly) ? '#38bdf8' : 'rgba(148,163,184,0.4)'
+            isState(poly)
+              ? 'rgba(21,94,49,0.45)'
+              : 'rgba(30,64,175,0.25)'
           }
           polygonLabel={poly =>
             isState(poly)
@@ -247,14 +301,20 @@ const GlobeStates: React.FC<GlobeStatesProps> = ({
             const name = poly.properties?.name ?? '';
 
             const clickCoords =
-              event && typeof event.clientX === 'number'
-                ? { x: event.clientX, y: event.clientY }
+              event && typeof (event as any).clientX === 'number'
+                ? {
+                    x: (event as any).clientX as number,
+                    y: (event as any).clientY as number,
+                  }
                 : undefined;
 
             if (isState(poly)) {
-              if (!onStateSelect) return;
-              const id = poly.properties?.postal ?? poly.id ?? '';
-              onStateSelect(id, name, clickCoords);
+              const id = getStatePostal(poly) ?? poly.id ?? '';
+              setSelectedStateId(id || null);
+
+              if (onStateSelect) {
+                onStateSelect(id, name, clickCoords);
+              }
               return;
             }
 

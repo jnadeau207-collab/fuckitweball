@@ -55,11 +55,25 @@ const GlobeStates = ({ region, onStateSelect, onViewChange, onRegionChange })=>{
     const [usPolygons, setUsPolygons] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$index$2e$js__$5b$client$5d$__$28$ecmascript$29$__["useState"])([]);
     const [worldPolygons, setWorldPolygons] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$index$2e$js__$5b$client$5d$__$28$ecmascript$29$__["useState"])([]);
     const [hoverPoly, setHoverPoly] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$index$2e$js__$5b$client$5d$__$28$ecmascript$29$__["useState"])(null);
+    const [selectedStateId, setSelectedStateId] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$index$2e$js__$5b$client$5d$__$28$ecmascript$29$__["useState"])(null);
     const [stainlessTex, setStainlessTex] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$index$2e$js__$5b$client$5d$__$28$ecmascript$29$__["useState"])(null);
     const [steelTex, setSteelTex] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$index$2e$js__$5b$client$5d$__$28$ecmascript$29$__["useState"])(null);
     const [blueTex, setBlueTex] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$index$2e$js__$5b$client$5d$__$28$ecmascript$29$__["useState"])(null);
     const isUS = region === 'unitedStates';
-    // --- load topojson ---
+    // --- helpers --------------------------------------------------------------
+    const getStatePostal = (poly)=>{
+        const postal = poly?.properties?.postal ?? poly?.id;
+        if (!postal) return null;
+        return String(postal).toUpperCase();
+    };
+    const isState = (poly)=>!!poly?.properties && typeof poly.properties.postal !== 'undefined';
+    const isCountry = (poly)=>poly?.properties && typeof poly.id !== 'undefined' && !isState(poly);
+    const getCountryRegion = (poly)=>{
+        const idNum = typeof poly.id === 'number' ? poly.id : Number.parseInt(String(poly.id), 10);
+        if (Number.isNaN(idNum)) return null;
+        return COUNTRY_ID_TO_REGION[idNum] ?? null;
+    };
+    // --- load topojson --------------------------------------------------------
     (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$index$2e$js__$5b$client$5d$__$28$ecmascript$29$__["useEffect"])({
         "GlobeStates.useEffect": ()=>{
             ({
@@ -72,14 +86,14 @@ const GlobeStates = ({ region, onStateSelect, onViewChange, onRegionChange })=>{
                             "GlobeStates.useEffect.states": (f)=>({
                                     ...f,
                                     properties: {
-                                        ...f.properties || {},
-                                        __kind: 'state'
+                                        ...f.properties,
+                                        postal: f.properties?.postal || f.id
                                     }
                                 })
                         }["GlobeStates.useEffect.states"]);
                         setUsPolygons(states);
                     } catch (err) {
-                        console.error('Failed to load US states topojson', err);
+                        console.error('Error loading US states topojson', err);
                     }
                 }
             })["GlobeStates.useEffect"]();
@@ -93,42 +107,31 @@ const GlobeStates = ({ region, onStateSelect, onViewChange, onRegionChange })=>{
                         const res = await fetch(worldCountriesUrl);
                         const topo = await res.json();
                         const geo = __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$topojson$2d$client$2f$src$2f$feature$2e$js__$5b$client$5d$__$28$ecmascript$29$__$3c$export__default__as__feature$3e$__["feature"](topo, topo.objects.countries);
-                        const countries = geo.features.map({
-                            "GlobeStates.useEffect.countries": (f)=>({
-                                    ...f,
-                                    properties: {
-                                        ...f.properties || {},
-                                        __kind: 'country'
-                                    }
-                                })
-                        }["GlobeStates.useEffect.countries"]);
-                        setWorldPolygons(countries);
+                        setWorldPolygons(geo.features);
                     } catch (err) {
-                        console.error('Failed to load world countries topojson', err);
+                        console.error('Error loading world countries topojson', err);
                     }
                 }
             })["GlobeStates.useEffect"]();
         }
     }["GlobeStates.useEffect"], []);
-    // --- load textures for materials ---
+    // --- textures for materials -----------------------------------------------
     (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$index$2e$js__$5b$client$5d$__$28$ecmascript$29$__["useEffect"])({
         "GlobeStates.useEffect": ()=>{
-            if ("TURBOPACK compile-time falsy", 0) //TURBOPACK unreachable
-            ;
             const loader = new __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$three$2f$build$2f$three$2e$core$2e$js__$5b$client$5d$__$28$ecmascript$29$__["TextureLoader"]();
-            loader.load('/uploads/stainless.png', {
+            loader.load('/textures/stainless.jpg', {
                 "GlobeStates.useEffect": (tex)=>{
                     tex.wrapS = tex.wrapT = __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$three$2f$build$2f$three$2e$core$2e$js__$5b$client$5d$__$28$ecmascript$29$__["RepeatWrapping"];
                     setStainlessTex(tex);
                 }
             }["GlobeStates.useEffect"]);
-            loader.load('/uploads/steel.png', {
+            loader.load('/textures/steel.jpg', {
                 "GlobeStates.useEffect": (tex)=>{
                     tex.wrapS = tex.wrapT = __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$three$2f$build$2f$three$2e$core$2e$js__$5b$client$5d$__$28$ecmascript$29$__["RepeatWrapping"];
                     setSteelTex(tex);
                 }
             }["GlobeStates.useEffect"]);
-            loader.load('/uploads/blue.png', {
+            loader.load('/textures/blue-metal.jpg', {
                 "GlobeStates.useEffect": (tex)=>{
                     tex.wrapS = tex.wrapT = __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$three$2f$build$2f$three$2e$core$2e$js__$5b$client$5d$__$28$ecmascript$29$__["RepeatWrapping"];
                     setBlueTex(tex);
@@ -136,18 +139,10 @@ const GlobeStates = ({ region, onStateSelect, onViewChange, onRegionChange })=>{
             }["GlobeStates.useEffect"]);
         }
     }["GlobeStates.useEffect"], []);
-    // --- camera & controls ---
+    // --- focus camera on region -----------------------------------------------
     (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$index$2e$js__$5b$client$5d$__$28$ecmascript$29$__["useEffect"])({
         "GlobeStates.useEffect": ()=>{
             if (!globeRef.current) return;
-            const controls = globeRef.current.controls();
-            controls.autoRotate = true;
-            controls.autoRotateSpeed = 0.25;
-            controls.enableDamping = true;
-            controls.dampingFactor = 0.05;
-            controls.enableZoom = true;
-            controls.minDistance = 140;
-            controls.maxDistance = 650;
             const focus = regionFocus[region];
             globeRef.current.pointOfView({
                 lat: focus.lat,
@@ -159,214 +154,136 @@ const GlobeStates = ({ region, onStateSelect, onViewChange, onRegionChange })=>{
         region,
         usPolygons
     ]);
-    // --- altitude reporting ---
+    // --- altitude reporting ----------------------------------------------------
     (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$index$2e$js__$5b$client$5d$__$28$ecmascript$29$__["useEffect"])({
         "GlobeStates.useEffect": ()=>{
             if (!globeRef.current || !onViewChange) return;
-            let frameId;
-            let lastAlt = 0;
-            const tick = {
-                "GlobeStates.useEffect.tick": ()=>{
-                    const pov = globeRef.current.pointOfView();
-                    if (pov && typeof pov.altitude === 'number') {
-                        const alt = pov.altitude;
-                        if (Math.abs(alt - lastAlt) > 0.02) {
-                            lastAlt = alt;
-                            onViewChange(alt);
-                        }
-                    }
-                    frameId = requestAnimationFrame(tick);
+            const globe = globeRef.current;
+            const handle = {
+                "GlobeStates.useEffect.handle": ()=>{
+                    const { altitude } = globe.pointOfView();
+                    onViewChange(altitude);
                 }
-            }["GlobeStates.useEffect.tick"];
-            tick();
+            }["GlobeStates.useEffect.handle"];
+            globe.controls().addEventListener('change', handle);
             return ({
-                "GlobeStates.useEffect": ()=>cancelAnimationFrame(frameId)
+                "GlobeStates.useEffect": ()=>{
+                    globe.controls().removeEventListener('change', handle);
+                }
             })["GlobeStates.useEffect"];
         }
     }["GlobeStates.useEffect"], [
         onViewChange
     ]);
-    const isState = (d)=>d?.properties?.__kind === 'state';
-    const isCountry = (d)=>d?.properties?.__kind === 'country';
-    const getCountryRegion = (d)=>{
-        const rawId = d?.id;
-        const numericId = typeof rawId === 'number' ? rawId : rawId ? Number(rawId) : NaN;
-        if (!Number.isFinite(numericId)) return null;
-        return COUNTRY_ID_TO_REGION[numericId] ?? null;
-    };
-    const isActiveCountry = (d)=>{
-        if (!isCountry(d)) return false;
-        const r = getCountryRegion(d);
-        return r !== null && r === region;
-    };
-    // --- polygon data ---
-    const polygonsData = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$index$2e$js__$5b$client$5d$__$28$ecmascript$29$__["useMemo"])({
-        "GlobeStates.useMemo[polygonsData]": ()=>{
-            if (!worldPolygons.length) return usPolygons;
-            if (isUS) {
-                const worldWithoutUS = worldPolygons.filter({
-                    "GlobeStates.useMemo[polygonsData].worldWithoutUS": (f)=>{
-                        const rawId = f.id;
-                        const numericId = typeof rawId === 'number' ? rawId : rawId ? Number(rawId) : NaN;
-                        return numericId !== 840;
-                    }
-                }["GlobeStates.useMemo[polygonsData].worldWithoutUS"]);
-                return [
-                    ...worldWithoutUS,
-                    ...usPolygons
-                ];
-            }
-            return worldPolygons;
-        }
-    }["GlobeStates.useMemo[polygonsData]"], [
+    // --- combined polygon data -------------------------------------------------
+    const allPolygons = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$index$2e$js__$5b$client$5d$__$28$ecmascript$29$__["useMemo"])({
+        "GlobeStates.useMemo[allPolygons]": ()=>[
+                ...worldPolygons,
+                ...usPolygons
+            ]
+    }["GlobeStates.useMemo[allPolygons]"], [
         worldPolygons,
-        usPolygons,
-        isUS
+        usPolygons
     ]);
-    // --- glossy materials ---
-    const { stateMaterial, countryMaterial, activeCountryMaterial, baseCountryMaterial } = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$index$2e$js__$5b$client$5d$__$28$ecmascript$29$__["useMemo"])({
-        "GlobeStates.useMemo": ()=>{
-            const stateMat = new __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$three$2f$build$2f$three$2e$core$2e$js__$5b$client$5d$__$28$ecmascript$29$__["MeshPhysicalMaterial"]({
-                map: stainlessTex || undefined,
-                color: new __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$three$2f$build$2f$three$2e$core$2e$js__$5b$client$5d$__$28$ecmascript$29$__["Color"]('#f3f4f6'),
-                metalness: 0.98,
-                roughness: 0.08,
-                clearcoat: 0.9,
-                clearcoatRoughness: 0.03,
-                reflectivity: 1.0
-            });
-            const countryMat = new __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$three$2f$build$2f$three$2e$core$2e$js__$5b$client$5d$__$28$ecmascript$29$__["MeshStandardMaterial"]({
-                map: steelTex || undefined,
-                color: new __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$three$2f$build$2f$three$2e$core$2e$js__$5b$client$5d$__$28$ecmascript$29$__["Color"]('#d1d5db'),
-                metalness: 0.7,
-                roughness: 0.35
-            });
-            const activeMat = new __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$three$2f$build$2f$three$2e$core$2e$js__$5b$client$5d$__$28$ecmascript$29$__["MeshPhysicalMaterial"]({
-                map: steelTex || undefined,
-                color: new __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$three$2f$build$2f$three$2e$core$2e$js__$5b$client$5d$__$28$ecmascript$29$__["Color"]('#bfdbfe'),
-                metalness: 0.95,
-                roughness: 0.12,
-                clearcoat: 0.85,
-                clearcoatRoughness: 0.08,
-                emissive: blueTex ? new __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$three$2f$build$2f$three$2e$core$2e$js__$5b$client$5d$__$28$ecmascript$29$__["Color"]('#1d4ed8') : new __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$three$2f$build$2f$three$2e$core$2e$js__$5b$client$5d$__$28$ecmascript$29$__["Color"]('#1e40af'),
-                emissiveIntensity: 0.15
-            });
-            const baseMat = new __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$three$2f$build$2f$three$2e$core$2e$js__$5b$client$5d$__$28$ecmascript$29$__["MeshStandardMaterial"]({
-                color: new __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$three$2f$build$2f$three$2e$core$2e$js__$5b$client$5d$__$28$ecmascript$29$__["Color"]('#e5e7eb'),
-                metalness: 0.5,
-                roughness: 0.6
-            });
-            return {
-                stateMaterial: stateMat,
-                countryMaterial: countryMat,
-                activeCountryMaterial: activeMat,
-                baseCountryMaterial: baseMat
-            };
+    // --- explosion / altitude logic -------------------------------------------
+    const BASE_ALT_STATE = 0.015; // base extrusion for US states
+    const BASE_ALT_COUNTRY = 0.008; // base extrusion for countries
+    const BASE_ALT_OTHER = 0.004;
+    // toned down ~30% from the previous “max boom”
+    const EXTRA_SELECTED = 0.010;
+    const EXTRA_HOVER = 0.005;
+    const polygonAltitude = (poly)=>{
+        if (isState(poly)) {
+            const id = getStatePostal(poly);
+            const isSelected = id && selectedStateId && id === selectedStateId;
+            const isHovered = hoverPoly === poly;
+            let extra = 0;
+            if (isSelected) extra += EXTRA_SELECTED;
+            if (isHovered) extra += EXTRA_HOVER;
+            return BASE_ALT_STATE + extra;
         }
-    }["GlobeStates.useMemo"], [
-        stainlessTex,
-        steelTex,
-        blueTex
-    ]);
-    // --- render ---
+        if (isCountry(poly)) {
+            return BASE_ALT_COUNTRY;
+        }
+        return BASE_ALT_OTHER;
+    };
+    // --- render ----------------------------------------------------------------
     return /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-        className: "relative mx-auto flex items-center justify-center",
-        style: {
-            width: 960,
-            height: 540
-        },
+        className: "h-full w-full",
         children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-            className: "relative z-10",
+            className: "h-full w-full",
             children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2d$globe$2e$gl$2f$dist$2f$react$2d$globe$2e$gl$2e$mjs__$5b$client$5d$__$28$ecmascript$29$__["default"], {
                 ref: globeRef,
-                width: 960,
-                height: 540,
-                backgroundColor: "rgba(0,0,0,0)",
-                // Soft white glass core under everything
-                globeMaterial: ()=>new __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$three$2f$build$2f$three$2e$core$2e$js__$5b$client$5d$__$28$ecmascript$29$__["MeshStandardMaterial"]({
-                        // soft sky blue / glassy core
-                        color: new __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$three$2f$build$2f$three$2e$core$2e$js__$5b$client$5d$__$28$ecmascript$29$__["Color"]('#e0f2fe'),
-                        metalness: 0.25,
-                        roughness: 0.75,
-                        transparent: true,
-                        opacity: 0.35
-                    }),
-                showAtmosphere: true,
-                atmosphereColor: "#e5efff",
-                atmosphereAltitude: 0.2,
-                onGlobeReady: ()=>{
-                    if (!globeRef.current) return;
-                    const scene = globeRef.current.scene();
-                    const existing = scene.getObjectByName('cartfaxLights');
-                    if (existing) scene.remove(existing);
-                    const group = new __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$three$2f$build$2f$three$2e$core$2e$js__$5b$client$5d$__$28$ecmascript$29$__["Group"]();
-                    group.name = 'cartfaxLights';
-                    const key = new __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$three$2f$build$2f$three$2e$core$2e$js__$5b$client$5d$__$28$ecmascript$29$__["DirectionalLight"]('#ffffff', 1.4);
-                    key.position.set(3.2, 2.4, 4.0);
-                    group.add(key);
-                    const rim = new __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$three$2f$build$2f$three$2e$core$2e$js__$5b$client$5d$__$28$ecmascript$29$__["DirectionalLight"]('#60a5fa', 0.9);
-                    rim.position.set(-3.0, -1.8, -3.0);
-                    group.add(rim);
-                    const ambient = new __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$three$2f$build$2f$three$2e$core$2e$js__$5b$client$5d$__$28$ecmascript$29$__["AmbientLight"]('#ffffff', 0.85);
-                    group.add(ambient);
-                    const hemi = new __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$three$2f$build$2f$three$2e$core$2e$js__$5b$client$5d$__$28$ecmascript$29$__["HemisphereLight"]('#dbeafe', '#e5e7eb', 0.6);
-                    group.add(hemi);
-                    scene.add(group);
+                backgroundColor: "rgba(0,0,0,1)",
+                animateIn: true,
+                hexPolygonResolution: 3,
+                hexPolygonMargin: 0.4,
+                globeMaterial: new __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$three$2f$build$2f$three$2e$core$2e$js__$5b$client$5d$__$28$ecmascript$29$__["MeshStandardMaterial"]({
+                    metalness: 0.85,
+                    roughness: 0.28,
+                    color: new __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$three$2f$build$2f$three$2e$core$2e$js__$5b$client$5d$__$28$ecmascript$29$__["Color"]('#020617'),
+                    envMap: stainlessTex ?? undefined,
+                    envMapIntensity: 0.9
+                }),
+                polygonsData: allPolygons,
+                polygonAltitude: polygonAltitude,
+                polygonCapMaterial: (poly)=>{
+                    // state caps: dark, glossy, not bright blue
+                    if (isState(poly)) {
+                        const id = getStatePostal(poly);
+                        const isSelected = id && selectedStateId && id === selectedStateId;
+                        const isHovered = hoverPoly === poly;
+                        const emissiveBase = new __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$three$2f$build$2f$three$2e$core$2e$js__$5b$client$5d$__$28$ecmascript$29$__["Color"]('#020617');
+                        const emissiveHighlight = new __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$three$2f$build$2f$three$2e$core$2e$js__$5b$client$5d$__$28$ecmascript$29$__["Color"]('#22c55e'); // olive-ish
+                        return new __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$three$2f$build$2f$three$2e$core$2e$js__$5b$client$5d$__$28$ecmascript$29$__["MeshStandardMaterial"]({
+                            metalness: 0.96,
+                            roughness: 0.26,
+                            color: new __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$three$2f$build$2f$three$2e$core$2e$js__$5b$client$5d$__$28$ecmascript$29$__["Color"]('#020617'),
+                            emissive: isHovered || isSelected ? emissiveHighlight : emissiveBase,
+                            emissiveIntensity: isHovered ? 0.4 : isSelected ? 0.25 : 0.16,
+                            envMap: steelTex ?? undefined,
+                            envMapIntensity: isHovered || isSelected ? 1.2 : 0.9
+                        });
+                    }
+                    // countries: subtle metallic band
+                    if (isCountry(poly)) {
+                        return new __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$three$2f$build$2f$three$2e$core$2e$js__$5b$client$5d$__$28$ecmascript$29$__["MeshStandardMaterial"]({
+                            metalness: 0.75,
+                            roughness: 0.35,
+                            color: new __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$three$2f$build$2f$three$2e$core$2e$js__$5b$client$5d$__$28$ecmascript$29$__["Color"]('#020617'),
+                            emissive: new __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$three$2f$build$2f$three$2e$core$2e$js__$5b$client$5d$__$28$ecmascript$29$__["Color"]('#020617'),
+                            emissiveIntensity: 0.18,
+                            envMap: blueTex ?? undefined,
+                            envMapIntensity: 0.7
+                        });
+                    }
+                    return new __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$three$2f$build$2f$three$2e$core$2e$js__$5b$client$5d$__$28$ecmascript$29$__["MeshStandardMaterial"]({
+                        metalness: 0.6,
+                        roughness: 0.4,
+                        color: new __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$three$2f$build$2f$three$2e$core$2e$js__$5b$client$5d$__$28$ecmascript$29$__["Color"]('#020617')
+                    });
                 },
-                polygonsData: polygonsData,
-                polygonLabel: (d)=>d.properties?.name || '',
-                polygonAltitude: (d)=>{
-                    const hovered = hoverPoly && hoverPoly === d;
-                    if (isState(d)) {
-                        if (region === 'unitedStates') {
-                            const base = 0.02;
-                            const bump = 0.012;
-                            return hovered ? base + bump : base;
-                        }
-                        return hovered ? 0.012 : 0.007;
-                    }
-                    if (isCountry(d)) {
-                        const active = isActiveCountry(d);
-                        const base = active ? 0.018 : 0.006;
-                        const bump = active ? 0.012 : 0.007;
-                        return hovered ? base + bump : base;
-                    }
-                    return 0.0;
-                },
-                polygonCapMaterial: (d)=>{
-                    if (isState(d) && region === 'unitedStates') {
-                        return stateMaterial;
-                    }
-                    if (isCountry(d)) {
-                        const active = isActiveCountry(d);
-                        return active ? activeCountryMaterial : countryMaterial;
-                    }
-                    return baseCountryMaterial;
-                },
-                polygonSideColor: (d)=>{
-                    if (isState(d)) {
-                        return region === 'unitedStates' ? '#6b7280' : '#9ca3af';
-                    }
-                    if (isCountry(d)) {
-                        return isActiveCountry(d) ? '#4b5563' : '#9ca3af';
-                    }
-                    return '#9ca3af';
-                },
-                polygonStrokeColor: (d)=>{
-                    const hovered = hoverPoly && hoverPoly === d;
-                    const active = isActiveCountry(d) || isState(d) && region === 'unitedStates';
-                    if (hovered) return '#38bdf8';
-                    return active ? '#60a5fa' : '#cbd5e1';
-                },
+                // sides: olive backlight – shows mainly in gaps between states
+                polygonSideColor: (poly)=>isState(poly) ? 'rgba(34,197,94,0.85)' // olive/emerald glow in the seams
+                     : '#020617',
+                // border lines: very subtle, no neon blue outline
+                polygonStrokeColor: (poly)=>isState(poly) ? 'rgba(21,94,49,0.45)' : 'rgba(30,64,175,0.25)',
+                polygonLabel: (poly)=>isState(poly) ? `${poly.properties?.name ?? ''} (${poly.properties?.postal})` : poly.properties?.name ?? '',
                 polygonsTransitionDuration: 260,
                 polygonCapCurvatureResolution: 2,
                 onPolygonHover: (poly)=>setHoverPoly(poly),
-                onPolygonClick: (poly)=>{
+                onPolygonClick: (poly, event)=>{
                     const name = poly.properties?.name ?? '';
+                    const clickCoords = event && typeof event.clientX === 'number' ? {
+                        x: event.clientX,
+                        y: event.clientY
+                    } : undefined;
                     if (isState(poly)) {
-                        if (!onStateSelect) return;
-                        const id = poly.properties?.postal ?? poly.id ?? '';
-                        onStateSelect(id, name);
+                        const id = getStatePostal(poly) ?? poly.id ?? '';
+                        setSelectedStateId(id || null);
+                        if (onStateSelect) {
+                            onStateSelect(id, name, clickCoords);
+                        }
                         return;
                     }
                     if (isCountry(poly)) {
@@ -376,27 +293,27 @@ const GlobeStates = ({ region, onStateSelect, onViewChange, onRegionChange })=>{
                         }
                         if (onStateSelect) {
                             const id = name || poly.id || '';
-                            onStateSelect(id, name);
+                            onStateSelect(id, name, clickCoords);
                         }
                     }
                 }
             }, void 0, false, {
                 fileName: "[project]/components/GlobeStates.tsx",
-                lineNumber: 266,
+                lineNumber: 218,
                 columnNumber: 9
             }, ("TURBOPACK compile-time value", void 0))
         }, void 0, false, {
             fileName: "[project]/components/GlobeStates.tsx",
-            lineNumber: 265,
+            lineNumber: 217,
             columnNumber: 7
         }, ("TURBOPACK compile-time value", void 0))
     }, void 0, false, {
         fileName: "[project]/components/GlobeStates.tsx",
-        lineNumber: 260,
+        lineNumber: 216,
         columnNumber: 5
     }, ("TURBOPACK compile-time value", void 0));
 };
-_s(GlobeStates, "iYMYsXGuy8BUGzXn4xRSdK6J9M4=");
+_s(GlobeStates, "ogVcQ4aMs/4zrnA/nGFJdrjEbcI=");
 _c = GlobeStates;
 const __TURBOPACK__default__export__ = GlobeStates;
 var _c;
