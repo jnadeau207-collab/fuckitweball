@@ -21,54 +21,43 @@ export default function Layout({ children }: LayoutProps) {
   const authLabel = isAuthed ? 'Log out' : 'Log in';
 
   return (
-    <div className="min-h-screen bg-slate-950 text-slate-50 flex flex-col">
+    <div className="min-h-screen bg-black text-slate-50 flex flex-col">
       {/* Top nav */}
-      <header className="border-b border-slate-800 bg-slate-900/70 backdrop-blur">
-        <div className="max-w-6xl mx-auto px-4 py-3 flex items-center justify-between">
+      <header className="border-b border-slate-800 bg-black/80 backdrop-blur">
+        <div className="max-w-6xl mx-auto px-4 py-3 flex items-center justify-between gap-3">
           <Link href="/" className="flex items-center gap-2">
-            <div className="h-8 w-8 rounded-lg bg-emerald-500 flex items-center justify-center text-sm font-bold text-slate-950 shadow-md shadow-emerald-500/40">
-              C
-            </div>
-            <div className="leading-tight">
-              <div className="font-semibold tracking-wide">CartFax</div>
-              <div className="text-[11px] text-slate-400">
-                Cannabis Retail Transparency
-              </div>
-            </div>
+            <span className="inline-flex h-6 w-6 items-center justify-center rounded-lg bg-sky-500 text-[11px] font-bold text-slate-950 shadow-sm shadow-sky-500/50">
+              CF
+            </span>
+            <span className="text-sm font-semibold tracking-tight">
+              CartFax
+            </span>
           </Link>
 
-          <nav className="flex items-center gap-4 text-sm">
-            <Link
-              href="/"
-              className="text-slate-300 hover:text-emerald-400 transition-colors"
-            >
-              Explore map
-            </Link>
-
-            {/* Single auth button: Log in / Log out */}
+          <div className="flex items-center gap-3">
+            {session?.user?.email && (
+              <span className="hidden text-xs text-slate-400 sm:inline">
+                {session.user.email}
+              </span>
+            )}
             <button
               type="button"
               onClick={handleAuthClick}
-              className="inline-flex items-center gap-2 rounded-full border border-slate-700 px-3 py-1 text-xs font-semibold text-slate-100 hover:border-emerald-400 hover:text-emerald-300 hover:shadow-[0_0_20px_rgba(16,185,129,0.4)] transition-all"
+              className="inline-flex items-center justify-center rounded-full border border-slate-600 bg-slate-900 px-3 py-1.5 text-xs font-medium text-slate-50 shadow-sm hover:bg-slate-800"
             >
-              <span className="inline-flex h-5 w-5 items-center justify-center rounded-full bg-slate-800 text-[10px]">
-                {isAuthed
-                  ? (session?.user as any)?.email?.[0]?.toUpperCase() || '✓'
-                  : '⭑'}
-              </span>
-              <span>{authLabel}</span>
+              {authLabel}
             </button>
-          </nav>
+          </div>
         </div>
       </header>
 
-      {/* Page content */}
+      {/* Main content */}
       <main className="flex-1">
-        <div className="max-w-6xl mx-auto px-4 py-6">{children}</div>
+        {children}
       </main>
 
       {/* Footer */}
-      <footer className="border-t border-slate-800 bg-slate-950/90 text-xs text-slate-500">
+      <footer className="border-t border-slate-800 bg-black/90 text-xs text-slate-500">
         <div className="max-w-6xl mx-auto px-4 py-4 flex items-center justify-between gap-3">
           <span>© {new Date().getFullYear()} CartFax</span>
           <span className="text-slate-600">
